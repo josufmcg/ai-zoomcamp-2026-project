@@ -1,0 +1,1 @@
+Follow `AGENTS.md` at the repository root for all EFINGES work: project context, repository layout, required domain behavior (roles, bills, incidences, voting), development workflow, and validation commands. Work through `docs/backlog.md` tasks in order and keep all tests green.

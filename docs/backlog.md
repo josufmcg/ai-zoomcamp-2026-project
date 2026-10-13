@@ -90,7 +90,7 @@ Description: Add a GitHub Actions workflow that installs backend dependencies an
 
 ## 20. Add the agent extension pack
 Goal: Give AI coding assistants project-specific context, tools, and guardrails.
-Description: Add an `AGENTS.md` with project context, repository layout, required behavior rules, and validation commands. Add reusable prompt templates for common tasks and a subagent profile for bug hunting. Add a mock MCP server script that exposes the database schema to LLM assistants. Add a pre-commit hook that blocks hardcoded secrets and validates that `openapi.yaml` matches the backend schema. Document permission notes describing what the agents and tools are allowed to do.
+Description: The root `AGENTS.md` already exists with project context, repository layout, required behavior rules, and validation commands; extend it only if this pack adds new rules. Add reusable prompt templates for common tasks and a subagent profile for bug hunting. Add a mock MCP server script that exposes the database schema to LLM assistants. Add a pre-commit hook that blocks hardcoded secrets and validates that `openapi.yaml` matches the backend schema. Document permission notes describing what the agents and tools are allowed to do.
 
 ## 21. Add security and audit artifacts
 Goal: Show deterministic scan results and audit practices for AI-assisted work.
