@@ -19,7 +19,7 @@ All components run locally via **Docker Compose** to guarantee environment parit
 | ----- | ----- | ----- | 
 | **Frontend** | React (Vite) + TypeScript + Tailwind CSS | Component-driven, highly maintainable, strong typing, rapid UI development with clean utility styling. | 
 | **Backend** | Python (FastAPI) | Automatically generates an **OpenAPI specification**, supports asynchronous requests, and ensures strict data validation via Pydantic. | 
-| **Database** | PostgreSQL / SQLite | Relational data integrity required for complex property hierarchies (Communities -> Buildings -> Units -> Residents) and tagging relations. | 
+| **Database** | PostgreSQL (runtime) / SQLite (unit tests) | Relational data integrity required for complex property hierarchies (Communities -> Buildings -> Units -> Residents) and tagging relations. | 
 | **Containerization** | Docker & Docker Compose | Orchestrates frontend, backend, database, and observability services into a single local execution environment. | 
 | **Observability** | OTel, Prometheus, Loki, Tempo, Grafana | Production-grade metrics, log aggregation, and distributed tracing running locally for deep operational insights. |
 | **Testing** | Vitest (Frontend) & Pytest (Backend) | Fast, modern testing frameworks with native support for coverage and integration testing. | 
@@ -56,12 +56,12 @@ services:
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
     environment:
-      DATABASE_URL: sqlite:////data/efinges.db
+      DATABASE_URL: postgresql+psycopg://efinges:efinges@postgres:5432/efinges
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_SERVICE_NAME: efinges-backend
-    volumes:
-      - efinges_data:/data
     depends_on:
+      postgres:
+        condition: service_healthy
       otel-collector:
         condition: service_started
     restart: unless-stopped
@@ -76,13 +76,30 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile.frontend
+      args:
+        VITE_API_URL: http://localhost:8000
     ports:
       - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
     depends_on:
       - backend
     restart: unless-stopped
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: efinges
+      POSTGRES_PASSWORD: efinges
+      POSTGRES_DB: efinges
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U efinges -d efinges"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.123.0
@@ -154,7 +171,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  efinges_data:
+  postgres_data:
   prometheus_data:
   loki_data:
   tempo_data:
@@ -164,7 +181,7 @@ networks:
   default:
     ipam:
     config:
-      - subnet: ${EFINGES_SUBNET:-10.215.24.0/24}
+      - subnet: ${EFINGES_SUBNET:-10.215.25.0/24}
 ```
 
 ### 3.5 Metrics, Logs, and Alerts Architecture (Observability)
