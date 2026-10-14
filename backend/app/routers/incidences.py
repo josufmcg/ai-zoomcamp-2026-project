@@ -40,9 +40,7 @@ from app.schemas import (
 
 router = APIRouter(tags=["incidences"])
 
-ManagerUser = Annotated[
-    User, Depends(require_role(UserRole.MANAGER, UserRole.ADMINISTRATOR))
-]
+ManagerUser = Annotated[User, Depends(require_role(UserRole.MANAGER, UserRole.ADMINISTRATOR))]
 
 
 def _load_incidence(session: Session, incidence_id: int) -> Incidence:
@@ -57,9 +55,7 @@ def _load_incidence(session: Session, incidence_id: int) -> Incidence:
         )
     ).one_or_none()
     if incidence is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Incidence not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Incidence not found")
     return incidence
 
 
@@ -114,9 +110,7 @@ def list_incidences(
     user: CurrentUser,
     session: Annotated[Session, Depends(get_db)],
     unit_id: Annotated[int | None, Query()] = None,
-    incidence_status: Annotated[
-        IncidenceStatus | None, Query(alias="status")
-    ] = None,
+    incidence_status: Annotated[IncidenceStatus | None, Query(alias="status")] = None,
 ) -> list[IncidenceRead]:
     """List incidences visible to the caller, optionally filtered."""
     statement = (
@@ -133,14 +127,10 @@ def list_incidences(
         statement = statement.where(Incidence.unit_id == unit_id)
     if incidence_status is not None:
         statement = statement.where(Incidence.status == incidence_status)
-    return [
-        _incidence_read(row) for row in session.scalars(statement).unique().all()
-    ]
+    return [_incidence_read(row) for row in session.scalars(statement).unique().all()]
 
 
-@router.post(
-    "/incidences", response_model=IncidenceRead, status_code=status.HTTP_201_CREATED
-)
+@router.post("/incidences", response_model=IncidenceRead, status_code=status.HTTP_201_CREATED)
 def create_incidence(
     payload: IncidenceCreate,
     user: CurrentUser,
@@ -153,13 +143,9 @@ def create_incidence(
     """
     unit = session.get(Unit, payload.unit_id)
     if unit is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found")
     if not access.can_comment_on_unit(session, user, unit):
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found")
 
     incidence = Incidence(
         unit_id=unit.id,
@@ -186,9 +172,7 @@ def read_incidence(
     else:
         allowed = access.can_write_unit(session, user, incidence.unit)
     if not allowed:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Incidence not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Incidence not found")
     return _incidence_read(incidence)
 
 
@@ -208,21 +192,13 @@ def update_incidence_status(
     """
     incidence = _load_incidence(session, incidence_id)
     if not access.can_write_unit(session, manager, incidence.unit):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role")
     if not incidence.can_transition_to(payload.status):
-        allowed = sorted(
-            stage.value for stage in INCIDENCE_TRANSITIONS[incidence.status]
-        )
+        allowed = sorted(stage.value for stage in INCIDENCE_TRANSITIONS[incidence.status])
         detail = (
             "Cannot transition from "
             f"'{incidence.status.value}' to '{payload.status.value}'; "
-            + (
-                f"allowed: {', '.join(allowed)}"
-                if allowed
-                else "this incidence is closed"
-            )
+            + (f"allowed: {', '.join(allowed)}" if allowed else "this incidence is closed")
         )
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
 
@@ -231,9 +207,7 @@ def update_incidence_status(
     return _incidence_read(_load_incidence(session, incidence.id))
 
 
-@router.get(
-    "/incidences/{incidence_id}/comments", response_model=list[CommentRead]
-)
+@router.get("/incidences/{incidence_id}/comments", response_model=list[CommentRead])
 def list_comments(
     incidence_id: int,
     user: CurrentUser,
@@ -246,9 +220,7 @@ def list_comments(
     else:
         allowed = access.can_write_unit(session, user, incidence.unit)
     if not allowed:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Incidence not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Incidence not found")
     return [_comment_read(comment) for comment in incidence.comments]
 
 
@@ -271,21 +243,15 @@ def create_comment(
     """
     incidence = session.get(Incidence, incidence_id)
     if incidence is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Incidence not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Incidence not found")
     if user.role is UserRole.RESIDENT:
         allowed = incidence.created_by_id == user.id
     else:
         allowed = access.can_write_unit(session, user, incidence.unit)
     if not allowed:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Incidence not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Incidence not found")
 
-    comment = Comment(
-        incidence_id=incidence.id, author_id=user.id, body=payload.body
-    )
+    comment = Comment(incidence_id=incidence.id, author_id=user.id, body=payload.body)
     session.add(comment)
     session.commit()
     session.refresh(comment)

@@ -67,9 +67,7 @@ def test_telemetry_disabled_without_endpoint() -> None:
 
 
 def test_telemetry_enabled_with_endpoint() -> None:
-    settings = Settings(
-        _env_file=None, otel_exporter_otlp_endpoint="http://localhost:4317"
-    )
+    settings = Settings(_env_file=None, otel_exporter_otlp_endpoint="http://localhost:4317")
     telemetry = Telemetry(settings)
     try:
         assert telemetry.request_counter is not None

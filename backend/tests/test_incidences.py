@@ -42,9 +42,7 @@ def _submit(
     )
 
 
-def _set_status(
-    client: TestClient, headers: dict[str, str], incidence_id: int, new_status: str
-):
+def _set_status(client: TestClient, headers: dict[str, str], incidence_id: int, new_status: str):
     return client.patch(
         f"/incidences/{incidence_id}/status",
         json={"status": new_status},
@@ -117,9 +115,12 @@ def test_submitting_for_a_missing_unit_returns_404(
 
 def test_incidences_require_a_token(api_client: TestClient) -> None:
     assert api_client.get("/incidences").status_code == 401
-    assert api_client.post(
-        "/incidences", json={"unit_id": 1, "title": "x", "description": "y"}
-    ).status_code == 401
+    assert (
+        api_client.post(
+            "/incidences", json={"unit_id": 1, "title": "x", "description": "y"}
+        ).status_code
+        == 401
+    )
 
 
 # --- The lifecycle ----------------------------------------------------------
@@ -138,15 +139,11 @@ def test_a_manager_walks_an_incidence_through_the_whole_lifecycle(
     tree = create_property_tree()
     assign_manager(manager, tree.community)
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
-    incidence = _submit(
-        api_client, auth_token(resident), unit_id=tree.apartment.id
-    ).json()
+    incidence = _submit(api_client, auth_token(resident), unit_id=tree.apartment.id).json()
     manager_headers = auth_token(manager)
 
     for stage in LIFECYCLE:
-        response = _set_status(
-            api_client, manager_headers, incidence["id"], stage
-        )
+        response = _set_status(api_client, manager_headers, incidence["id"], stage)
         assert response.status_code == 200, response.text
         assert response.json()["status"] == stage
 
@@ -164,14 +161,10 @@ def test_skipping_a_lifecycle_stage_is_rejected(
     tree = create_property_tree()
     assign_manager(manager, tree.community)
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
-    incidence = _submit(
-        api_client, auth_token(resident), unit_id=tree.apartment.id
-    ).json()
+    incidence = _submit(api_client, auth_token(resident), unit_id=tree.apartment.id).json()
 
     # submitted -> resolved skips "in progress".
-    response = _set_status(
-        api_client, auth_token(manager), incidence["id"], "resolved"
-    )
+    response = _set_status(api_client, auth_token(manager), incidence["id"], "resolved")
 
     assert response.status_code == 409
     assert "in progress" in response.json()["detail"]
@@ -190,15 +183,11 @@ def test_moving_an_incidence_backwards_is_rejected(
     tree = create_property_tree()
     assign_manager(manager, tree.community)
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
-    incidence = _submit(
-        api_client, auth_token(resident), unit_id=tree.apartment.id
-    ).json()
+    incidence = _submit(api_client, auth_token(resident), unit_id=tree.apartment.id).json()
     manager_headers = auth_token(manager)
     _set_status(api_client, manager_headers, incidence["id"], "in progress")
 
-    response = _set_status(
-        api_client, manager_headers, incidence["id"], "submitted"
-    )
+    response = _set_status(api_client, manager_headers, incidence["id"], "submitted")
 
     assert response.status_code == 409
 
@@ -217,37 +206,24 @@ def test_a_closed_incidence_is_terminal(
     tree = create_property_tree()
     assign_manager(manager, tree.community)
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
-    incidence = _submit(
-        api_client, auth_token(resident), unit_id=tree.apartment.id
-    ).json()
+    incidence = _submit(api_client, auth_token(resident), unit_id=tree.apartment.id).json()
     manager_headers = auth_token(manager)
     for stage in LIFECYCLE:
         _set_status(api_client, manager_headers, incidence["id"], stage)
 
-    response = _set_status(
-        api_client, manager_headers, incidence["id"], "closed"
-    )
+    response = _set_status(api_client, manager_headers, incidence["id"], "closed")
 
     assert response.status_code == 409
     assert "closed" in response.json()["detail"]
     db_session.expire_all()
-    assert (
-        db_session.get(Incidence, incidence["id"]).status
-        is IncidenceStatus.CLOSED
-    )
+    assert db_session.get(Incidence, incidence["id"]).status is IncidenceStatus.CLOSED
 
 
 def test_the_transition_table_matches_the_specification() -> None:
     """The declared lifecycle is exactly the one in the specification."""
-    assert INCIDENCE_TRANSITIONS[IncidenceStatus.SUBMITTED] == {
-        IncidenceStatus.IN_PROGRESS
-    }
-    assert INCIDENCE_TRANSITIONS[IncidenceStatus.IN_PROGRESS] == {
-        IncidenceStatus.RESOLVED
-    }
-    assert INCIDENCE_TRANSITIONS[IncidenceStatus.RESOLVED] == {
-        IncidenceStatus.CLOSED
-    }
+    assert INCIDENCE_TRANSITIONS[IncidenceStatus.SUBMITTED] == {IncidenceStatus.IN_PROGRESS}
+    assert INCIDENCE_TRANSITIONS[IncidenceStatus.IN_PROGRESS] == {IncidenceStatus.RESOLVED}
+    assert INCIDENCE_TRANSITIONS[IncidenceStatus.RESOLVED] == {IncidenceStatus.CLOSED}
     assert INCIDENCE_TRANSITIONS[IncidenceStatus.CLOSED] == frozenset()
 
 
@@ -280,13 +256,9 @@ def test_a_manager_cannot_change_a_status_outside_their_scope(
     resident = create_user("resident@efinges.test")
     tree = create_property_tree()
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
-    incidence = _submit(
-        api_client, auth_token(resident), unit_id=tree.apartment.id
-    ).json()
+    incidence = _submit(api_client, auth_token(resident), unit_id=tree.apartment.id).json()
 
-    response = _set_status(
-        api_client, auth_token(manager), incidence["id"], "in progress"
-    )
+    response = _set_status(api_client, auth_token(manager), incidence["id"], "in progress")
 
     assert response.status_code == 403
 
@@ -307,25 +279,17 @@ def test_a_resident_and_a_manager_exchange_comments(
     tree = create_property_tree()
     assign_manager(manager, tree.community)
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
-    incidence = _submit(
-        api_client, auth_token(resident), unit_id=tree.apartment.id
-    ).json()
+    incidence = _submit(api_client, auth_token(resident), unit_id=tree.apartment.id).json()
 
-    first = _comment(
-        api_client, auth_token(resident), incidence["id"], "Any update?"
-    )
-    second = _comment(
-        api_client, auth_token(manager), incidence["id"], "A plumber is coming."
-    )
+    first = _comment(api_client, auth_token(resident), incidence["id"], "Any update?")
+    second = _comment(api_client, auth_token(manager), incidence["id"], "A plumber is coming.")
 
     assert first.status_code == 201
     assert first.json()["author_email"] == "resident@efinges.test"
     assert second.status_code == 201
     assert second.json()["author_email"] == "manager@efinges.test"
 
-    thread = api_client.get(
-        f"/incidences/{incidence['id']}/comments", headers=auth_token(resident)
-    )
+    thread = api_client.get(f"/incidences/{incidence['id']}/comments", headers=auth_token(resident))
     assert [row["body"] for row in thread.json()] == [
         "Any update?",
         "A plumber is coming.",
@@ -348,9 +312,7 @@ def test_the_incidence_response_carries_the_thread(
 
     response = api_client.get(f"/incidences/{incidence['id']}", headers=headers)
 
-    assert [row["body"] for row in response.json()["comments"]] == [
-        "Extra context."
-    ]
+    assert [row["body"] for row in response.json()["comments"]] == ["Extra context."]
 
 
 def test_an_empty_comment_is_rejected(
@@ -382,13 +344,9 @@ def test_a_resident_cannot_comment_on_another_residents_incidence(
     neighbour = create_user("neighbour@efinges.test")
     tree = create_property_tree()
     assign_unit(owner, tree.apartment, OwnershipType.OWNER)
-    incidence = _submit(
-        api_client, auth_token(owner), unit_id=tree.apartment.id
-    ).json()
+    incidence = _submit(api_client, auth_token(owner), unit_id=tree.apartment.id).json()
 
-    response = _comment(
-        api_client, auth_token(neighbour), incidence["id"], "Not my business"
-    )
+    response = _comment(api_client, auth_token(neighbour), incidence["id"], "Not my business")
 
     assert response.status_code == 404
 
@@ -404,13 +362,9 @@ def test_a_resident_cannot_read_another_residents_incidence(
     neighbour = create_user("neighbour@efinges.test")
     tree = create_property_tree()
     assign_unit(owner, tree.apartment, OwnershipType.OWNER)
-    incidence = _submit(
-        api_client, auth_token(owner), unit_id=tree.apartment.id
-    ).json()
+    incidence = _submit(api_client, auth_token(owner), unit_id=tree.apartment.id).json()
 
-    response = api_client.get(
-        f"/incidences/{incidence['id']}", headers=auth_token(neighbour)
-    )
+    response = api_client.get(f"/incidences/{incidence['id']}", headers=auth_token(neighbour))
 
     assert response.status_code == 404
 
@@ -428,9 +382,7 @@ def test_a_resident_lists_only_their_own_incidences(
     assign_unit(mine, tree.apartment, OwnershipType.OWNER)
     assign_unit(neighbour, tree.garage, OwnershipType.OWNER)
     _submit(api_client, auth_token(neighbour), unit_id=tree.garage.id)
-    expected = _submit(
-        api_client, auth_token(mine), unit_id=tree.apartment.id
-    ).json()
+    expected = _submit(api_client, auth_token(mine), unit_id=tree.apartment.id).json()
 
     response = api_client.get("/incidences", headers=auth_token(mine))
 
@@ -453,9 +405,7 @@ def test_a_manager_lists_only_incidences_in_their_communities(
     assign_unit(resident, mine.apartment, OwnershipType.OWNER)
     assign_unit(resident, other.apartment, OwnershipType.OWNER)
     resident_headers = auth_token(resident)
-    expected = _submit(
-        api_client, resident_headers, unit_id=mine.apartment.id
-    ).json()
+    expected = _submit(api_client, resident_headers, unit_id=mine.apartment.id).json()
     _submit(api_client, resident_headers, unit_id=other.apartment.id)
 
     response = api_client.get("/incidences", headers=auth_token(manager))
@@ -477,9 +427,7 @@ def test_filtering_incidences_by_status(
     assign_manager(manager, tree.community)
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
     resident_headers = auth_token(resident)
-    submitted = _submit(
-        api_client, resident_headers, unit_id=tree.apartment.id
-    ).json()
+    submitted = _submit(api_client, resident_headers, unit_id=tree.apartment.id).json()
     moving = _submit(
         api_client,
         resident_headers,
@@ -501,9 +449,7 @@ def test_an_unknown_unit_returns_404_on_the_thread(
 ) -> None:
     resident = create_user("resident@efinges.test")
 
-    response = api_client.get(
-        "/incidences/9999/comments", headers=auth_token(resident)
-    )
+    response = api_client.get("/incidences/9999/comments", headers=auth_token(resident))
 
     assert response.status_code == 404
 
@@ -524,9 +470,7 @@ def test_a_manager_can_combine_their_scope_with_the_unit_and_status_filters(
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
     assign_unit(resident, tree.garage, OwnershipType.OWNER)
     resident_headers = auth_token(resident)
-    apartment_incidence = _submit(
-        api_client, resident_headers, unit_id=tree.apartment.id
-    ).json()
+    apartment_incidence = _submit(api_client, resident_headers, unit_id=tree.apartment.id).json()
     _submit(
         api_client,
         resident_headers,
@@ -536,9 +480,7 @@ def test_a_manager_can_combine_their_scope_with_the_unit_and_status_filters(
     headers = auth_token(manager)
 
     unfiltered = api_client.get("/incidences", headers=headers)
-    by_unit = api_client.get(
-        f"/incidences?unit_id={tree.apartment.id}", headers=headers
-    )
+    by_unit = api_client.get(f"/incidences?unit_id={tree.apartment.id}", headers=headers)
     by_status = api_client.get("/incidences?status=submitted", headers=headers)
 
     assert unfiltered.status_code == 200

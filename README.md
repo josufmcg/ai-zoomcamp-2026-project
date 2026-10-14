@@ -116,6 +116,7 @@ see live request and error rates.
 ```bash
 make install   # install backend (uv sync) and frontend (npm install) dependencies
 make run       # start the backend dev server on port 8000
+make lint      # lint both sides (Ruff for the backend, ESLint for the frontend)
 make test      # run the backend pytest unit suite and the frontend Vitest suite
 make integration   # run the backend end-to-end workflows (needs postgres up)
 make build     # type-check and build the frontend for production
@@ -123,6 +124,34 @@ make openapi   # re-export the OpenAPI contract to openapi.yaml
 ```
 
 See `backend/README.md` and `frontend/README.md` for the individual commands.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push and every pull request and has
+three jobs:
+
+| Job | What it does |
+| --- | --- |
+| **backend** | Installs dependencies with `uv`, runs `ruff check` and `ruff format --check`, runs the unit suite (`uv run pytest`), then runs the integration workflows (`uv run pytest tests/integration`) against a PostgreSQL service container |
+| **frontend** | Installs dependencies with `npm ci`, runs ESLint (`npm run lint`), runs Vitest (`npm test`), then produces the production build (`npm run build`, which type-checks first) |
+| **docker** | Runs only after both jobs pass, and builds both Docker images to prove they still build from the committed `Dockerfile.backend` and `Dockerfile.frontend` |
+
+The unit test step fails if `openapi.yaml` no longer matches the backend schema,
+so a forgotten re-export is caught in CI. Everything the pipeline checks can be
+reproduced locally, without the PostgreSQL service container for the unit suite:
+
+```bash
+make lint    # ruff check + ruff format --check, then eslint
+make test    # backend unit suite + frontend Vitest suite
+make build   # the frontend production build
+```
+
+`make integration` needs a reachable PostgreSQL; locally it uses the compose
+postgres. Because each job installs the dependencies, a run is a few minutes;
+uv, npm, and the Docker layers are all cached between runs.
+
+Every job must be green before a change is merged. The `backend`, `frontend`,
+and `docker` checks are the required status checks for `main`.
 
 ## Tests
 

@@ -17,6 +17,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -69,12 +70,8 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_index(
-        op.f("ix_unit_assignments_user_id"), table_name="unit_assignments"
-    )
-    op.drop_index(
-        op.f("ix_unit_assignments_unit_id"), table_name="unit_assignments"
-    )
+    op.drop_index(op.f("ix_unit_assignments_user_id"), table_name="unit_assignments")
+    op.drop_index(op.f("ix_unit_assignments_unit_id"), table_name="unit_assignments")
     op.drop_table("unit_assignments")
 
     # PostgreSQL keeps the native enum type after its table is dropped, so

@@ -18,6 +18,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -51,9 +52,7 @@ def upgrade() -> None:
             server_default=sa.text("(CURRENT_TIMESTAMP)"),
             nullable=False,
         ),
-        sa.ForeignKeyConstraint(
-            ["created_by_id"], ["users.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["created_by_id"], ["users.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["unit_id"], ["units.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -63,9 +62,7 @@ def upgrade() -> None:
         ["created_by_id"],
         unique=False,
     )
-    op.create_index(
-        op.f("ix_incidences_unit_id"), "incidences", ["unit_id"], unique=False
-    )
+    op.create_index(op.f("ix_incidences_unit_id"), "incidences", ["unit_id"], unique=False)
 
     op.create_table(
         "comments",
@@ -80,14 +77,10 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.ForeignKeyConstraint(["author_id"], ["users.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(
-            ["incidence_id"], ["incidences.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["incidence_id"], ["incidences.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_comments_author_id"), "comments", ["author_id"], unique=False
-    )
+    op.create_index(op.f("ix_comments_author_id"), "comments", ["author_id"], unique=False)
     op.create_index(
         op.f("ix_comments_incidence_id"),
         "comments",

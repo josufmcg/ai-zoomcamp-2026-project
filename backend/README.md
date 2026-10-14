@@ -24,6 +24,8 @@ at <http://127.0.0.1:8000/docs> and the health probe at
 ```bash
 uv run pytest                 # unit suite (tests/, in-memory SQLite)
 uv run pytest tests/integration   # integration workflows (dedicated database)
+uv run ruff check .           # lint
+uv run ruff format --check .  # formatting check
 ```
 
 `uv run pytest` runs the unit suite only. The end-to-end integration workflows
@@ -71,6 +73,20 @@ them, so the dedicated database only needs to exist and be safely clearable;
 no migration step is required. Everything the workflows create is made through
 the public API except the very first administrator, which is seeded directly
 because `POST /users` is administrator-only.
+
+## Linting and formatting
+
+Ruff is the linter and the formatter (backlog task 19), configured in
+`pyproject.toml`. Both checks run in CI before the tests:
+
+```bash
+uv run ruff check .            # lint
+uv run ruff check . --fix      # apply the safe fixes
+uv run ruff format .           # format in place
+uv run ruff format --check .   # verify formatting without changing files
+```
+
+`make lint` at the repository root runs both checks.
 
 ## Database and migrations
 
@@ -136,6 +152,7 @@ from fastapi import Depends
 
 from app.dependencies import require_role
 from app.models import User, UserRole
+
 
 @app.get("/manager-area")
 def manager_area(

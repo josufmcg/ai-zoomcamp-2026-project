@@ -212,13 +212,9 @@ def assign_manager(api_app: FastAPI) -> Callable[..., ManagerAssignment]:
     user management, so the row is seeded directly like ``create_user``.
     """
 
-    def _assign_manager(
-        manager: User, community: Community
-    ) -> ManagerAssignment:
+    def _assign_manager(manager: User, community: Community) -> ManagerAssignment:
         with api_app.state.db.session() as db_session:
-            assignment = ManagerAssignment(
-                manager_id=manager.id, community_id=community.id
-            )
+            assignment = ManagerAssignment(manager_id=manager.id, community_id=community.id)
             db_session.add(assignment)
             db_session.commit()
             db_session.refresh(assignment)

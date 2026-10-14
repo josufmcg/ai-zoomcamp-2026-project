@@ -48,18 +48,12 @@ class Settings(BaseSettings):
     #
     # Comma-separated in the environment, for example:
     # ``CORS_ALLOW_ORIGINS=http://localhost:3000,https://app.example.com``.
-    cors_allow_origins: str = (
-        "http://localhost:3000,http://127.0.0.1:3000"
-    )
+    cors_allow_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
 
     @property
     def cors_origins(self) -> list[str]:
         """The allowed origins as a list, ignoring empty entries."""
-        return [
-            origin.strip()
-            for origin in self.cors_allow_origins.split(",")
-            if origin.strip()
-        ]
+        return [origin.strip() for origin in self.cors_allow_origins.split(",") if origin.strip()]
 
     # OpenTelemetry OTLP endpoint. When unset, telemetry is disabled.
     otel_exporter_otlp_endpoint: str | None = None

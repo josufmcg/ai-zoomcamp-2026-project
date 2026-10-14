@@ -80,9 +80,7 @@ def _seed_users(app) -> tuple[User, User, User]:
 
 
 def _login(client: TestClient, email: str) -> dict[str, str]:
-    response = client.post(
-        "/auth/token", data={"username": email, "password": PASSWORD}
-    )
+    response = client.post("/auth/token", data={"username": email, "password": PASSWORD})
     assert response.status_code == 200, response.text
     return {"Authorization": f"Bearer {response.json()['access_token']}"}
 
@@ -123,9 +121,7 @@ def main() -> None:
             json={"community_id": community["id"], "name": "Block A"},
             headers=manager_h,
         ).json()
-        tag = client.post(
-            "/tags", json={"name": "E2E Downtown"}, headers=manager_h
-        ).json()
+        tag = client.post("/tags", json={"name": "E2E Downtown"}, headers=manager_h).json()
         apartment = client.post(
             "/units",
             json={
@@ -180,10 +176,7 @@ def main() -> None:
         assert [row["id"] for row in filtered] == [bill["id"]], filtered
         paid = client.post(f"/bills/{bill['id']}/pay", headers=manager_h).json()
         assert paid["status"] == "paid", paid
-        assert (
-            client.get(f"/bills/{bill['id']}", headers=resident_h).json()["status"]
-            == "paid"
-        )
+        assert client.get(f"/bills/{bill['id']}", headers=resident_h).json()["status"] == "paid"
 
         # --- task 11: incidence lifecycle and comment thread -----------------
         incidence = client.post(
@@ -218,9 +211,7 @@ def main() -> None:
                 json={"body": body},
                 headers=headers,
             ).raise_for_status()
-        thread = client.get(
-            f"/incidences/{incidence['id']}/comments", headers=resident_h
-        ).json()
+        thread = client.get(f"/incidences/{incidence['id']}/comments", headers=resident_h).json()
         assert [row["body"] for row in thread] == [
             "Any update?",
             "Fixed today.",
@@ -253,9 +244,7 @@ def main() -> None:
             headers=resident_h,
         )
         assert duplicate.status_code == 409, duplicate.text
-        results = client.get(
-            f"/initiatives/{initiative['id']}/results", headers=resident_h
-        ).json()
+        results = client.get(f"/initiatives/{initiative['id']}/results", headers=resident_h).json()
         assert results["total_votes"] == 2, results
         assert {row["label"]: row["votes"] for row in results["tallies"]} == {
             "Yes": 1,

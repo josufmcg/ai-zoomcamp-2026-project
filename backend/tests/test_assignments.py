@@ -142,15 +142,10 @@ def test_assigning_the_same_unit_twice_is_rejected(
     token = login(manager.email)
 
     assert (
-        _assign(
-            api_client, token, user_id=first.id, unit_id=tree.apartment.id
-        ).status_code
-        == 201
+        _assign(api_client, token, user_id=first.id, unit_id=tree.apartment.id).status_code == 201
     )
 
-    duplicate = _assign(
-        api_client, token, user_id=second.id, unit_id=tree.apartment.id
-    )
+    duplicate = _assign(api_client, token, user_id=second.id, unit_id=tree.apartment.id)
 
     assert duplicate.status_code == 409
     assert duplicate.json()["detail"] == "Unit is already assigned"
@@ -167,12 +162,8 @@ def test_assigning_the_same_unit_to_the_same_resident_is_rejected(
     tree = create_property_tree()
     token = login(manager.email)
 
-    first = _assign(
-        api_client, token, user_id=resident.id, unit_id=tree.apartment.id
-    )
-    second = _assign(
-        api_client, token, user_id=resident.id, unit_id=tree.apartment.id
-    )
+    first = _assign(api_client, token, user_id=resident.id, unit_id=tree.apartment.id)
+    second = _assign(api_client, token, user_id=resident.id, unit_id=tree.apartment.id)
 
     assert first.status_code == 201
     assert second.status_code == 409
@@ -186,9 +177,7 @@ def test_assignment_of_a_missing_unit_returns_404(
     manager = create_user("manager@efinges.test", role=UserRole.MANAGER)
     resident = create_user("resident@efinges.test")
 
-    response = _assign(
-        api_client, login(manager.email), user_id=resident.id, unit_id=9999
-    )
+    response = _assign(api_client, login(manager.email), user_id=resident.id, unit_id=9999)
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Unit not found"
@@ -289,9 +278,7 @@ def test_a_resident_cannot_list_all_assignments(
 ) -> None:
     resident = create_user("resident@efinges.test")
 
-    response = api_client.get(
-        "/assignments", headers=auth_header(login(resident.email))
-    )
+    response = api_client.get("/assignments", headers=auth_header(login(resident.email)))
 
     assert response.status_code == 403
 
@@ -324,9 +311,7 @@ def test_resident_sees_only_their_own_units(
     assign_unit(resident, tree.garage, OwnershipType.TENANT)
     assign_unit(neighbour, tree.storage, OwnershipType.OWNER)
 
-    response = api_client.get(
-        "/auth/me/units", headers=auth_header(login(resident.email))
-    )
+    response = api_client.get("/auth/me/units", headers=auth_header(login(resident.email)))
 
     assert response.status_code == 200
     body = response.json()
@@ -344,9 +329,7 @@ def test_resident_without_assignments_sees_an_empty_list(
 ) -> None:
     resident = create_user("resident@efinges.test")
 
-    response = api_client.get(
-        "/auth/me/units", headers=auth_header(login(resident.email))
-    )
+    response = api_client.get("/auth/me/units", headers=auth_header(login(resident.email)))
 
     assert response.status_code == 200
     assert response.json() == []
@@ -390,23 +373,14 @@ def test_manager_removes_an_assignment(
     tree = create_property_tree()
     token = login(manager.email)
 
-    created = _assign(
-        api_client, token, user_id=resident.id, unit_id=tree.apartment.id
-    )
+    created = _assign(api_client, token, user_id=resident.id, unit_id=tree.apartment.id)
     assignment_id = created.json()["id"]
 
-    deleted = api_client.delete(
-        f"/assignments/{assignment_id}", headers=auth_header(token)
-    )
+    deleted = api_client.delete(f"/assignments/{assignment_id}", headers=auth_header(token))
 
     assert deleted.status_code == 204
     assert deleted.content == b""
-    assert (
-        api_client.get(
-            "/auth/me/units", headers=auth_header(login(resident.email))
-        ).json()
-        == []
-    )
+    assert api_client.get("/auth/me/units", headers=auth_header(login(resident.email))).json() == []
 
 
 def test_removing_a_missing_assignment_returns_404(
@@ -416,9 +390,7 @@ def test_removing_a_missing_assignment_returns_404(
 ) -> None:
     manager = create_user("manager@efinges.test", role=UserRole.MANAGER)
 
-    response = api_client.delete(
-        "/assignments/9999", headers=auth_header(login(manager.email))
-    )
+    response = api_client.delete("/assignments/9999", headers=auth_header(login(manager.email)))
 
     assert response.status_code == 404
 
@@ -455,12 +427,8 @@ def test_reassigning_a_removed_unit_succeeds(
     tree = create_property_tree()
     token = login(manager.email)
 
-    created = _assign(
-        api_client, token, user_id=first.id, unit_id=tree.apartment.id
-    )
-    api_client.delete(
-        f"/assignments/{created.json()['id']}", headers=auth_header(token)
-    )
+    created = _assign(api_client, token, user_id=first.id, unit_id=tree.apartment.id)
+    api_client.delete(f"/assignments/{created.json()['id']}", headers=auth_header(token))
 
     reassigned = _assign(
         api_client,
@@ -487,9 +455,7 @@ def test_manager_lists_residents(
     create_user("ana@efinges.test")
     create_user("bea@efinges.test")
 
-    response = api_client.get(
-        "/residents", headers=auth_header(login(manager.email))
-    )
+    response = api_client.get("/residents", headers=auth_header(login(manager.email)))
 
     assert response.status_code == 200
     body = response.json()
@@ -511,9 +477,7 @@ def test_resident_directory_excludes_other_roles(
     create_user("resident@efinges.test")
     create_user("other-manager@efinges.test", role=UserRole.MANAGER)
 
-    response = api_client.get(
-        "/residents", headers=auth_header(login(manager.email))
-    )
+    response = api_client.get("/residents", headers=auth_header(login(manager.email)))
 
     assert response.status_code == 200
     assert [row["email"] for row in response.json()] == ["resident@efinges.test"]
@@ -530,9 +494,7 @@ def test_resident_directory_filters_by_activation(
     token = login(manager.email)
 
     active = api_client.get("/residents?is_active=true", headers=auth_header(token))
-    inactive = api_client.get(
-        "/residents?is_active=false", headers=auth_header(token)
-    )
+    inactive = api_client.get("/residents?is_active=false", headers=auth_header(token))
 
     assert [row["email"] for row in active.json()] == ["active@efinges.test"]
     assert [row["email"] for row in inactive.json()] == ["gone@efinges.test"]
@@ -546,9 +508,7 @@ def test_an_administrator_can_list_residents_too(
     admin = create_user("admin@efinges.test", role=UserRole.ADMINISTRATOR)
     create_user("resident@efinges.test")
 
-    response = api_client.get(
-        "/residents", headers=auth_header(login(admin.email))
-    )
+    response = api_client.get("/residents", headers=auth_header(login(admin.email)))
 
     assert response.status_code == 200
     assert len(response.json()) == 1
@@ -561,9 +521,7 @@ def test_a_resident_cannot_list_residents(
 ) -> None:
     resident = create_user("resident@efinges.test")
 
-    response = api_client.get(
-        "/residents", headers=auth_header(login(resident.email))
-    )
+    response = api_client.get("/residents", headers=auth_header(login(resident.email)))
 
     assert response.status_code == 403
 

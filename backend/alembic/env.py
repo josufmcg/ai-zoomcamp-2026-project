@@ -10,14 +10,14 @@ from __future__ import annotations
 
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from app.config import get_settings
-from app.database import Base
+from alembic import context
 
 # Import the models so every table is registered on Base.metadata.
 from app import models  # noqa: F401  (imported for its side effects)
+from app.config import get_settings
+from app.database import Base
 
 config = context.config
 

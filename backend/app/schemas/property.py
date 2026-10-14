@@ -147,7 +147,7 @@ class MyUnitRead(UnitRead):
     ownership_type: OwnershipType
 
     @classmethod
-    def from_assignment(cls, assignment: UnitAssignment) -> "MyUnitRead":
+    def from_assignment(cls, assignment: UnitAssignment) -> MyUnitRead:
         """Build the response from an assignment and its loaded unit."""
         unit = assignment.unit
         return cls(

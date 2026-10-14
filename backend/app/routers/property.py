@@ -57,9 +57,7 @@ from app.schemas import (
 router = APIRouter(tags=["properties"])
 
 AdminUser = Annotated[User, Depends(require_role(UserRole.ADMINISTRATOR))]
-ManagerUser = Annotated[
-    User, Depends(require_role(UserRole.MANAGER, UserRole.ADMINISTRATOR))
-]
+ManagerUser = Annotated[User, Depends(require_role(UserRole.MANAGER, UserRole.ADMINISTRATOR))]
 
 
 # --- shared helpers ---------------------------------------------------------
@@ -71,9 +69,7 @@ def _conflict(session: Session, detail: str) -> None:
         session.commit()
     except IntegrityError as exc:
         session.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail=detail
-        ) from exc
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail) from exc
 
 
 def _load_tags(session: Session, tag_ids: list[int]) -> list[Tag]:
@@ -94,37 +90,27 @@ def _load_community(session: Session, community_id: int) -> Community:
     """Return one community by id or raise 404."""
     community = session.get(Community, community_id)
     if community is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Community not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Community not found")
     return community
 
 
 def _load_building(session: Session, building_id: int) -> Building:
     """Return one building by id, with its community loaded, or raise 404."""
     building = session.scalars(
-        select(Building)
-        .where(Building.id == building_id)
-        .options(selectinload(Building.tags))
+        select(Building).where(Building.id == building_id).options(selectinload(Building.tags))
     ).one_or_none()
     if building is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Building not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Building not found")
     return building
 
 
 def _load_unit(session: Session, unit_id: int) -> Unit:
     """Return one unit by id, with tags and building loaded, or raise 404."""
     unit = session.scalars(
-        select(Unit)
-        .where(Unit.id == unit_id)
-        .options(selectinload(Unit.tags))
+        select(Unit).where(Unit.id == unit_id).options(selectinload(Unit.tags))
     ).one_or_none()
     if unit is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found")
     return unit
 
 
@@ -145,9 +131,7 @@ def _scope_communities(statement, community_ids: set[int] | None):
 def _require_write(session: Session, user: User, community_id: int) -> None:
     """Raise 403 unless ``user`` may write to the given community."""
     if not access.can_write_community(session, user, community_id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role")
 
 
 # --- communities ------------------------------------------------------------
@@ -192,9 +176,7 @@ def read_community(
     community = _load_community(session, community_id)
     allowed = access.readable_community_ids(session, user)
     if allowed is not None and community.id not in allowed:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Community not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Community not found")
     return community
 
 
@@ -214,9 +196,7 @@ def update_community(
     return community
 
 
-@router.delete(
-    "/communities/{community_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/communities/{community_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_community(
     community_id: int,
     _admin: AdminUser,
@@ -251,9 +231,7 @@ def list_buildings(
     return list(session.scalars(statement).all())
 
 
-@router.post(
-    "/buildings", response_model=BuildingRead, status_code=status.HTTP_201_CREATED
-)
+@router.post("/buildings", response_model=BuildingRead, status_code=status.HTTP_201_CREATED)
 def create_building(
     payload: BuildingCreate,
     manager: ManagerUser,
@@ -284,9 +262,7 @@ def read_building(
     building = _load_building(session, building_id)
     allowed = access.readable_community_ids(session, user)
     if allowed is not None and building.community_id not in allowed:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Building not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Building not found")
     return building
 
 
@@ -310,9 +286,7 @@ def update_building(
     return building
 
 
-@router.delete(
-    "/buildings/{building_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/buildings/{building_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_building(
     building_id: int,
     manager: ManagerUser,
@@ -346,28 +320,20 @@ def list_units(
     filter cannot join ``buildings`` twice.
     """
     statement = (
-        select(Unit)
-        .options(selectinload(Unit.tags))
-        .order_by(Unit.building_id, Unit.identifier)
+        select(Unit).options(selectinload(Unit.tags)).order_by(Unit.building_id, Unit.identifier)
     )
 
     if user.role is UserRole.RESIDENT:
-        statement = statement.where(
-            Unit.assignments.any(UnitAssignment.user_id == user.id)
-        )
+        statement = statement.where(Unit.assignments.any(UnitAssignment.user_id == user.id))
     else:
         allowed = access.readable_community_ids(session, user)
         if allowed is not None:
-            statement = statement.where(
-                Unit.building.has(Building.community_id.in_(allowed or []))
-            )
+            statement = statement.where(Unit.building.has(Building.community_id.in_(allowed or [])))
 
     if building_id is not None:
         statement = statement.where(Unit.building_id == building_id)
     if community_id is not None:
-        statement = statement.where(
-            Unit.building.has(Building.community_id == community_id)
-        )
+        statement = statement.where(Unit.building.has(Building.community_id == community_id))
     if tag_id is not None:
         statement = statement.where(Unit.tags.any(Tag.id == tag_id))
     return list(session.scalars(statement).all())
@@ -408,9 +374,7 @@ def read_unit(
     """
     unit = _load_unit(session, unit_id)
     if not access.can_read_unit(session, user, unit):
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found")
     return unit
 
 
@@ -453,9 +417,7 @@ def _community_of(session: Session, unit: Unit) -> int:
     """Return the community id that owns ``unit``."""
     building = session.get(Building, unit.building_id)
     if building is None:  # pragma: no cover - guarded by foreign keys
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found")
     return building.community_id
 
 
@@ -494,9 +456,7 @@ def delete_tag(
     """Delete a tag, detaching it from every building and unit."""
     tag = session.get(Tag, tag_id)
     if tag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found")
     session.delete(tag)
     session.commit()
 
@@ -541,9 +501,7 @@ def create_manager_assignment(
     """
     manager = session.get(User, payload.manager_id)
     if manager is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Manager not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Manager not found")
     if manager.role is not UserRole.MANAGER:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
@@ -551,9 +509,7 @@ def create_manager_assignment(
         )
     _load_community(session, payload.community_id)
 
-    assignment = ManagerAssignment(
-        manager_id=manager.id, community_id=payload.community_id
-    )
+    assignment = ManagerAssignment(manager_id=manager.id, community_id=payload.community_id)
     session.add(assignment)
     _conflict(session, "Manager is already assigned to that community")
     session.refresh(assignment)

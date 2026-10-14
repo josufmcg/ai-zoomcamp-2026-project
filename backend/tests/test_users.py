@@ -74,9 +74,7 @@ def test_the_password_is_stored_hashed(
 
     _create(api_client, auth_token(admin))
 
-    created = db_session.query(User).filter_by(
-        email="new.manager@efinges.test"
-    ).one()
+    created = db_session.query(User).filter_by(email="new.manager@efinges.test").one()
     assert created.hashed_password != NEW_PASSWORD
     assert verify_password(NEW_PASSWORD, created.hashed_password)
 
@@ -107,9 +105,12 @@ def test_a_resident_cannot_list_users(
 
 def test_user_management_requires_a_token(api_client: TestClient) -> None:
     assert api_client.get("/users").status_code == 401
-    assert api_client.post(
-        "/users", json={"email": "x@efinges.test", "password": NEW_PASSWORD}
-    ).status_code == 401
+    assert (
+        api_client.post(
+            "/users", json={"email": "x@efinges.test", "password": NEW_PASSWORD}
+        ).status_code
+        == 401
+    )
 
 
 # --- Creation rules ---------------------------------------------------------
@@ -327,9 +328,7 @@ def test_updating_a_missing_user_returns_404(
 ) -> None:
     admin = create_user("admin@efinges.test", role=UserRole.ADMINISTRATOR)
 
-    response = api_client.patch(
-        "/users/9999", json={"role": "manager"}, headers=auth_token(admin)
-    )
+    response = api_client.patch("/users/9999", json={"role": "manager"}, headers=auth_token(admin))
 
     assert response.status_code == 404
 

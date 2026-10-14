@@ -135,9 +135,7 @@ def test_a_non_positive_amount_is_rejected(
     headers = auth_token(manager)
 
     zero = _create_bill(api_client, headers, unit_id=tree.apartment.id, amount="0")
-    negative = _create_bill(
-        api_client, headers, unit_id=tree.apartment.id, amount="-5.00"
-    )
+    negative = _create_bill(api_client, headers, unit_id=tree.apartment.id, amount="-5.00")
 
     assert zero.status_code == 422
     assert negative.status_code == 422
@@ -232,13 +230,9 @@ def test_a_resident_cannot_mark_a_bill_paid(
     tree = create_property_tree()
     assign_manager(manager, tree.community)
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
-    bill = _create_bill(
-        api_client, auth_token(manager), unit_id=tree.apartment.id
-    ).json()
+    bill = _create_bill(api_client, auth_token(manager), unit_id=tree.apartment.id).json()
 
-    response = api_client.post(
-        f"/bills/{bill['id']}/pay", headers=auth_token(resident)
-    )
+    response = api_client.post(f"/bills/{bill['id']}/pay", headers=auth_token(resident))
 
     assert response.status_code == 403
 
@@ -292,9 +286,7 @@ def test_overdue_is_never_stored(
         due_date=YESTERDAY,
     ).json()
 
-    assert api_client.get(f"/bills/{bill['id']}", headers=headers).json()[
-        "status"
-    ] == "overdue"
+    assert api_client.get(f"/bills/{bill['id']}", headers=headers).json()["status"] == "overdue"
 
     db_session.expire_all()
     stored = db_session.get(Bill, bill["id"])
@@ -380,9 +372,7 @@ def test_a_resident_sees_only_their_own_units_bills(
     mine = _create_bill(
         api_client, manager_headers, unit_id=tree.apartment.id, description="Mine"
     ).json()
-    _create_bill(
-        api_client, manager_headers, unit_id=tree.garage.id, description="Not mine"
-    )
+    _create_bill(api_client, manager_headers, unit_id=tree.garage.id, description="Not mine")
 
     response = api_client.get("/bills", headers=auth_token(resident))
 
@@ -401,9 +391,7 @@ def test_a_resident_cannot_read_another_units_bill(
     resident = create_user("resident@efinges.test")
     tree = create_property_tree()
     assign_manager(manager, tree.community)
-    bill = _create_bill(
-        api_client, auth_token(manager), unit_id=tree.apartment.id
-    ).json()
+    bill = _create_bill(api_client, auth_token(manager), unit_id=tree.apartment.id).json()
 
     response = api_client.get(f"/bills/{bill['id']}", headers=auth_token(resident))
 
@@ -424,9 +412,7 @@ def test_a_manager_can_filter_bills_by_unit(
     _create_bill(api_client, headers, unit_id=tree.apartment.id)
     garage = _create_bill(api_client, headers, unit_id=tree.garage.id).json()
 
-    response = api_client.get(
-        f"/bills?unit_id={tree.garage.id}", headers=headers
-    )
+    response = api_client.get(f"/bills?unit_id={tree.garage.id}", headers=headers)
 
     assert [row["id"] for row in response.json()] == [garage["id"]]
 

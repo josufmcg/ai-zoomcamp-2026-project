@@ -74,9 +74,7 @@ def test_me_returns_the_current_user_without_the_password(
     user = create_user("admin@efinges.test", role=UserRole.ADMINISTRATOR)
     token = _login(api_client, "admin@efinges.test").json()["access_token"]
 
-    response = api_client.get(
-        "/auth/me", headers={"Authorization": f"Bearer {token}"}
-    )
+    response = api_client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
 
     assert response.status_code == 200
     assert response.json() == {
@@ -93,9 +91,7 @@ def test_me_without_a_token_returns_401(api_client: TestClient) -> None:
 
 
 def test_me_with_an_invalid_token_returns_401(api_client: TestClient) -> None:
-    response = api_client.get(
-        "/auth/me", headers={"Authorization": "Bearer not-a-real-token"}
-    )
+    response = api_client.get("/auth/me", headers={"Authorization": "Bearer not-a-real-token"})
 
     assert response.status_code == 401
 
@@ -111,9 +107,7 @@ def test_me_with_a_token_for_a_deleted_user_returns_401(
         db_session.query(User).delete()
         db_session.commit()
 
-    response = api_client.get(
-        "/auth/me", headers={"Authorization": f"Bearer {token}"}
-    )
+    response = api_client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
 
     assert response.status_code == 401
 
@@ -130,9 +124,7 @@ def test_me_with_a_token_for_a_deactivated_user_returns_401(
         stored.is_active = False
         db_session.commit()
 
-    response = api_client.get(
-        "/auth/me", headers={"Authorization": f"Bearer {token}"}
-    )
+    response = api_client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
 
     assert response.status_code == 401
 
@@ -161,24 +153,18 @@ def test_role_is_allowed(api_app: FastAPI, create_user: Callable[..., User]) -> 
     with TestClient(api_app) as client:
         for email in ("manager@efinges.test", "admin@efinges.test"):
             token = _login(client, email).json()["access_token"]
-            response = client.get(
-                "/manager-area", headers={"Authorization": f"Bearer {token}"}
-            )
+            response = client.get("/manager-area", headers={"Authorization": f"Bearer {token}"})
             assert response.status_code == 200
             assert response.json() == {"email": email}
 
 
-def test_role_rejection_returns_403(
-    api_app: FastAPI, create_user: Callable[..., User]
-) -> None:
+def test_role_rejection_returns_403(api_app: FastAPI, create_user: Callable[..., User]) -> None:
     _mount_protected_route(api_app)
     create_user("resident@efinges.test", role=UserRole.RESIDENT)
 
     with TestClient(api_app) as client:
         token = _login(client, "resident@efinges.test").json()["access_token"]
-        response = client.get(
-            "/manager-area", headers={"Authorization": f"Bearer {token}"}
-        )
+        response = client.get("/manager-area", headers={"Authorization": f"Bearer {token}"})
 
     assert response.status_code == 403
     assert response.json()["detail"] == "Insufficient role"

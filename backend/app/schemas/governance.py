@@ -60,7 +60,7 @@ class InitiativeCreate(BaseModel):
     scope: InitiativeScope = Field(default_factory=InitiativeScope)
 
     @model_validator(mode="after")
-    def _check_dates_and_options(self) -> "InitiativeCreate":
+    def _check_dates_and_options(self) -> InitiativeCreate:
         if self.closes_at < self.opens_at:
             raise ValueError("closes_at must not be before opens_at")
         labels = [option.label.strip().lower() for option in self.options]

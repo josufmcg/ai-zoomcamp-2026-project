@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     Boolean,
@@ -25,8 +26,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 from app.models.columns import enum_column
 
+if TYPE_CHECKING:
+    # Imported for the string relationship annotations only; importing these at
+    # runtime would create an import cycle between the model modules.
+    from app.models.property import ManagerAssignment, Unit
 
-class UserRole(str, enum.Enum):
+
+class UserRole(enum.StrEnum):
     """The three roles a user can hold (backlog task 6)."""
 
     ADMINISTRATOR = "administrator"
@@ -34,7 +40,7 @@ class UserRole(str, enum.Enum):
     RESIDENT = "resident"
 
 
-class OwnershipType(str, enum.Enum):
+class OwnershipType(enum.StrEnum):
     """How a resident holds a unit (backlog task 7).
 
     ``OWNER`` covers outright ownership; ``TENANT`` covers a rental or other
@@ -70,13 +76,13 @@ class User(Base):
     # The units this user owns or rents (backlog task 7). Only residents are
     # given assignments by the manager endpoints, but the relationship itself
     # does not restrict the role so administrators can inspect every row.
-    unit_assignments: Mapped[list["UnitAssignment"]] = relationship(
+    unit_assignments: Mapped[list[UnitAssignment]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
     # The communities this user manages (backlog task 8). Empty for residents
     # and for administrators, who have global scope.
-    manager_assignments: Mapped[list["ManagerAssignment"]] = relationship(
+    manager_assignments: Mapped[list[ManagerAssignment]] = relationship(
         back_populates="manager",
         cascade="all, delete-orphan",
     )
@@ -108,15 +114,13 @@ class UnitAssignment(Base):
     unit_id: Mapped[int] = mapped_column(
         ForeignKey("units.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    ownership_type: Mapped[OwnershipType] = enum_column(
-        OwnershipType, "ownership_type"
-    )
+    ownership_type: Mapped[OwnershipType] = enum_column(OwnershipType, "ownership_type")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
     user: Mapped[User] = relationship(back_populates="unit_assignments")
-    unit: Mapped["Unit"] = relationship(back_populates="assignments")
+    unit: Mapped[Unit] = relationship(back_populates="assignments")
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid
         return (

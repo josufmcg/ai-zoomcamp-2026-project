@@ -23,7 +23,6 @@ from app.models import (
 )
 from tests.conftest import PropertyTree
 
-
 # --- Administrators manage the tree ----------------------------------------
 
 
@@ -63,9 +62,7 @@ def test_administrator_renames_and_deletes_a_community(
 ) -> None:
     admin = create_user("admin@efinges.test", role=UserRole.ADMINISTRATOR)
     headers = auth_token(admin)
-    created = api_client.post(
-        "/communities", json={"name": "Riverside"}, headers=headers
-    ).json()
+    created = api_client.post("/communities", json={"name": "Riverside"}, headers=headers).json()
 
     renamed = api_client.patch(
         f"/communities/{created['id']}", json={"name": "Riverside North"}, headers=headers
@@ -89,9 +86,7 @@ def test_deleting_a_community_cascades_to_its_units(
     admin = create_user("admin@efinges.test", role=UserRole.ADMINISTRATOR)
     tree = create_property_tree()
 
-    response = api_client.delete(
-        f"/communities/{tree.community.id}", headers=auth_token(admin)
-    )
+    response = api_client.delete(f"/communities/{tree.community.id}", headers=auth_token(admin))
 
     assert response.status_code == 204
     assert db_session.get(Unit, tree.apartment.id) is None
@@ -270,9 +265,7 @@ def test_manager_deletes_a_unit(
     tree = create_property_tree()
     assign_manager(manager, tree.community)
 
-    response = api_client.delete(
-        f"/units/{tree.storage.id}", headers=auth_token(manager)
-    )
+    response = api_client.delete(f"/units/{tree.storage.id}", headers=auth_token(manager))
 
     assert response.status_code == 204
     assert db_session.get(Unit, tree.storage.id) is None
@@ -325,9 +318,7 @@ def test_manager_reading_an_out_of_scope_building_gets_404(
     manager = create_user("manager@efinges.test", role=UserRole.MANAGER)
     tree = create_property_tree()
 
-    response = api_client.get(
-        f"/buildings/{tree.building.id}", headers=auth_token(manager)
-    )
+    response = api_client.get(f"/buildings/{tree.building.id}", headers=auth_token(manager))
 
     assert response.status_code == 404
 
@@ -361,9 +352,7 @@ def test_resident_reading_another_residents_unit_gets_404(
     tree = create_property_tree()
     assign_unit(neighbour, tree.apartment, OwnershipType.OWNER)
 
-    response = api_client.get(
-        f"/units/{tree.apartment.id}", headers=auth_token(resident)
-    )
+    response = api_client.get(f"/units/{tree.apartment.id}", headers=auth_token(resident))
 
     assert response.status_code == 404
 
@@ -381,18 +370,14 @@ def test_manager_filters_units_by_tag(
     assign_manager(manager, tree.community)
     headers = auth_token(manager)
 
-    garage_tag = api_client.post(
-        "/tags", json={"name": "Garages"}, headers=headers
-    ).json()
+    garage_tag = api_client.post("/tags", json={"name": "Garages"}, headers=headers).json()
     api_client.patch(
         f"/units/{tree.garage.id}",
         json={"tag_ids": [garage_tag["id"]]},
         headers=headers,
     )
 
-    response = api_client.get(
-        f"/units?tag_id={garage_tag['id']}", headers=headers
-    )
+    response = api_client.get(f"/units?tag_id={garage_tag['id']}", headers=headers)
 
     assert response.status_code == 200
     assert [row["id"] for row in response.json()] == [tree.garage.id]
@@ -419,12 +404,8 @@ def test_every_unit_filter_works_alongside_a_managers_scope(
     headers = auth_token(manager)
 
     every_unit = api_client.get("/units", headers=headers)
-    by_community = api_client.get(
-        f"/units?community_id={tree.community.id}", headers=headers
-    )
-    by_building = api_client.get(
-        f"/units?building_id={tree.building.id}", headers=headers
-    )
+    by_community = api_client.get(f"/units?community_id={tree.community.id}", headers=headers)
+    by_building = api_client.get(f"/units?building_id={tree.building.id}", headers=headers)
     by_tag = api_client.get(f"/units?tag_id={tag.id}", headers=headers)
 
     assert every_unit.status_code == 200
@@ -450,9 +431,7 @@ def test_a_resident_can_combine_ownership_with_unit_filters(
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
     headers = auth_token(resident)
 
-    response = api_client.get(
-        f"/units?community_id={tree.community.id}", headers=headers
-    )
+    response = api_client.get(f"/units?community_id={tree.community.id}", headers=headers)
 
     assert response.status_code == 200
     assert [row["id"] for row in response.json()] == [tree.apartment.id]
@@ -489,9 +468,7 @@ def test_a_resident_cannot_create_a_tag(
 ) -> None:
     resident = create_user("resident@efinges.test")
 
-    response = api_client.post(
-        "/tags", json={"name": "Downtown"}, headers=auth_token(resident)
-    )
+    response = api_client.post("/tags", json={"name": "Downtown"}, headers=auth_token(resident))
 
     assert response.status_code == 403
 
@@ -593,9 +570,7 @@ def test_assigning_the_same_pair_twice_is_rejected(
     headers = auth_token(admin)
     payload = {"manager_id": manager.id, "community_id": tree.community.id}
 
-    assert api_client.post(
-        "/manager-assignments", json=payload, headers=headers
-    ).status_code == 201
+    assert api_client.post("/manager-assignments", json=payload, headers=headers).status_code == 201
     duplicate = api_client.post("/manager-assignments", json=payload, headers=headers)
 
     assert duplicate.status_code == 409
@@ -653,9 +628,7 @@ def test_removing_a_manager_assignment_revokes_access(
 
     assert api_client.get("/buildings", headers=manager_headers).json() != []
 
-    removed = api_client.delete(
-        f"/manager-assignments/{assignment.id}", headers=auth_token(admin)
-    )
+    removed = api_client.delete(f"/manager-assignments/{assignment.id}", headers=auth_token(admin))
 
     assert removed.status_code == 204
     assert api_client.get("/buildings", headers=manager_headers).json() == []
@@ -668,9 +641,7 @@ def test_manager_assignment_listing_is_administrator_only(
 ) -> None:
     manager = create_user("manager@efinges.test", role=UserRole.MANAGER)
 
-    assert api_client.get(
-        "/manager-assignments", headers=auth_token(manager)
-    ).status_code == 403
+    assert api_client.get("/manager-assignments", headers=auth_token(manager)).status_code == 403
 
 
 def test_an_unknown_community_or_manager_returns_404(
@@ -740,9 +711,7 @@ def test_building_and_unit_reads_include_tags(
         headers=auth_token(manager),
     )
 
-    response = api_client.get(
-        f"/buildings/{tree.building.id}", headers=auth_token(manager)
-    )
+    response = api_client.get(f"/buildings/{tree.building.id}", headers=auth_token(manager))
 
     assert response.status_code == 200
     assert [row["name"] for row in response.json()["tags"]] == ["Downtown"]

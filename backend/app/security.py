@@ -11,7 +11,7 @@ tests can override them and production can pick a strong ``SECRET_KEY``.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import jwt
 from pwdlib import PasswordHash
@@ -48,7 +48,7 @@ def create_access_token(
     expires_minutes: int = 60,
 ) -> str:
     """Return a signed JWT identifying ``user_id`` and their ``role``."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     payload = {
         "sub": str(user_id),
         "role": role,

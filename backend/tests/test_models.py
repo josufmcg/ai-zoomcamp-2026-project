@@ -50,9 +50,7 @@ def test_all_unit_types_are_accepted(session: Session) -> None:
     session.add(community)
     session.commit()
 
-    stored = session.scalars(
-        select(Unit.unit_type).order_by(Unit.identifier)
-    ).all()
+    stored = session.scalars(select(Unit.unit_type).order_by(Unit.identifier)).all()
     assert stored == [UnitType.APARTMENT, UnitType.GARAGE, UnitType.STORAGE]
 
 
@@ -116,7 +114,10 @@ def test_tag_names_are_unique(session: Session) -> None:
 def test_building_names_are_unique_within_a_community(session: Session) -> None:
     community = Community(name="Riverside")
     session.add_all(
-        [Building(name="Block A", community=community), Building(name="Block A", community=community)]
+        [
+            Building(name="Block A", community=community),
+            Building(name="Block A", community=community),
+        ]
     )
     with pytest.raises(IntegrityError):
         session.commit()
@@ -155,9 +156,13 @@ def test_development_and_test_database_urls_are_separate() -> None:
 
 
 def test_test_database_url_can_be_overridden(monkeypatch) -> None:
-    monkeypatch.setenv("TEST_DATABASE_URL", "postgresql+psycopg://efinges:efinges@localhost/efinges_test")
+    monkeypatch.setenv(
+        "TEST_DATABASE_URL", "postgresql+psycopg://efinges:efinges@localhost/efinges_test"
+    )
     settings = Settings(_env_file=None)
-    assert settings.test_database_url == "postgresql+psycopg://efinges:efinges@localhost/efinges_test"
+    assert (
+        settings.test_database_url == "postgresql+psycopg://efinges:efinges@localhost/efinges_test"
+    )
 
 
 def test_in_memory_database_is_shared_across_sessions(database: Database) -> None:
@@ -196,9 +201,7 @@ def test_all_user_roles_are_accepted(session: Session) -> None:
         ("manager@efinges.test", UserRole.MANAGER),
         ("resident@efinges.test", UserRole.RESIDENT),
     ):
-        session.add(
-            User(email=email, hashed_password="hash", role=role)
-        )
+        session.add(User(email=email, hashed_password="hash", role=role))
     session.commit()
 
     stored = session.scalars(select(User.role).order_by(User.email)).all()

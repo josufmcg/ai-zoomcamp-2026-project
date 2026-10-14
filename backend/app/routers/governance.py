@@ -49,9 +49,7 @@ from app.schemas import (
 
 router = APIRouter(tags=["initiatives"])
 
-ManagerUser = Annotated[
-    User, Depends(require_role(UserRole.MANAGER, UserRole.ADMINISTRATOR))
-]
+ManagerUser = Annotated[User, Depends(require_role(UserRole.MANAGER, UserRole.ADMINISTRATOR))]
 ResidentUser = Annotated[User, Depends(require_role(UserRole.RESIDENT))]
 
 
@@ -100,9 +98,7 @@ def _load_initiative(session: Session, initiative_id: int) -> Initiative:
         )
     ).one_or_none()
     if initiative is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Initiative not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Initiative not found")
     return initiative
 
 
@@ -113,7 +109,7 @@ def _ballot_counts(session: Session, initiative_id: int) -> dict[int, int]:
         .where(Vote.initiative_id == initiative_id)
         .group_by(Vote.option_id)
     ).all()
-    return {option_id: count for option_id, count in rows}
+    return dict(rows)
 
 
 def _initiative_read(session: Session, initiative: Initiative) -> InitiativeRead:
@@ -161,19 +157,13 @@ def list_initiatives(
     )
     today = date.today()
     if is_open is True:
-        statement = statement.where(
-            Initiative.opens_at <= today, Initiative.closes_at >= today
-        )
+        statement = statement.where(Initiative.opens_at <= today, Initiative.closes_at >= today)
     elif is_open is False:
-        statement = statement.where(
-            (Initiative.closes_at < today) | (Initiative.opens_at > today)
-        )
+        statement = statement.where((Initiative.closes_at < today) | (Initiative.opens_at > today))
     return [_initiative_read(session, row) for row in session.scalars(statement).all()]
 
 
-@router.post(
-    "/initiatives", response_model=InitiativeRead, status_code=status.HTTP_201_CREATED
-)
+@router.post("/initiatives", response_model=InitiativeRead, status_code=status.HTTP_201_CREATED)
 def create_initiative(
     payload: InitiativeCreate,
     manager: ManagerUser,
@@ -277,9 +267,7 @@ def cast_vote(
 
     option = session.get(InitiativeOption, payload.option_id)
     if option is None or option.initiative_id != initiative.id:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Option not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Option not found")
 
     eligible = resident_eligible_unit_ids(session, resident.id, initiative.scope)
     if payload.unit_id not in eligible:

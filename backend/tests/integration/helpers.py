@@ -65,12 +65,10 @@ class Workflow:
         return [self.apartment["id"], self.garage["id"]]
 
 
-
 def assert_denied(response: Any) -> None:
     """Assert a role boundary answered 401 (no token) or 403 (wrong role)."""
     assert response.status_code in (401, 403), (
-        "expected 401/403 at a role boundary, got "
-        f"{response.status_code}: {response.text}"
+        f"expected 401/403 at a role boundary, got {response.status_code}: {response.text}"
     )
 
 
@@ -81,8 +79,7 @@ def assert_hidden(response: Any) -> None:
     outside the caller's scope, so an id cannot be probed for existence.
     """
     assert response.status_code == 404, (
-        "expected 404 for an out-of-scope resource, got "
-        f"{response.status_code}: {response.text}"
+        f"expected 404 for an out-of-scope resource, got {response.status_code}: {response.text}"
     )
 
 
@@ -197,9 +194,7 @@ def assign_resident(
     )
 
 
-def provision_workflow(
-    client: TestClient, bootstrap_admin: Account
-) -> Workflow:
+def provision_workflow(client: TestClient, bootstrap_admin: Account) -> Workflow:
     """Provision the accounts, property tree, and scope every workflow needs.
 
     Everything below the bootstrap administrator is created through the public
@@ -256,4 +251,3 @@ def provision_workflow(
         manager_headers=manager_headers,
         resident_headers=resident_headers,
     )
-

@@ -20,9 +20,7 @@ CONTRACT_PATH = REPOSITORY_ROOT / "openapi.yaml"
 
 
 def _contract() -> dict:
-    assert CONTRACT_PATH.exists(), (
-        "openapi.yaml is missing; run `make openapi` to export it"
-    )
+    assert CONTRACT_PATH.exists(), "openapi.yaml is missing; run `make openapi` to export it"
     return yaml.safe_load(CONTRACT_PATH.read_text(encoding="utf-8"))
 
 

@@ -45,6 +45,7 @@ EFINGES is a residential property management platform for property management fi
 ```bash
 make install   # install backend dependencies (uv sync)
 make run       # run the backend dev server on port 8000
+make lint      # lint both sides (Ruff check + format check, then ESLint)
 make test      # run the backend unit suite and the frontend Vitest suite
 cd backend && uv run pytest
 make integration   # run the backend end-to-end workflows against a dedicated database (backlog task 18)
@@ -56,3 +57,12 @@ make up        # start the full stack with Docker Compose (backlog task 3)
 ```
 
 Some commands only exist once the corresponding backlog tasks are done; never run commands that the current project configuration does not define.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push and pull request: a `backend` job
+(uv install, Ruff lint and format check, unit suite, integration workflows
+against a PostgreSQL service), a `frontend` job (npm ci, ESLint, Vitest,
+production build), and a `docker` job that builds both images once the other two
+pass. Keep the local checks that mirror those jobs green before pushing, and run
+`make lint` together with the test suites after every change.

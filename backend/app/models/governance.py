@@ -17,15 +17,15 @@ database can check.
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
+    JSON,
     CheckConstraint,
     Date,
     DateTime,
     ForeignKey,
     Integer,
-    JSON,
     String,
     Text,
     UniqueConstraint,
@@ -34,6 +34,12 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    # Imported for the string relationship annotations only; importing these at
+    # runtime would create an import cycle between the model modules.
+    from app.models.identity import User
+    from app.models.property import Unit
 
 
 class Initiative(Base):
@@ -59,13 +65,13 @@ class Initiative(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    created_by: Mapped["User"] = relationship()
-    options: Mapped[list["InitiativeOption"]] = relationship(
+    created_by: Mapped[User] = relationship()
+    options: Mapped[list[InitiativeOption]] = relationship(
         back_populates="initiative",
         cascade="all, delete-orphan",
         order_by="InitiativeOption.position",
     )
-    votes: Mapped[list["Vote"]] = relationship(
+    votes: Mapped[list[Vote]] = relationship(
         back_populates="initiative",
         cascade="all, delete-orphan",
         order_by="Vote.id",
@@ -93,12 +99,8 @@ class InitiativeOption(Base):
 
     __tablename__ = "initiative_options"
     __table_args__ = (
-        UniqueConstraint(
-            "initiative_id", "label", name="uq_initiative_option_label"
-        ),
-        UniqueConstraint(
-            "initiative_id", "position", name="uq_initiative_option_position"
-        ),
+        UniqueConstraint("initiative_id", "label", name="uq_initiative_option_label"),
+        UniqueConstraint("initiative_id", "position", name="uq_initiative_option_position"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -109,7 +111,7 @@ class InitiativeOption(Base):
     position: Mapped[int] = mapped_column(Integer, nullable=False)
 
     initiative: Mapped[Initiative] = relationship(back_populates="options")
-    votes: Mapped[list["Vote"]] = relationship(back_populates="option")
+    votes: Mapped[list[Vote]] = relationship(back_populates="option")
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid
         return (
@@ -129,9 +131,7 @@ class Vote(Base):
 
     __tablename__ = "votes"
     __table_args__ = (
-        UniqueConstraint(
-            "initiative_id", "unit_id", name="uq_vote_initiative_unit"
-        ),
+        UniqueConstraint("initiative_id", "unit_id", name="uq_vote_initiative_unit"),
         CheckConstraint("unit_id > 0", name="ck_vote_unit_positive"),
     )
 
@@ -154,8 +154,8 @@ class Vote(Base):
 
     initiative: Mapped[Initiative] = relationship(back_populates="votes")
     option: Mapped[InitiativeOption] = relationship(back_populates="votes")
-    unit: Mapped["Unit"] = relationship()
-    voter: Mapped["User"] = relationship()
+    unit: Mapped[Unit] = relationship()
+    voter: Mapped[User] = relationship()
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid
         return (

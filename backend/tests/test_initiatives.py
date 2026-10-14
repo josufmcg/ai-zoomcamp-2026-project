@@ -110,9 +110,7 @@ def test_an_initiative_needs_at_least_two_options(
 ) -> None:
     manager = create_user("manager@efinges.test", role=UserRole.MANAGER)
 
-    response = _create_initiative(
-        api_client, auth_token(manager), options=["Only one"]
-    )
+    response = _create_initiative(api_client, auth_token(manager), options=["Only one"])
 
     assert response.status_code == 422
 
@@ -124,9 +122,7 @@ def test_duplicate_option_labels_are_rejected(
 ) -> None:
     manager = create_user("manager@efinges.test", role=UserRole.MANAGER)
 
-    response = _create_initiative(
-        api_client, auth_token(manager), options=["Yes", "yes"]
-    )
+    response = _create_initiative(api_client, auth_token(manager), options=["Yes", "yes"])
 
     assert response.status_code == 422
 
@@ -235,9 +231,7 @@ def test_a_second_ballot_for_the_same_unit_is_rejected(
     tree = create_property_tree()
     assign_manager(manager, tree.community)
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
-    initiative = _create_initiative(
-        api_client, auth_token(manager)
-    ).json()
+    initiative = _create_initiative(api_client, auth_token(manager)).json()
     yes, no = (option["id"] for option in initiative["options"])
     resident_headers = auth_token(resident)
 
@@ -280,9 +274,7 @@ def test_the_unique_constraint_prevents_a_duplicate_ballot(
     tree = create_property_tree()
     assign_manager(manager, tree.community)
     assign_unit(resident, tree.apartment, OwnershipType.OWNER)
-    initiative = _create_initiative(
-        api_client, auth_token(manager)
-    ).json()
+    initiative = _create_initiative(api_client, auth_token(manager)).json()
     yes, no = (option["id"] for option in initiative["options"])
     _vote(
         api_client,
@@ -399,9 +391,7 @@ def test_tag_scoping_selects_only_tagged_units(
         json={"tag_ids": [tag.id]},
         headers=manager_headers,
     )
-    initiative = _create_initiative(
-        api_client, manager_headers, scope={"tag_ids": [tag.id]}
-    ).json()
+    initiative = _create_initiative(api_client, manager_headers, scope={"tag_ids": [tag.id]}).json()
     option_id = initiative["options"][0]["id"]
     resident_headers = auth_token(resident)
 
@@ -437,9 +427,7 @@ def test_an_empty_scope_makes_every_unit_eligible(
     tree = create_property_tree()
     assign_manager(manager, tree.community)
     assign_unit(resident, tree.storage, OwnershipType.TENANT)
-    initiative = _create_initiative(
-        api_client, auth_token(manager), scope={}
-    ).json()
+    initiative = _create_initiative(api_client, auth_token(manager), scope={}).json()
 
     response = _vote(
         api_client,

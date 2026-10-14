@@ -11,7 +11,7 @@
  * is shown as "voted" and is never sent a second ballot.
  */
 
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useState, type FormEvent } from "react";
 
 import { useAsync } from "../../hooks/useAsync";
 import { governanceApi } from "../../services";
@@ -49,18 +49,22 @@ function InitiativeVoteCard({ initiative }: { initiative: Initiative }) {
   const [done, setDone] = useState(false);
 
   // Seed the form from the API so a unit that already voted shows its choice.
-  useEffect(() => {
-    if (!eligible.data) {
-      return;
-    }
+  // Adjusting state while rendering (rather than from an effect) is React's
+  // documented pattern for deriving state from a prop: the form re-seeds as
+  // soon as the fetch resolves and never keeps stale selections.
+  const [seededFrom, setSeededFrom] = useState<{ data: EligibleUnit[] | null }>({
+    data: null,
+  });
+  if (eligible.data && eligible.data !== seededFrom.data) {
     const seed: BallotSelections = {};
     for (const unit of eligible.data) {
       if (unit.vote_id !== null && unit.option_id !== null) {
         seed[unit.unit_id] = unit.option_id;
       }
     }
+    setSeededFrom({ data: eligible.data });
     setSelections(seed);
-  }, [eligible.data]);
+  }
 
   const units = eligible.data ?? [];
   const openUnits = votableUnits(units);

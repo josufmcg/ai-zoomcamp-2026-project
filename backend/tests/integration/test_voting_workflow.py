@@ -19,8 +19,8 @@ from sqlalchemy import select
 from app.models import UserRole, Vote
 from tests.integration.helpers import (
     assert_denied,
-    created,
     create_account,
+    created,
     provision_workflow,
 )
 
@@ -60,9 +60,7 @@ def _vote(client, headers, initiative_id: int, unit_id: int, option_id: int):
     )
 
 
-def test_open_initiative_weighted_vote_aggregates(
-    client, db_session, bootstrap_admin
-):
+def test_open_initiative_weighted_vote_aggregates(client, db_session, bootstrap_admin):
     """A resident owning two eligible units casts two ballots; counts add up."""
     flow = provision_workflow(client, bootstrap_admin)
 
@@ -103,9 +101,7 @@ def test_open_initiative_weighted_vote_aggregates(
     assert second.json()["unit_id"] == flow.garage["id"]
 
     # Two rows really are stored, one per unit.
-    stored = db_session.scalars(
-        select(Vote).where(Vote.initiative_id == initiative_id)
-    ).all()
+    stored = db_session.scalars(select(Vote).where(Vote.initiative_id == initiative_id)).all()
     assert len(stored) == 2
     assert {vote.unit_id for vote in stored} == set(flow.resident_unit_ids)
 
@@ -226,9 +222,7 @@ def test_tag_scope_filters_eligible_units(client, bootstrap_admin):
     )
 
 
-def test_second_ballot_for_same_unit_is_rejected(
-    client, db_session, bootstrap_admin
-):
+def test_second_ballot_for_same_unit_is_rejected(client, db_session, bootstrap_admin):
     """One ballot per unit: a second request for the same unit is refused."""
     flow = provision_workflow(client, bootstrap_admin)
     initiative = _create_initiative(
@@ -284,9 +278,7 @@ def test_closed_initiative_rejects_votes(client, bootstrap_admin):
     yes = closed["options"][0]["id"]
 
     # The initiative is reported as not open.
-    read = client.get(
-        f"/initiatives/{closed['id']}", headers=flow.resident_headers
-    ).json()
+    read = client.get(f"/initiatives/{closed['id']}", headers=flow.resident_headers).json()
     assert read["is_open"] is False
 
     refused = _vote(
@@ -300,18 +292,14 @@ def test_closed_initiative_rejects_votes(client, bootstrap_admin):
 
     # A resident may not create an initiative at all.
     assert_denied(
-        _create_initiative_response(
-            client, flow.resident_headers, scope={}, title="Not allowed"
-        )
+        _create_initiative_response(client, flow.resident_headers, scope={}, title="Not allowed")
     )
 
 
 def test_a_second_resident_votes_independently(client, bootstrap_admin):
     """Two residents in the same community each cast their own unit ballots."""
     flow = provision_workflow(client, bootstrap_admin)
-    initiative = _create_initiative(
-        client, flow.manager_headers, scope={}, title="Community vote"
-    )
+    initiative = _create_initiative(client, flow.manager_headers, scope={}, title="Community vote")
     yes, no = (option["id"] for option in initiative["options"])
 
     # A second resident, assigned another apartment in the same community.
@@ -350,9 +338,7 @@ def test_a_second_resident_votes_independently(client, bootstrap_admin):
     }
 
 
-def _add_neighbour(
-    client, flow
-) -> tuple[dict[str, str], dict]:
+def _add_neighbour(client, flow) -> tuple[dict[str, str], dict]:
     """Create a second resident and an in-community unit assigned to them."""
     neighbour = create_account(
         client,

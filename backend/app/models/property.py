@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     Column,
@@ -30,8 +31,15 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 from app.models.columns import enum_column
 
+if TYPE_CHECKING:
+    # Imported for the string relationship annotations only; importing these at
+    # runtime would create an import cycle between the model modules.
+    from app.models.billing import Bill
+    from app.models.identity import UnitAssignment, User
+    from app.models.maintenance import Incidence
 
-class UnitType(str, enum.Enum):
+
+class UnitType(enum.StrEnum):
     """The kinds of unit a building can contain."""
 
     APARTMENT = "apartment"
@@ -83,12 +91,12 @@ class Community(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    buildings: Mapped[list["Building"]] = relationship(
+    buildings: Mapped[list[Building]] = relationship(
         back_populates="community",
         cascade="all, delete-orphan",
         order_by="Building.name",
     )
-    manager_assignments: Mapped[list["ManagerAssignment"]] = relationship(
+    manager_assignments: Mapped[list[ManagerAssignment]] = relationship(
         back_populates="community",
         cascade="all, delete-orphan",
     )
@@ -101,9 +109,7 @@ class Building(Base):
     """A building (or block) inside a community."""
 
     __tablename__ = "buildings"
-    __table_args__ = (
-        UniqueConstraint("community_id", "name", name="uq_building_community_name"),
-    )
+    __table_args__ = (UniqueConstraint("community_id", "name", name="uq_building_community_name"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     community_id: Mapped[int] = mapped_column(
@@ -115,12 +121,12 @@ class Building(Base):
     )
 
     community: Mapped[Community] = relationship(back_populates="buildings")
-    units: Mapped[list["Unit"]] = relationship(
+    units: Mapped[list[Unit]] = relationship(
         back_populates="building",
         cascade="all, delete-orphan",
         order_by="Unit.identifier",
     )
-    tags: Mapped[list["Tag"]] = relationship(
+    tags: Mapped[list[Tag]] = relationship(
         secondary=building_tags,
         back_populates="buildings",
         order_by="Tag.name",
@@ -149,21 +155,21 @@ class Unit(Base):
     )
 
     building: Mapped[Building] = relationship(back_populates="units")
-    tags: Mapped[list["Tag"]] = relationship(
+    tags: Mapped[list[Tag]] = relationship(
         secondary=unit_tags,
         back_populates="units",
         order_by="Tag.name",
     )
-    assignments: Mapped[list["UnitAssignment"]] = relationship(
+    assignments: Mapped[list[UnitAssignment]] = relationship(
         back_populates="unit",
         cascade="all, delete-orphan",
     )
-    bills: Mapped[list["Bill"]] = relationship(
+    bills: Mapped[list[Bill]] = relationship(
         back_populates="unit",
         cascade="all, delete-orphan",
         order_by="Bill.id",
     )
-    incidences: Mapped[list["Incidence"]] = relationship(
+    incidences: Mapped[list[Incidence]] = relationship(
         back_populates="unit",
         cascade="all, delete-orphan",
         order_by="Incidence.id",
@@ -210,9 +216,7 @@ class ManagerAssignment(Base):
 
     __tablename__ = "manager_assignments"
     __table_args__ = (
-        UniqueConstraint(
-            "manager_id", "community_id", name="uq_manager_assignment_pair"
-        ),
+        UniqueConstraint("manager_id", "community_id", name="uq_manager_assignment_pair"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -226,7 +230,7 @@ class ManagerAssignment(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    manager: Mapped["User"] = relationship(back_populates="manager_assignments")
+    manager: Mapped[User] = relationship(back_populates="manager_assignments")
     community: Mapped[Community] = relationship(back_populates="manager_assignments")
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid

@@ -33,7 +33,8 @@ import {
   StatusBadge,
   TagList,
 } from "../components";
-import { TagChecklist, TagEditor, toggleId } from "./TagChecklist";
+import { TagChecklist, TagEditor } from "./TagChecklist";
+import { toggleId } from "./tagSelection";
 
 /** Inline form that creates a building in one community. */
 function NewBuildingForm({
@@ -340,9 +341,9 @@ export function PropertyTreeSection() {
   const reloadBuildings = useCallback(() => {
     buildings.reload();
     units.reload();
-  }, [buildings.reload, units.reload]);
+  }, [buildings, units]);
 
-  const reloadUnits = useCallback(() => units.reload(), [units.reload]);
+  const reloadUnits = useCallback(() => units.reload(), [units]);
 
   const tagsById = useMemo(() => tags.data ?? [], [tags.data]);
 

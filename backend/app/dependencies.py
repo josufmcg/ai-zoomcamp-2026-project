@@ -16,7 +16,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Annotated
 
-import jwt
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session

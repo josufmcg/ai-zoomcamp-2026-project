@@ -32,9 +32,7 @@ def login(
 ) -> Token:
     """Authenticate a user and return a signed access token."""
     settings: Settings = request.app.state.settings
-    user = session.scalars(
-        select(User).where(User.email == form_data.username)
-    ).one_or_none()
+    user = session.scalars(select(User).where(User.email == form_data.username)).one_or_none()
 
     # Verify the password even when the account is unknown so the response time
     # does not reveal whether the email exists.

@@ -14,6 +14,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -26,9 +27,7 @@ depends_on: str | Sequence[str] | None = None
 # creates it when the `units` table is created and drops it when the table is
 # dropped. On SQLite it becomes a VARCHAR with a CHECK constraint created as
 # part of the table.
-unit_type = sa.Enum(
-    "apartment", "garage", "storage", name="unit_type", create_constraint=True
-)
+unit_type = sa.Enum("apartment", "garage", "storage", name="unit_type", create_constraint=True)
 
 
 def upgrade() -> None:
@@ -72,9 +71,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("community_id", "name", name="uq_building_community_name"),
     )
-    op.create_index(
-        op.f("ix_buildings_community_id"), "buildings", ["community_id"], unique=False
-    )
+    op.create_index(op.f("ix_buildings_community_id"), "buildings", ["community_id"], unique=False)
     op.create_table(
         "building_tags",
         sa.Column("building_id", sa.Integer(), nullable=False),
@@ -99,9 +96,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("building_id", "identifier", name="uq_unit_building_identifier"),
     )
-    op.create_index(
-        op.f("ix_units_building_id"), "units", ["building_id"], unique=False
-    )
+    op.create_index(op.f("ix_units_building_id"), "units", ["building_id"], unique=False)
     op.create_table(
         "unit_tags",
         sa.Column("unit_id", sa.Integer(), nullable=False),

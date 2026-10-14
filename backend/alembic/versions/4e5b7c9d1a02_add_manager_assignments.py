@@ -16,6 +16,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -37,14 +38,10 @@ def upgrade() -> None:
             server_default=sa.text("(CURRENT_TIMESTAMP)"),
             nullable=False,
         ),
-        sa.ForeignKeyConstraint(
-            ["community_id"], ["communities.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["community_id"], ["communities.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["manager_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint(
-            "manager_id", "community_id", name="uq_manager_assignment_pair"
-        ),
+        sa.UniqueConstraint("manager_id", "community_id", name="uq_manager_assignment_pair"),
     )
     op.create_index(
         op.f("ix_manager_assignments_community_id"),

@@ -21,10 +21,10 @@ COMPOSE ?= docker compose
 # control; the default matches the compose postgres on its published port.
 INTEGRATION_DATABASE_URL ?= postgresql+psycopg://efinges:efinges@127.0.0.1:$(POSTGRES_PORT)/efinges_test
 
-.PHONY: install run test build \
+.PHONY: install run test build lint \
 	backend-install backend-run backend-test backend-test-integration \
-	backend-migrate backend-revision backend-openapi \
-	frontend-install frontend-run frontend-test frontend-build \
+	backend-migrate backend-revision backend-openapi backend-lint \
+	frontend-install frontend-run frontend-test frontend-build frontend-lint \
 	integration integration-db \
 	up down logs url
 
@@ -36,6 +36,9 @@ run: backend-run
 
 ## Run all unit tests (backend and frontend)
 test: backend-test frontend-test
+
+## Lint both sides (Ruff for the backend, ESLint for the frontend)
+lint: backend-lint frontend-lint
 
 ## Run the integration workflows against a dedicated database (needs postgres up)
 integration: backend-test-integration
@@ -104,6 +107,9 @@ backend-revision:
 backend-openapi:
 	cd $(BACKEND_DIR) && uv run python -m scripts.export_openapi
 
+backend-lint:
+	cd $(BACKEND_DIR) && uv run ruff check . && uv run ruff format --check .
+
 frontend-install:
 	cd $(FRONTEND_DIR) && npm install
 
@@ -112,6 +118,9 @@ frontend-run:
 
 frontend-test:
 	cd $(FRONTEND_DIR) && npm test
+
+frontend-lint:
+	cd $(FRONTEND_DIR) && npm run lint
 
 frontend-build:
 	cd $(FRONTEND_DIR) && npm run build

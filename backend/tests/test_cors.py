@@ -43,9 +43,7 @@ def test_actual_request_carries_the_allow_origin_header(api_client: TestClient) 
 
 
 def test_unknown_origin_is_not_echoed_back(api_client: TestClient) -> None:
-    response = api_client.get(
-        "/healthz", headers={"Origin": "http://evil.example.com"}
-    )
+    response = api_client.get("/healthz", headers={"Origin": "http://evil.example.com"})
 
     # The request still succeeds; the browser is the component that refuses to
     # hand the body to the page when the header is missing.
@@ -77,9 +75,7 @@ def test_empty_configuration_disables_the_middleware() -> None:
     app.state.db.create_all()
     try:
         with TestClient(app) as client:
-            response = client.get(
-                "/healthz", headers={"Origin": FRONTEND_ORIGIN}
-            )
+            response = client.get("/healthz", headers={"Origin": FRONTEND_ORIGIN})
     finally:
         app.state.db.drop_all()
         app.state.db.dispose()

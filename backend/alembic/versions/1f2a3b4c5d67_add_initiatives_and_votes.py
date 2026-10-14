@@ -20,6 +20,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -53,9 +54,7 @@ def upgrade() -> None:
             server_default=sa.text("(CURRENT_TIMESTAMP)"),
             nullable=False,
         ),
-        sa.ForeignKeyConstraint(
-            ["created_by_id"], ["users.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["created_by_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(
@@ -71,16 +70,10 @@ def upgrade() -> None:
         sa.Column("initiative_id", sa.Integer(), nullable=False),
         sa.Column("label", sa.String(length=200), nullable=False),
         sa.Column("position", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["initiative_id"], ["initiatives.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["initiative_id"], ["initiatives.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint(
-            "initiative_id", "label", name="uq_initiative_option_label"
-        ),
-        sa.UniqueConstraint(
-            "initiative_id", "position", name="uq_initiative_option_position"
-        ),
+        sa.UniqueConstraint("initiative_id", "label", name="uq_initiative_option_label"),
+        sa.UniqueConstraint("initiative_id", "position", name="uq_initiative_option_position"),
     )
     op.create_index(
         op.f("ix_initiative_options_initiative_id"),
@@ -103,28 +96,16 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.CheckConstraint("unit_id > 0", name="ck_vote_unit_positive"),
-        sa.ForeignKeyConstraint(
-            ["initiative_id"], ["initiatives.id"], ondelete="CASCADE"
-        ),
-        sa.ForeignKeyConstraint(
-            ["option_id"], ["initiative_options.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["initiative_id"], ["initiatives.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["option_id"], ["initiative_options.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["unit_id"], ["units.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["voter_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint(
-            "initiative_id", "unit_id", name="uq_vote_initiative_unit"
-        ),
+        sa.UniqueConstraint("initiative_id", "unit_id", name="uq_vote_initiative_unit"),
     )
-    op.create_index(
-        op.f("ix_votes_initiative_id"), "votes", ["initiative_id"], unique=False
-    )
-    op.create_index(
-        op.f("ix_votes_unit_id"), "votes", ["unit_id"], unique=False
-    )
-    op.create_index(
-        op.f("ix_votes_voter_id"), "votes", ["voter_id"], unique=False
-    )
+    op.create_index(op.f("ix_votes_initiative_id"), "votes", ["initiative_id"], unique=False)
+    op.create_index(op.f("ix_votes_unit_id"), "votes", ["unit_id"], unique=False)
+    op.create_index(op.f("ix_votes_voter_id"), "votes", ["voter_id"], unique=False)
 
 
 def downgrade() -> None:
@@ -139,7 +120,5 @@ def downgrade() -> None:
     )
     op.drop_table("initiative_options")
 
-    op.drop_index(
-        op.f("ix_initiatives_created_by_id"), table_name="initiatives"
-    )
+    op.drop_index(op.f("ix_initiatives_created_by_id"), table_name="initiatives")
     op.drop_table("initiatives")

@@ -50,16 +50,10 @@ class Telemetry:
                     export_interval_millis=5_000,
                 )
             )
-            span_processors.append(
-                BatchSpanProcessor(OTLPSpanExporter(endpoint=endpoint))
-            )
-            log_processors.append(
-                BatchLogRecordProcessor(OTLPLogExporter(endpoint=endpoint))
-            )
+            span_processors.append(BatchSpanProcessor(OTLPSpanExporter(endpoint=endpoint)))
+            log_processors.append(BatchLogRecordProcessor(OTLPLogExporter(endpoint=endpoint)))
 
-        self.meter_provider = MeterProvider(
-            resource=resource, metric_readers=metric_readers
-        )
+        self.meter_provider = MeterProvider(resource=resource, metric_readers=metric_readers)
         self.tracer_provider = TracerProvider(resource=resource)
         self.logger_provider = LoggerProvider(resource=resource)
         for span_processor in span_processors:
@@ -84,9 +78,7 @@ class Telemetry:
             body="EFINGES backend started",
             attributes={
                 "service.name": self._settings.otel_service_name,
-                "telemetry.enabled": bool(
-                    self._settings.otel_exporter_otlp_endpoint
-                ),
+                "telemetry.enabled": bool(self._settings.otel_exporter_otlp_endpoint),
             },
         )
 
@@ -117,9 +109,7 @@ class RequestMetricsMiddleware:
                 status_code = message["status"]
             await send(message)
 
-        with self.telemetry.tracer.start_as_current_span(
-            "http.server.request"
-        ) as span:
+        with self.telemetry.tracer.start_as_current_span("http.server.request") as span:
             try:
                 await self.app(scope, receive, send_with_status)
             finally:

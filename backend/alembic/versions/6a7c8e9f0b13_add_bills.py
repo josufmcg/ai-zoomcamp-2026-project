@@ -17,6 +17,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -55,9 +56,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["unit_id"], ["units.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_bills_unit_id"), "bills", ["unit_id"], unique=False
-    )
+    op.create_index(op.f("ix_bills_unit_id"), "bills", ["unit_id"], unique=False)
 
 
 def downgrade() -> None:

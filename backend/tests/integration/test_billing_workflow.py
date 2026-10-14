@@ -67,9 +67,7 @@ def test_bill_moves_from_pending_to_paid(client, db_session, bootstrap_admin):
     assert bill["unit_identifier"] == flow.apartment["identifier"]
 
     # The stored status is pending; 'overdue'/'paid' are not stored yet.
-    stored = db_session.execute(
-        select(Bill.status).where(Bill.id == bill_id)
-    ).scalar_one()
+    stored = db_session.execute(select(Bill.status).where(Bill.id == bill_id)).scalar_one()
     assert stored is BillStatus.PENDING
 
     # The resident sees it on their own unit.
@@ -82,21 +80,12 @@ def test_bill_moves_from_pending_to_paid(client, db_session, bootstrap_admin):
     assert paid.status_code == 200, paid.text
     assert paid.json()["status"] == "paid"
 
-    stored = db_session.execute(
-        select(Bill.status).where(Bill.id == bill_id)
-    ).scalar_one()
+    stored = db_session.execute(select(Bill.status).where(Bill.id == bill_id)).scalar_one()
     assert stored is BillStatus.PAID
 
     # The resident now reads it as paid through both the list and the detail.
-    assert client.get("/bills", headers=flow.resident_headers).json()[0][
-        "status"
-    ] == "paid"
-    assert (
-        client.get(f"/bills/{bill_id}", headers=flow.resident_headers).json()[
-            "status"
-        ]
-        == "paid"
-    )
+    assert client.get("/bills", headers=flow.resident_headers).json()[0]["status"] == "paid"
+    assert client.get(f"/bills/{bill_id}", headers=flow.resident_headers).json()["status"] == "paid"
 
     # Paying again is refused.
     again = client.post(f"/bills/{bill_id}/pay", headers=flow.manager_headers)
@@ -120,35 +109,23 @@ def test_overdue_is_computed_and_never_stored(client, db_session, bootstrap_admi
     # Every response shows the computed display status.
     assert bill["status"] == "overdue"
     assert (
-        client.get(f"/bills/{bill_id}", headers=flow.resident_headers).json()[
-            "status"
-        ]
-        == "overdue"
+        client.get(f"/bills/{bill_id}", headers=flow.resident_headers).json()["status"] == "overdue"
     )
 
     # The database still holds 'pending'; overdue was never persisted.
-    stored = db_session.execute(
-        select(Bill.status).where(Bill.id == bill_id)
-    ).scalar_one()
+    stored = db_session.execute(select(Bill.status).where(Bill.id == bill_id)).scalar_one()
     assert stored is BillStatus.PENDING
 
     # The status filter selects on the computed value.
-    overdue = client.get(
-        "/bills?status=overdue", headers=flow.resident_headers
-    ).json()
+    overdue = client.get("/bills?status=overdue", headers=flow.resident_headers).json()
     assert [row["id"] for row in overdue] == [bill_id]
-    pending = client.get(
-        "/bills?status=pending", headers=flow.resident_headers
-    ).json()
+    pending = client.get("/bills?status=pending", headers=flow.resident_headers).json()
     assert pending == []
 
     # Paying an overdue bill is allowed and clears the computed status.
     paid = client.post(f"/bills/{bill_id}/pay", headers=flow.manager_headers).json()
     assert paid["status"] == "paid"
-    assert (
-        client.get("/bills?status=overdue", headers=flow.resident_headers).json()
-        == []
-    )
+    assert client.get("/bills?status=overdue", headers=flow.resident_headers).json() == []
 
 
 def test_bills_are_scoped_to_the_owning_resident(client, bootstrap_admin):
@@ -171,13 +148,9 @@ def test_bills_are_scoped_to_the_owning_resident(client, bootstrap_admin):
 
     # A resident may not issue or settle bills.
     assert_denied(
-        _issue_response(
-            client, flow.resident_headers, flow.apartment["id"], due_date=TODAY
-        )
+        _issue_response(client, flow.resident_headers, flow.apartment["id"], due_date=TODAY)
     )
-    assert_denied(
-        client.post(f"/bills/{bill_id}/pay", headers=flow.resident_headers)
-    )
+    assert_denied(client.post(f"/bills/{bill_id}/pay", headers=flow.resident_headers))
 
     # A manager without scope over the community may not issue a bill either.
     outsider = create_account(
@@ -187,11 +160,7 @@ def test_bills_are_scoped_to_the_owning_resident(client, bootstrap_admin):
         role=UserRole.MANAGER,
     )
     outsider_headers = outsider.sign_in(client)
-    assert_denied(
-        _issue_response(
-            client, outsider_headers, flow.apartment["id"], due_date=TODAY
-        )
-    )
+    assert_denied(_issue_response(client, outsider_headers, flow.apartment["id"], due_date=TODAY))
 
 
 def test_due_date_before_issue_date_is_rejected(client, bootstrap_admin):

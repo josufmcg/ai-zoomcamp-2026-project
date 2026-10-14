@@ -15,8 +15,8 @@ from app.models import Incidence, IncidenceStatus, UserRole
 from tests.integration.helpers import (
     assert_denied,
     assert_hidden,
-    created,
     create_account,
+    created,
     provision_workflow,
 )
 
@@ -106,9 +106,7 @@ def test_resident_reports_manager_resolves_and_thread_is_shared(
     }
 
     # The incidence list carries the thread so the resident screen is one call.
-    listed = client.get(
-        "/incidences", headers=flow.resident_headers
-    ).json()
+    listed = client.get("/incidences", headers=flow.resident_headers).json()
     assert [row["id"] for row in listed] == [incidence_id]
     assert len(listed[0]["comments"]) == 2
 
@@ -129,14 +127,8 @@ def test_incidence_is_hidden_from_another_resident(client, bootstrap_admin):
 
     # Reading, listing comments, and commenting are all hidden behind 404 so
     # the incidence id cannot be probed for existence.
-    assert_hidden(
-        client.get(f"/incidences/{incidence_id}", headers=other_headers)
-    )
-    assert_hidden(
-        client.get(
-            f"/incidences/{incidence_id}/comments", headers=other_headers
-        )
-    )
+    assert_hidden(client.get(f"/incidences/{incidence_id}", headers=other_headers))
+    assert_hidden(client.get(f"/incidences/{incidence_id}/comments", headers=other_headers))
     assert_hidden(
         client.post(
             f"/incidences/{incidence_id}/comments",
@@ -161,9 +153,7 @@ def test_incidence_is_hidden_from_another_resident(client, bootstrap_admin):
     assert client.get("/incidences", headers=other_headers).json() == []
 
 
-def test_only_the_managing_manager_can_advance_the_lifecycle(
-    client, bootstrap_admin
-):
+def test_only_the_managing_manager_can_advance_the_lifecycle(client, bootstrap_admin):
     """Status changes are a manager action, scoped to the unit's community."""
     flow = provision_workflow(client, bootstrap_admin)
     incidence = _report(client, flow.resident_headers, flow.apartment["id"])

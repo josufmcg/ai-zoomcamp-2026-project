@@ -33,9 +33,7 @@ def _load_user(session: Session, user_id: int) -> User:
     """Return one user by id or raise 404."""
     user = session.get(User, user_id)
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return user
 
 

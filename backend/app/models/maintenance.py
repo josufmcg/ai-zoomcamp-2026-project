@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -20,8 +21,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 from app.models.columns import enum_column
 
+if TYPE_CHECKING:
+    # Imported for the string relationship annotations only; importing these at
+    # runtime would create an import cycle between the model modules.
+    from app.models.identity import User
+    from app.models.property import Unit
 
-class IncidenceStatus(str, enum.Enum):
+
+class IncidenceStatus(enum.StrEnum):
     """The four stages of an incidence, in lifecycle order."""
 
     SUBMITTED = "submitted"
@@ -65,9 +72,9 @@ class Incidence(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    unit: Mapped["Unit"] = relationship(back_populates="incidences")
-    created_by: Mapped["User"] = relationship()
-    comments: Mapped[list["Comment"]] = relationship(
+    unit: Mapped[Unit] = relationship(back_populates="incidences")
+    created_by: Mapped[User] = relationship()
+    comments: Mapped[list[Comment]] = relationship(
         back_populates="incidence",
         cascade="all, delete-orphan",
         order_by="Comment.id",
@@ -78,10 +85,7 @@ class Incidence(Base):
         return target in INCIDENCE_TRANSITIONS[self.status]
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid
-        return (
-            f"Incidence(id={self.id!r}, unit_id={self.unit_id!r}, "
-            f"status={self.status.value!r})"
-        )
+        return f"Incidence(id={self.id!r}, unit_id={self.unit_id!r}, status={self.status.value!r})"
 
 
 class Comment(Base):
@@ -107,7 +111,7 @@ class Comment(Base):
     )
 
     incidence: Mapped[Incidence] = relationship(back_populates="comments")
-    author: Mapped["User"] = relationship()
+    author: Mapped[User] = relationship()
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid
         return f"Comment(id={self.id!r}, incidence_id={self.incidence_id!r})"

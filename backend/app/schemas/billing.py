@@ -45,7 +45,7 @@ class BillRead(BaseModel):
     status: BillDisplayStatus
 
     @classmethod
-    def from_bill(cls, bill: Bill, *, today: date) -> "BillRead":
+    def from_bill(cls, bill: Bill, *, today: date) -> BillRead:
         """Build the response, computing ``overdue`` from the due date."""
         return cls(
             id=bill.id,

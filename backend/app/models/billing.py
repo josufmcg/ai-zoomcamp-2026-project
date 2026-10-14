@@ -12,6 +12,7 @@ from __future__ import annotations
 import enum
 from datetime import date, datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Date, DateTime, ForeignKey, Numeric, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -19,8 +20,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 from app.models.columns import enum_column
 
+if TYPE_CHECKING:
+    # Imported for the string relationship annotations only; importing these at
+    # runtime would create an import cycle between the model modules.
+    from app.models.property import Unit
 
-class BillStatus(str, enum.Enum):
+
+class BillStatus(enum.StrEnum):
     """The status stored on a bill. ``overdue`` is computed, not stored."""
 
     PENDING = "pending"
@@ -29,7 +35,7 @@ class BillStatus(str, enum.Enum):
 
 # A computed, non-persisted status used by the API so clients can filter on
 # ``overdue`` without the database ever storing that value.
-class BillDisplayStatus(str, enum.Enum):
+class BillDisplayStatus(enum.StrEnum):
     """The status a client sees: the stored status or ``overdue``."""
 
     PENDING = "pending"
@@ -59,14 +65,12 @@ class Bill(Base):
     # moves it to paid. The default is Python-side only, so it adds no column
     # and needs no migration, but it means an omitted status can never leave a
     # NULL in the database.
-    status: Mapped[BillStatus] = enum_column(
-        BillStatus, "bill_status", default=BillStatus.PENDING
-    )
+    status: Mapped[BillStatus] = enum_column(BillStatus, "bill_status", default=BillStatus.PENDING)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    unit: Mapped["Unit"] = relationship(back_populates="bills")
+    unit: Mapped[Unit] = relationship(back_populates="bills")
 
     def display_status(self, today: date) -> BillDisplayStatus:
         """Return the status a client should see for this bill.

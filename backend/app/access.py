@@ -41,9 +41,7 @@ def managed_community_ids(session: Session, user: User) -> set[int]:
         return set()
     return set(
         session.scalars(
-            select(ManagerAssignment.community_id).where(
-                ManagerAssignment.manager_id == user.id
-            )
+            select(ManagerAssignment.community_id).where(ManagerAssignment.manager_id == user.id)
         ).all()
     )
 

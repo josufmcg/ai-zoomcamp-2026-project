@@ -37,9 +37,7 @@ router = APIRouter(tags=["assignments"])
 
 # Managers and administrators manage assignments; residents only read their
 # own. The dependency returns 401 for a missing token and 403 for a resident.
-ManagerUser = Annotated[
-    User, Depends(require_role(UserRole.MANAGER, UserRole.ADMINISTRATOR))
-]
+ManagerUser = Annotated[User, Depends(require_role(UserRole.MANAGER, UserRole.ADMINISTRATOR))]
 
 
 @router.get("/residents", response_model=list[UserRead])
@@ -59,7 +57,6 @@ def list_residents(
     if is_active is not None:
         statement = statement.where(User.is_active == is_active)
     return list(session.scalars(statement.order_by(User.email)).all())
-
 
 
 def list_assignments_for_user(session: Session, user_id: int) -> list[UnitAssignment]:
@@ -162,9 +159,7 @@ def create_assignment(
     """
     user = session.get(User, payload.user_id)
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     if user.role is not UserRole.RESIDENT:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
@@ -173,9 +168,7 @@ def create_assignment(
 
     unit = session.get(Unit, payload.unit_id)
     if unit is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found")
 
     existing = session.scalars(
         select(UnitAssignment).where(UnitAssignment.unit_id == payload.unit_id)

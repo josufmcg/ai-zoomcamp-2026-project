@@ -49,7 +49,7 @@ export function MyBillsSection() {
   const loadBills = useCallback(() => billingApi.listBills(), []);
   const request = useAsync<Bill[]>(loadBills);
 
-  const bills = request.data ?? [];
+  const bills = useMemo(() => request.data ?? [], [request.data]);
   const counts = useMemo(() => countBillsByFilter(bills), [bills]);
   const visible = useMemo(() => filterBills(bills, filter), [bills, filter]);
 

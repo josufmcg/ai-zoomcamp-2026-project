@@ -145,6 +145,21 @@ npm test          # single run (Vitest)
 npm run test:watch  # watch mode
 ```
 
+## Lint
+
+ESLint (flat config, `eslint.config.js`) checks the sources and the tests; it is
+part of the CI pipeline (backlog task 19) and runs before the tests:
+
+```bash
+npm run lint
+```
+
+The config applies ESLint's recommended rules, the TypeScript recommended rules,
+the React hooks rules, and the React Refresh rule, and gives the `*.test.*`
+files and `src/test/` the Vitest globals so `describe`/`it`/`expect`/`vi` are
+recognized. `make lint` at the repository root runs it together with the backend
+lint.
+
 ## Type-check and build
 
 ```bash
@@ -199,6 +214,7 @@ src/
       ManagerIncidencesSection.tsx   # lifecycle transitions and replies
       InitiativesSection.tsx         # create initiatives with a scope
       TagChecklist.tsx               # tag checklist and editor
+      tagSelection.ts                # add/remove id from a list (tested seam)
       incidenceStatus.ts             # lifecycle transition mirror (tested)
       initiativeScope.ts             # draft validation and payload (tested)
     admin/

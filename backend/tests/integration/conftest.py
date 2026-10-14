@@ -138,9 +138,7 @@ def db_session(integration_app: FastAPI) -> Iterator[Session]:
 
 
 @pytest.fixture
-def bootstrap_admin(
-    integration_app: FastAPI, db_session: Session
-) -> Account:
+def bootstrap_admin(integration_app: FastAPI, db_session: Session) -> Account:
     """Seed the first administrator directly, then use the public API.
 
     ``POST /users`` is administrator-only, so the very first account cannot be

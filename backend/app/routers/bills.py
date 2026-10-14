@@ -35,22 +35,16 @@ from app.schemas import BillCreate, BillRead
 
 router = APIRouter(tags=["bills"])
 
-ManagerUser = Annotated[
-    User, Depends(require_role(UserRole.MANAGER, UserRole.ADMINISTRATOR))
-]
+ManagerUser = Annotated[User, Depends(require_role(UserRole.MANAGER, UserRole.ADMINISTRATOR))]
 
 
 def _load_bill(session: Session, bill_id: int) -> Bill:
     """Return one bill by id, with its unit loaded, or raise 404."""
     bill = session.scalars(
-        select(Bill)
-        .where(Bill.id == bill_id)
-        .options(selectinload(Bill.unit))
+        select(Bill).where(Bill.id == bill_id).options(selectinload(Bill.unit))
     ).one_or_none()
     if bill is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Bill not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Bill not found")
     return bill
 
 
@@ -58,9 +52,7 @@ def _load_unit(session: Session, unit_id: int) -> Unit:
     """Return one unit by id or raise 404."""
     unit = session.get(Unit, unit_id)
     if unit is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unit not found")
     return unit
 
 
@@ -78,9 +70,7 @@ def list_bills(
     due date without changing anything in the database.
     """
     today = date.today()
-    statement = (
-        select(Bill).options(selectinload(Bill.unit)).order_by(Bill.id)
-    )
+    statement = select(Bill).options(selectinload(Bill.unit)).order_by(Bill.id)
 
     if user.role is UserRole.RESIDENT:
         # ``Bill.unit.has(...)`` correlates ``units`` with ``bills``; writing
@@ -93,9 +83,7 @@ def list_bills(
         allowed = access.readable_community_ids(session, user)
         if allowed is not None:
             statement = statement.where(
-                Bill.unit.has(
-                    Unit.building.has(Building.community_id.in_(allowed or []))
-                )
+                Bill.unit.has(Unit.building.has(Building.community_id.in_(allowed or [])))
             )
 
     if unit_id is not None:
@@ -122,9 +110,7 @@ def create_bill(
     """
     unit = _load_unit(session, payload.unit_id)
     if not access.can_write_unit(session, manager, unit):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role")
 
     issue_date = payload.issue_date or date.today()
     if payload.due_date < issue_date:
@@ -156,9 +142,7 @@ def read_bill(
     """Return one bill the caller may see (own unit, or managed community)."""
     bill = _load_bill(session, bill_id)
     if not access.can_read_unit(session, user, bill.unit):
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Bill not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Bill not found")
     return BillRead.from_bill(bill, today=date.today())
 
 
@@ -175,13 +159,9 @@ def pay_bill(
     """
     bill = _load_bill(session, bill_id)
     if not access.can_write_unit(session, manager, bill.unit):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role")
     if bill.status is BillStatus.PAID:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="Bill is already paid"
-        )
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Bill is already paid")
 
     bill.status = BillStatus.PAID
     session.commit()

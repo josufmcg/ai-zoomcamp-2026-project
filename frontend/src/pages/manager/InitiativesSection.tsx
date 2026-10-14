@@ -40,7 +40,8 @@ import {
   SectionCard,
   StatusBadge,
 } from "../components";
-import { TagChecklist, toggleId } from "./TagChecklist";
+import { TagChecklist } from "./TagChecklist";
+import { toggleId } from "./tagSelection";
 
 /** Today as an ISO `YYYY-MM-DD` string. */
 function todayIso(): string {

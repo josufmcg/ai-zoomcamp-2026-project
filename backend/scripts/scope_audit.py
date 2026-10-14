@@ -58,9 +58,7 @@ WIPE_ORDER = (
 
 
 def _login(client: TestClient, email: str) -> dict[str, str]:
-    response = client.post(
-        "/auth/token", data={"username": email, "password": PASSWORD}
-    )
+    response = client.post("/auth/token", data={"username": email, "password": PASSWORD})
     assert response.status_code == 200, response.text
     return {"Authorization": f"Bearer {response.json()['access_token']}"}
 
@@ -102,9 +100,7 @@ def build_fixtures(app) -> dict:
             session.add(community)
             session.commit()
             session.add(
-                ManagerAssignment(
-                    manager_id=users[manager_name].id, community_id=community.id
-                )
+                ManagerAssignment(manager_id=users[manager_name].id, community_id=community.id)
             )
             units = []
             for index, identifier in enumerate(unit_ids):
@@ -151,7 +147,7 @@ def build_fixtures(app) -> dict:
             session.commit()
             fixtures["communities"][label] = community
             fixtures["units"][label] = units
-            for key, value in users.items():
+            for value in users.values():
                 session.refresh(value)
 
         for user in users.values():
@@ -184,10 +180,7 @@ def main() -> None:
 
     checks: list[tuple[str, str, str, set, set]] = []
     with TestClient(app) as client:
-        headers = {
-            name: _login(client, user.email)
-            for name, user in fixtures["users"].items()
-        }
+        headers = {name: _login(client, user.email) for name, user in fixtures["users"].items()}
 
         def collect(label, path, who, expected_ids, key="id"):
             """Compare the endpoint's rows with an independent expectation.
@@ -208,32 +201,85 @@ def main() -> None:
         collect("residentA units", "/units", "residentA", set(units_a))
         collect("residentB units", "/units", "residentB", set(units_b))
 
-        collect("managerA units by community", f"/units?community_id={fixtures['communities']['A'].id}", "managerA", set(units_a))
-        collect("managerA units by other community", f"/units?community_id={fixtures['communities']['B'].id}", "managerA", set())
-        collect("managerA units by building", f"/units?building_id={fixtures['units']['A'][0].building_id}", "managerA", set(units_a))
-        collect("residentA units by other community", f"/units?community_id={fixtures['communities']['B'].id}", "residentA", set())
+        community_a = fixtures["communities"]["A"].id
+        community_b = fixtures["communities"]["B"].id
+        building_a = fixtures["units"]["A"][0].building_id
+        collect(
+            "managerA units by community",
+            f"/units?community_id={community_a}",
+            "managerA",
+            set(units_a),
+        )
+        collect(
+            "managerA units by other community",
+            f"/units?community_id={community_b}",
+            "managerA",
+            set(),
+        )
+        collect(
+            "managerA units by building",
+            f"/units?building_id={building_a}",
+            "managerA",
+            set(units_a),
+        )
+        collect(
+            "residentA units by other community",
+            f"/units?community_id={community_b}",
+            "residentA",
+            set(),
+        )
 
         collect("admin bills", "/bills", "admin", all_units, key="unit_id")
         collect("managerA bills", "/bills", "managerA", set(units_a), key="unit_id")
         collect("managerB bills", "/bills", "managerB", set(units_b), key="unit_id")
         collect("residentA bills", "/bills", "residentA", set(units_a), key="unit_id")
         collect("residentB bills", "/bills", "residentB", set(units_b), key="unit_id")
-        collect("managerA bills filtered", f"/bills?unit_id={fixtures['units']['A'][0].id}", "managerA", {fixtures["units"]["A"][0].id}, key="unit_id")
+        unit_a = fixtures["units"]["A"][0].id
+        collect(
+            "managerA bills filtered",
+            f"/bills?unit_id={unit_a}",
+            "managerA",
+            {unit_a},
+            key="unit_id",
+        )
 
         collect("admin incidences", "/incidences", "admin", all_units, key="unit_id")
         collect("managerA incidences", "/incidences", "managerA", set(units_a), key="unit_id")
         collect("managerB incidences", "/incidences", "managerB", set(units_b), key="unit_id")
         collect("residentA incidences", "/incidences", "residentA", set(units_a), key="unit_id")
-        collect("managerB incidences filter", "/incidences?status=submitted", "managerB", set(units_b), key="unit_id")
+        collect(
+            "managerB incidences filter",
+            "/incidences?status=submitted",
+            "managerB",
+            set(units_b),
+            key="unit_id",
+        )
 
         # Buildings are identified by building id, not unit id.
         with db.session() as session:
-            buildings_a = set(session.scalars(select(Building.id).where(Building.community_id == fixtures["communities"]["A"].id)).all())
-            buildings_b = set(session.scalars(select(Building.id).where(Building.community_id == fixtures["communities"]["B"].id)).all())
+            buildings_a = set(
+                session.scalars(
+                    select(Building.id).where(
+                        Building.community_id == fixtures["communities"]["A"].id
+                    )
+                ).all()
+            )
+            buildings_b = set(
+                session.scalars(
+                    select(Building.id).where(
+                        Building.community_id == fixtures["communities"]["B"].id
+                    )
+                ).all()
+            )
         collect("admin buildings", "/buildings", "admin", buildings_a | buildings_b)
         collect("managerA buildings", "/buildings", "managerA", buildings_a)
         collect("residentA buildings", "/buildings", "residentA", buildings_a)
-        collect("managerA buildings filtered", f"/buildings?community_id={fixtures['communities']['A'].id}", "managerA", buildings_a)
+        collect(
+            "managerA buildings filtered",
+            f"/buildings?community_id={community_a}",
+            "managerA",
+            buildings_a,
+        )
 
         communities_a = {fixtures["communities"]["A"].id}
         communities_b = {fixtures["communities"]["B"].id}
@@ -242,9 +288,7 @@ def main() -> None:
         collect("residentB communities", "/communities", "residentB", communities_b)
 
     failures = [
-        (label, path, who, got, want)
-        for label, path, who, got, want in checks
-        if got != want
+        (label, path, who, got, want) for label, path, who, got, want in checks if got != want
     ]
     for label, path, who, got, want in failures:
         print(f"MISMATCH {label}: {path} as {who}\n  got  {sorted(got)}\n  want {sorted(want)}")

@@ -11,6 +11,7 @@ import { useState } from "react";
 
 import type { Tag } from "../../types/property";
 import { Notice } from "../components";
+import { toggleId } from "./tagSelection";
 
 /** Controlled checkbox list of every tag, with the current selection checked. */
 export function TagChecklist({
@@ -59,13 +60,6 @@ export function TagChecklist({
       </div>
     </fieldset>
   );
-}
-
-/** Add or remove one value from a list, returning a new list. */
-export function toggleId<T>(values: readonly T[], value: T): T[] {
-  return values.includes(value)
-    ? values.filter((existing) => existing !== value)
-    : [...values, value];
 }
 
 /**
