@@ -16,7 +16,9 @@ from app.main import create_app
 from app.models import (
     Building,
     Community,
+    ManagerAssignment,
     OwnershipType,
+    Tag,
     Unit,
     UnitAssignment,
     UnitType,
@@ -202,6 +204,62 @@ def assign_unit(api_app: FastAPI) -> Callable[..., UnitAssignment]:
 
 
 @pytest.fixture
+def assign_manager(api_app: FastAPI) -> Callable[..., ManagerAssignment]:
+    """Return a helper that gives a manager access to a community directly.
+
+    The public endpoint is ``POST /manager-assignments`` (administrator only),
+    but most property tests need a manager with a scope without also exercising
+    user management, so the row is seeded directly like ``create_user``.
+    """
+
+    def _assign_manager(
+        manager: User, community: Community
+    ) -> ManagerAssignment:
+        with api_app.state.db.session() as db_session:
+            assignment = ManagerAssignment(
+                manager_id=manager.id, community_id=community.id
+            )
+            db_session.add(assignment)
+            db_session.commit()
+            db_session.refresh(assignment)
+            db_session.expunge(assignment)
+        return assignment
+
+    return _assign_manager
+
+
+@pytest.fixture
+def create_tag(api_app: FastAPI) -> Callable[..., Tag]:
+    """Return a helper that inserts a tag directly into the app database."""
+
+    def _create_tag(name: str) -> Tag:
+        with api_app.state.db.session() as db_session:
+            tag = Tag(name=name)
+            db_session.add(tag)
+            db_session.commit()
+            db_session.refresh(tag)
+            db_session.expunge(tag)
+        return tag
+
+    return _create_tag
+
+
+@pytest.fixture
+def db_session(api_app: FastAPI) -> Iterator[Session]:
+    """A session on the application's database, for asserting stored rows.
+
+    Tests that check what was *persisted* (a bill's stored status, a hashed
+    password) use this instead of the HTTP response, so they can prove the
+    response is not just hiding the truth.
+    """
+    session = api_app.state.db.session()
+    try:
+        yield session
+    finally:
+        session.close()
+
+
+@pytest.fixture
 def login(api_client: TestClient) -> Callable[..., str]:
     """Return a helper that logs a user in and returns the access token."""
 
@@ -214,6 +272,18 @@ def login(api_client: TestClient) -> Callable[..., str]:
         return response.json()["access_token"]
 
     return _login
+
+
+@pytest.fixture
+def auth_token(
+    login: Callable[..., str],
+) -> Callable[[User], dict[str, str]]:
+    """Return a helper that logs a user in and returns the request headers."""
+
+    def _auth_token(user: User) -> dict[str, str]:
+        return auth_header(login(user.email))
+
+    return _auth_token
 
 
 def auth_header(token: str) -> dict[str, str]:

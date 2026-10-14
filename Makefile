@@ -16,7 +16,7 @@ EFINGES_SUBNET ?= 10.215.25.0/24
 COMPOSE ?= docker compose
 
 .PHONY: install run test build \
-	backend-install backend-run backend-test backend-migrate backend-revision \
+	backend-install backend-run backend-test backend-migrate backend-revision backend-openapi \
 	frontend-install frontend-run frontend-test frontend-build \
 	up down logs url
 
@@ -37,6 +37,9 @@ migrate: backend-migrate
 
 ## Create a new migration from the current models (use m="message")
 revision: backend-revision
+
+## Export the FastAPI OpenAPI schema to openapi.yaml at the repository root
+openapi: backend-openapi
 
 ## Build and start the full stack (backend, frontend, postgres, observability)
 up:
@@ -78,6 +81,9 @@ backend-migrate:
 
 backend-revision:
 	cd $(BACKEND_DIR) && uv run alembic revision --autogenerate -m "$(m)"
+
+backend-openapi:
+	cd $(BACKEND_DIR) && uv run python -m scripts.export_openapi
 
 frontend-install:
 	cd $(FRONTEND_DIR) && npm install

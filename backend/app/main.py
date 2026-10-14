@@ -12,7 +12,15 @@ from fastapi import FastAPI
 
 from app.config import Settings, get_settings
 from app.database import Database
-from app.routers import assignments, auth
+from app.routers import (
+    assignments,
+    auth,
+    bills,
+    governance,
+    incidences,
+    property,
+    users,
+)
 from app.telemetry import RequestMetricsMiddleware, Telemetry
 
 
@@ -49,6 +57,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     # Resident and unit assignment endpoints (backlog task 7).
     app.include_router(assignments.router)
+
+    # Property tree, tags, and manager assignments (backlog task 8).
+    # Order matters: the fixed /manager-assignments path must be registered
+    # before any dynamic /{resource}/{id} route from later routers.
+    app.include_router(property.router)
+
+    # Administrator user management (backlog task 9).
+    app.include_router(users.router)
+
+    # Manual bills (backlog task 10).
+    app.include_router(bills.router)
+
+    # Incidences and comment threads (backlog task 11).
+    app.include_router(incidences.router)
+
+    # Initiatives and per-unit voting (backlog task 12).
+    app.include_router(governance.router)
 
     return app
 

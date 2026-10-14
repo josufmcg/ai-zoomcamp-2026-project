@@ -113,6 +113,7 @@ make install   # install backend (uv sync) and frontend (npm install) dependenci
 make run       # start the backend dev server on port 8000
 make test      # run the backend pytest suite and the frontend Vitest suite
 make build     # type-check and build the frontend for production
+make openapi   # re-export the OpenAPI contract to openapi.yaml
 ```
 
 See `backend/README.md` and `frontend/README.md` for the individual commands.
@@ -122,8 +123,15 @@ See `backend/README.md` and `frontend/README.md` for the individual commands.
 The backend uses SQLAlchemy 2.0 with Alembic migrations. The property hierarchy
 is Community → Building → Unit (apartment, garage, or storage), with shared
 tags that managers can attach to buildings and units. The `users` table stores
-accounts with a role of `administrator`, `manager`, or `resident`, and the
-`unit_assignments` table links each resident to the units they own or rent.
+accounts with a role of `administrator`, `manager`, or `resident`;
+`unit_assignments` links each resident to the units they own or rent; and
+`manager_assignments` records which communities each manager is responsible
+for. Bills, incidences with comment threads, and initiatives with per-unit
+votes are stored alongside them.
+
+The models and the Pydantic schemas are split into `app/models/` and
+`app/schemas/` packages (`property`, `identity`, `billing`, `maintenance`,
+`governance`), with every name re-exported so imports stay short.
 
 ```bash
 make migrate   # apply the migrations to the configured database
@@ -149,6 +157,39 @@ those links through `/assignments` (list, create, remove), while a resident
 reads their own units through `GET /auth/me/units`. A unit has at most one
 resident at a time, so assigning the same unit twice returns 409. See
 `backend/README.md` for the endpoint table.
+
+## What the API covers
+
+Administrators have global scope, managers are limited to the communities they
+are assigned to, and residents see only their own units. Every role boundary is
+enforced server-side in `backend/app/access.py`.
+
+| Area | Endpoints | Who |
+| --- | --- | --- |
+| Property tree and tags | `/communities`, `/buildings`, `/units`, `/tags` | Managers maintain their scope; residents read their own units |
+| Manager scope | `/manager-assignments` | Administrators only |
+| User management | `/users` | Administrators only |
+| Bills | `/bills`, `/bills/{id}/pay` | Managers issue and settle; residents read their own |
+| Incidences | `/incidences`, `/incidences/{id}/comments` | Residents report; managers advance status; both comment |
+| Initiatives | `/initiatives`, `/initiatives/{id}/votes` | Managers create; residents cast one ballot per eligible unit |
+
+Two derived values are never stored: a bill's **overdue** status is computed
+from its due date every time it is serialized, and a unit's **eligibility** for
+an initiative is computed from the scope filter at voting time. Money uses
+`NUMERIC(12, 2)` and `decimal.Decimal`, never binary floating point.
+
+## API contract
+
+`openapi.yaml` at the repository root is the single source of truth for the API
+surface. It is generated from the FastAPI application and never hand-edited:
+
+```bash
+make openapi   # re-export openapi.yaml from the backend schema
+```
+
+Run it after every API change and commit the result. `cd backend && uv run
+pytest` fails if the committed file no longer matches the live schema, so a
+forgotten re-export is caught immediately.
 
 ## Scope
 

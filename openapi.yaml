@@ -1,0 +1,2576 @@
+components:
+  schemas:
+    AssignmentCreate:
+      description: Request body for assigning a resident to a unit.
+      properties:
+        ownership_type:
+          $ref: '#/components/schemas/OwnershipType'
+        unit_id:
+          title: Unit Id
+          type: integer
+        user_id:
+          title: User Id
+          type: integer
+      required:
+      - user_id
+      - unit_id
+      - ownership_type
+      title: AssignmentCreate
+      type: object
+    AssignmentRead:
+      description: 'Public representation of a unit assignment.
+
+
+        The embedded user and unit objects let manager screens render a table
+
+        without a second request, and they never contain the password hash.'
+      properties:
+        id:
+          title: Id
+          type: integer
+        ownership_type:
+          $ref: '#/components/schemas/OwnershipType'
+        unit:
+          $ref: '#/components/schemas/UnitRead'
+        unit_id:
+          title: Unit Id
+          type: integer
+        user:
+          $ref: '#/components/schemas/UserRead'
+        user_id:
+          title: User Id
+          type: integer
+      required:
+      - id
+      - user_id
+      - unit_id
+      - ownership_type
+      - user
+      - unit
+      title: AssignmentRead
+      type: object
+    BillCreate:
+      description: 'Request body for ``POST /bills`` (manager for the unit''s community).
+
+
+        ``amount`` is a :class:`~decimal.Decimal` with at most two decimal places
+
+        and a positive value, so money never travels as binary floating point.
+
+        ``issue_date`` defaults to today when the manager omits it.'
+      properties:
+        amount:
+          anyOf:
+          - exclusiveMinimum: 0.0
+            type: number
+          - type: string
+          title: Amount
+        description:
+          maxLength: 500
+          minLength: 1
+          title: Description
+          type: string
+        due_date:
+          format: date
+          title: Due Date
+          type: string
+        issue_date:
+          anyOf:
+          - format: date
+            type: string
+          - type: 'null'
+          title: Issue Date
+        unit_id:
+          title: Unit Id
+          type: integer
+      required:
+      - unit_id
+      - amount
+      - description
+      - due_date
+      title: BillCreate
+      type: object
+    BillDisplayStatus:
+      description: 'The status a client sees: the stored status or ``overdue``.'
+      enum:
+      - pending
+      - paid
+      - overdue
+      title: BillDisplayStatus
+      type: string
+    BillRead:
+      description: Public representation of a bill, with the computed display status.
+      properties:
+        amount:
+          title: Amount
+          type: string
+        description:
+          title: Description
+          type: string
+        due_date:
+          format: date
+          title: Due Date
+          type: string
+        id:
+          title: Id
+          type: integer
+        issue_date:
+          format: date
+          title: Issue Date
+          type: string
+        status:
+          $ref: '#/components/schemas/BillDisplayStatus'
+        unit_id:
+          title: Unit Id
+          type: integer
+        unit_identifier:
+          title: Unit Identifier
+          type: string
+        unit_type:
+          $ref: '#/components/schemas/UnitType'
+      required:
+      - id
+      - unit_id
+      - unit_identifier
+      - unit_type
+      - amount
+      - description
+      - issue_date
+      - due_date
+      - status
+      title: BillRead
+      type: object
+    Body_login_auth_token_post:
+      properties:
+        client_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Client Id
+        client_secret:
+          anyOf:
+          - type: string
+          - type: 'null'
+          format: password
+          title: Client Secret
+        grant_type:
+          anyOf:
+          - pattern: ^password$
+            type: string
+          - type: 'null'
+          title: Grant Type
+        password:
+          format: password
+          title: Password
+          type: string
+        scope:
+          default: ''
+          title: Scope
+          type: string
+        username:
+          title: Username
+          type: string
+      required:
+      - username
+      - password
+      title: Body_login_auth_token_post
+      type: object
+    BuildingCreate:
+      description: 'Request body for ``POST /buildings`` (administrators only).
+
+
+        A building belongs to a fixed community, so ``community_id`` is required
+
+        and immutable; moving a building means deleting and recreating it.'
+      properties:
+        community_id:
+          title: Community Id
+          type: integer
+        name:
+          maxLength: 200
+          minLength: 1
+          title: Name
+          type: string
+        tag_ids:
+          items:
+            type: integer
+          title: Tag Ids
+          type: array
+      required:
+      - community_id
+      - name
+      title: BuildingCreate
+      type: object
+    BuildingRead:
+      description: Public representation of a building, with its tags.
+      properties:
+        community_id:
+          title: Community Id
+          type: integer
+        id:
+          title: Id
+          type: integer
+        name:
+          title: Name
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/TagRead'
+          title: Tags
+          type: array
+      required:
+      - id
+      - community_id
+      - name
+      title: BuildingRead
+      type: object
+    BuildingUpdate:
+      description: Request body for ``PATCH /buildings/{id}`` (manager for its community).
+      properties:
+        name:
+          anyOf:
+          - maxLength: 200
+            minLength: 1
+            type: string
+          - type: 'null'
+          title: Name
+        tag_ids:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Tag Ids
+      title: BuildingUpdate
+      type: object
+    CommentCreate:
+      description: Request body for ``POST /incidences/{id}/comments``.
+      properties:
+        body:
+          maxLength: 4000
+          minLength: 1
+          title: Body
+          type: string
+      required:
+      - body
+      title: CommentCreate
+      type: object
+    CommentRead:
+      description: Public representation of one comment in a thread.
+      properties:
+        author_email:
+          title: Author Email
+          type: string
+        author_id:
+          title: Author Id
+          type: integer
+        body:
+          title: Body
+          type: string
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        id:
+          title: Id
+          type: integer
+        incidence_id:
+          title: Incidence Id
+          type: integer
+      required:
+      - id
+      - incidence_id
+      - author_id
+      - author_email
+      - body
+      - created_at
+      title: CommentRead
+      type: object
+    CommunityCreate:
+      description: Request body for ``POST /communities`` (administrators only).
+      properties:
+        name:
+          maxLength: 200
+          minLength: 1
+          title: Name
+          type: string
+      required:
+      - name
+      title: CommunityCreate
+      type: object
+    CommunityRead:
+      description: Public representation of a community.
+      properties:
+        id:
+          title: Id
+          type: integer
+        name:
+          title: Name
+          type: string
+      required:
+      - id
+      - name
+      title: CommunityRead
+      type: object
+    CommunityUpdate:
+      description: Request body for ``PATCH /communities/{id}`` (administrators only).
+      properties:
+        name:
+          anyOf:
+          - maxLength: 200
+            minLength: 1
+            type: string
+          - type: 'null'
+          title: Name
+      title: CommunityUpdate
+      type: object
+    EligibleUnitRead:
+      description: 'One of the caller''s units that may vote in an initiative.
+
+
+        ``option_id`` is ``None`` (with ``vote_id`` ``None``) until the unit votes,
+
+        so the resident form can render both "cast a ballot here" and "you chose
+
+        X" from a single list.'
+      properties:
+        option_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Option Id
+        unit_id:
+          title: Unit Id
+          type: integer
+        unit_identifier:
+          title: Unit Identifier
+          type: string
+        unit_type:
+          $ref: '#/components/schemas/UnitType'
+        vote_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Vote Id
+      required:
+      - unit_id
+      - unit_identifier
+      - unit_type
+      title: EligibleUnitRead
+      type: object
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    IncidenceCreate:
+      description: 'Request body for ``POST /incidences`` (residents only).
+
+
+        The unit must be one of the caller''s own units, so only ``unit_id`` is
+
+        needed; the reporter is the signed-in user.'
+      properties:
+        description:
+          maxLength: 4000
+          minLength: 1
+          title: Description
+          type: string
+        title:
+          maxLength: 200
+          minLength: 1
+          title: Title
+          type: string
+        unit_id:
+          title: Unit Id
+          type: integer
+      required:
+      - unit_id
+      - title
+      - description
+      title: IncidenceCreate
+      type: object
+    IncidenceRead:
+      description: 'Public representation of an incidence.
+
+
+        ``comments`` is included so a detail response carries the whole thread;
+
+        the list endpoint returns the same shape with the comment list populated,
+
+        which keeps the frontend on one type.'
+      properties:
+        comments:
+          items:
+            $ref: '#/components/schemas/CommentRead'
+          title: Comments
+          type: array
+        created_at:
+          format: date-time
+          title: Created At
+          type: string
+        created_by_email:
+          title: Created By Email
+          type: string
+        created_by_id:
+          title: Created By Id
+          type: integer
+        description:
+          title: Description
+          type: string
+        id:
+          title: Id
+          type: integer
+        status:
+          $ref: '#/components/schemas/IncidenceStatus'
+        title:
+          title: Title
+          type: string
+        unit_id:
+          title: Unit Id
+          type: integer
+        unit_identifier:
+          title: Unit Identifier
+          type: string
+      required:
+      - id
+      - unit_id
+      - unit_identifier
+      - created_by_id
+      - created_by_email
+      - title
+      - description
+      - status
+      - created_at
+      title: IncidenceRead
+      type: object
+    IncidenceStatus:
+      description: The four stages of an incidence, in lifecycle order.
+      enum:
+      - submitted
+      - in progress
+      - resolved
+      - closed
+      title: IncidenceStatus
+      type: string
+    IncidenceStatusUpdate:
+      description: Request body for ``PATCH /incidences/{id}/status`` (managers only).
+      properties:
+        status:
+          $ref: '#/components/schemas/IncidenceStatus'
+      required:
+      - status
+      title: IncidenceStatusUpdate
+      type: object
+    InitiativeCreate:
+      description: 'Request body for ``POST /initiatives`` (managers only).
+
+
+        ``closes_at`` must not precede ``opens_at`` and there must be at least two
+
+        distinct options, both enforced by the validator below so an invalid
+
+        initiative can never be stored.'
+      properties:
+        closes_at:
+          format: date
+          title: Closes At
+          type: string
+        description:
+          maxLength: 4000
+          minLength: 1
+          title: Description
+          type: string
+        opens_at:
+          format: date
+          title: Opens At
+          type: string
+        options:
+          items:
+            $ref: '#/components/schemas/InitiativeOptionCreate'
+          minItems: 2
+          title: Options
+          type: array
+        scope:
+          $ref: '#/components/schemas/InitiativeScope'
+        title:
+          maxLength: 200
+          minLength: 1
+          title: Title
+          type: string
+      required:
+      - title
+      - description
+      - opens_at
+      - closes_at
+      - options
+      title: InitiativeCreate
+      type: object
+    InitiativeOptionCreate:
+      description: One choice in the initiative request body.
+      properties:
+        label:
+          maxLength: 200
+          minLength: 1
+          title: Label
+          type: string
+      required:
+      - label
+      title: InitiativeOptionCreate
+      type: object
+    InitiativeOptionRead:
+      description: Public representation of one choice, with its running ballot count.
+      properties:
+        id:
+          title: Id
+          type: integer
+        label:
+          title: Label
+          type: string
+        position:
+          title: Position
+          type: integer
+        votes:
+          default: 0
+          title: Votes
+          type: integer
+      required:
+      - id
+      - label
+      - position
+      title: InitiativeOptionRead
+      type: object
+    InitiativeRead:
+      description: 'Public representation of an initiative, with options and ballot counts.
+
+
+        ``is_open`` is computed against the request''s "today" so the frontend can
+
+        disable the voting form without duplicating the date rule; ``scope`` is
+
+        echoed back so the manager screens can render the eligibility filter.'
+      properties:
+        closes_at:
+          format: date
+          title: Closes At
+          type: string
+        created_by_id:
+          title: Created By Id
+          type: integer
+        description:
+          title: Description
+          type: string
+        id:
+          title: Id
+          type: integer
+        is_open:
+          title: Is Open
+          type: boolean
+        opens_at:
+          format: date
+          title: Opens At
+          type: string
+        options:
+          items:
+            $ref: '#/components/schemas/InitiativeOptionRead'
+          title: Options
+          type: array
+        scope:
+          $ref: '#/components/schemas/InitiativeScope'
+        title:
+          title: Title
+          type: string
+      required:
+      - id
+      - title
+      - description
+      - opens_at
+      - closes_at
+      - is_open
+      - scope
+      - created_by_id
+      title: InitiativeRead
+      type: object
+    InitiativeScope:
+      description: 'Eligibility filter over communities, buildings, unit types, and tags.
+
+
+        All keys are optional and combine with AND: a unit is eligible when it
+
+        matches every filter that is present.'
+      properties:
+        building_ids:
+          items:
+            type: integer
+          title: Building Ids
+          type: array
+        community_ids:
+          items:
+            type: integer
+          title: Community Ids
+          type: array
+        tag_ids:
+          items:
+            type: integer
+          title: Tag Ids
+          type: array
+        unit_types:
+          items:
+            $ref: '#/components/schemas/UnitType'
+          title: Unit Types
+          type: array
+      title: InitiativeScope
+      type: object
+    ManagerAssignmentCreate:
+      description: Request body for assigning a manager to a community (administrators only).
+      properties:
+        community_id:
+          title: Community Id
+          type: integer
+        manager_id:
+          title: Manager Id
+          type: integer
+      required:
+      - manager_id
+      - community_id
+      title: ManagerAssignmentCreate
+      type: object
+    ManagerAssignmentRead:
+      description: Public representation of a manager-to-community assignment.
+      properties:
+        community:
+          $ref: '#/components/schemas/CommunityRead'
+        community_id:
+          title: Community Id
+          type: integer
+        id:
+          title: Id
+          type: integer
+        manager:
+          $ref: '#/components/schemas/UserRead'
+        manager_id:
+          title: Manager Id
+          type: integer
+      required:
+      - id
+      - manager_id
+      - community_id
+      - manager
+      - community
+      title: ManagerAssignmentRead
+      type: object
+    MyUnitRead:
+      description: 'A unit belonging to the signed-in resident, with the ownership flag.
+
+
+        Built from a :class:`app.models.UnitAssignment` so the resident can tell
+
+        which units they own from the ones they rent.'
+      properties:
+        building_id:
+          title: Building Id
+          type: integer
+        id:
+          title: Id
+          type: integer
+        identifier:
+          title: Identifier
+          type: string
+        ownership_type:
+          $ref: '#/components/schemas/OwnershipType'
+        tags:
+          items:
+            $ref: '#/components/schemas/TagRead'
+          title: Tags
+          type: array
+        unit_type:
+          $ref: '#/components/schemas/UnitType'
+      required:
+      - id
+      - building_id
+      - identifier
+      - unit_type
+      - ownership_type
+      title: MyUnitRead
+      type: object
+    OwnershipType:
+      description: 'How a resident holds a unit (backlog task 7).
+
+
+        ``OWNER`` covers outright ownership; ``TENANT`` covers a rental or other
+
+        occupancy agreement. Both are billed and voted on the same way, so the flag
+
+        only records the legal relationship to the unit.'
+      enum:
+      - owner
+      - tenant
+      title: OwnershipType
+      type: string
+    TagCreate:
+      description: Request body for creating a tag (managers and administrators).
+      properties:
+        name:
+          maxLength: 100
+          minLength: 1
+          title: Name
+          type: string
+      required:
+      - name
+      title: TagCreate
+      type: object
+    TagRead:
+      description: A free-text label attached to a building or a unit.
+      properties:
+        id:
+          title: Id
+          type: integer
+        name:
+          title: Name
+          type: string
+      required:
+      - id
+      - name
+      title: TagRead
+      type: object
+    Token:
+      description: Response body for a successful ``POST /auth/token`` login.
+      properties:
+        access_token:
+          title: Access Token
+          type: string
+        token_type:
+          default: bearer
+          title: Token Type
+          type: string
+      required:
+      - access_token
+      title: Token
+      type: object
+    UnitCreate:
+      description: Request body for ``POST /units`` (manager for the building's community).
+      properties:
+        building_id:
+          title: Building Id
+          type: integer
+        identifier:
+          maxLength: 100
+          minLength: 1
+          title: Identifier
+          type: string
+        tag_ids:
+          items:
+            type: integer
+          title: Tag Ids
+          type: array
+        unit_type:
+          $ref: '#/components/schemas/UnitType'
+      required:
+      - building_id
+      - identifier
+      - unit_type
+      title: UnitCreate
+      type: object
+    UnitRead:
+      description: 'Public representation of a unit, with its tags.
+
+
+        The parent building id is included so the frontend can group units without
+
+        extra requests.'
+      properties:
+        building_id:
+          title: Building Id
+          type: integer
+        id:
+          title: Id
+          type: integer
+        identifier:
+          title: Identifier
+          type: string
+        tags:
+          items:
+            $ref: '#/components/schemas/TagRead'
+          title: Tags
+          type: array
+        unit_type:
+          $ref: '#/components/schemas/UnitType'
+      required:
+      - id
+      - building_id
+      - identifier
+      - unit_type
+      title: UnitRead
+      type: object
+    UnitType:
+      description: The kinds of unit a building can contain.
+      enum:
+      - apartment
+      - garage
+      - storage
+      title: UnitType
+      type: string
+    UnitUpdate:
+      description: Request body for ``PATCH /units/{id}``.
+      properties:
+        identifier:
+          anyOf:
+          - maxLength: 100
+            minLength: 1
+            type: string
+          - type: 'null'
+          title: Identifier
+        tag_ids:
+          anyOf:
+          - items:
+              type: integer
+            type: array
+          - type: 'null'
+          title: Tag Ids
+        unit_type:
+          anyOf:
+          - $ref: '#/components/schemas/UnitType'
+          - type: 'null'
+      title: UnitUpdate
+      type: object
+    UserCreate:
+      description: 'Request body for ``POST /users`` (administrator only).
+
+
+        Validation is intentionally narrow: a non-empty email, a password of at
+
+        least eight characters, and one of the three roles. The concrete email
+
+        format is the administrator''s responsibility because the platform is
+
+        deployed inside a firm that seeds accounts from its own directory.'
+      properties:
+        email:
+          maxLength: 320
+          minLength: 3
+          title: Email
+          type: string
+        password:
+          maxLength: 128
+          minLength: 8
+          title: Password
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+          default: resident
+      required:
+      - email
+      - password
+      title: UserCreate
+      type: object
+    UserRead:
+      description: 'Public representation of a user. Never exposes the password hash.
+
+
+        ``email`` is a plain string: the database stores emails without a format
+
+        constraint, so the response schema must serialize stored data faithfully
+
+        rather than fail on addresses that use reserved domains such as ``.test``.'
+      properties:
+        email:
+          title: Email
+          type: string
+        id:
+          title: Id
+          type: integer
+        is_active:
+          title: Is Active
+          type: boolean
+        role:
+          $ref: '#/components/schemas/UserRole'
+      required:
+      - id
+      - email
+      - role
+      - is_active
+      title: UserRead
+      type: object
+    UserRole:
+      description: The three roles a user can hold (backlog task 6).
+      enum:
+      - administrator
+      - manager
+      - resident
+      title: UserRole
+      type: string
+    UserUpdate:
+      description: 'Request body for ``PATCH /users/{id}`` (administrator only).
+
+
+        Every field is optional so a patch can change only the role, only the
+
+        activation flag, or only the password. ``None`` means "leave unchanged".'
+      properties:
+        is_active:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Active
+        password:
+          anyOf:
+          - maxLength: 128
+            minLength: 8
+            type: string
+          - type: 'null'
+          title: Password
+        role:
+          anyOf:
+          - $ref: '#/components/schemas/UserRole'
+          - type: 'null'
+      title: UserUpdate
+      type: object
+    ValidationError:
+      properties:
+        ctx:
+          title: Context
+          type: object
+        input:
+          title: Input
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    VoteCast:
+      description: 'Request body for ``POST /initiatives/{id}/votes`` (residents only).
+
+
+        One ballot covers one of the caller''s eligible units, so both the unit and
+
+        the chosen option are required.'
+      properties:
+        option_id:
+          title: Option Id
+          type: integer
+        unit_id:
+          title: Unit Id
+          type: integer
+      required:
+      - unit_id
+      - option_id
+      title: VoteCast
+      type: object
+    VoteRead:
+      description: Public representation of one cast ballot.
+      properties:
+        id:
+          title: Id
+          type: integer
+        initiative_id:
+          title: Initiative Id
+          type: integer
+        option_id:
+          title: Option Id
+          type: integer
+        option_label:
+          title: Option Label
+          type: string
+        unit_id:
+          title: Unit Id
+          type: integer
+        unit_identifier:
+          title: Unit Identifier
+          type: string
+      required:
+      - id
+      - initiative_id
+      - option_id
+      - option_label
+      - unit_id
+      - unit_identifier
+      title: VoteRead
+      type: object
+    VoteResult:
+      description: 'Aggregation response for ``GET /initiatives/{id}/results``.
+
+
+        ``total_votes`` is the number of eligible unit ballots cast, and
+
+        ``tallies`` reports the count per option in the manager''s ordering.'
+      properties:
+        initiative_id:
+          title: Initiative Id
+          type: integer
+        tallies:
+          items:
+            $ref: '#/components/schemas/VoteTally'
+          title: Tallies
+          type: array
+        total_votes:
+          title: Total Votes
+          type: integer
+      required:
+      - initiative_id
+      - total_votes
+      title: VoteResult
+      type: object
+    VoteTally:
+      description: Ballot count for one option in an aggregation response.
+      properties:
+        label:
+          title: Label
+          type: string
+        option_id:
+          title: Option Id
+          type: integer
+        votes:
+          title: Votes
+          type: integer
+      required:
+      - option_id
+      - label
+      - votes
+      title: VoteTally
+      type: object
+  securitySchemes:
+    OAuth2PasswordBearer:
+      flows:
+        password:
+          scopes: {}
+          tokenUrl: /auth/token
+      type: oauth2
+info:
+  title: EFINGES API
+  version: 0.1.0
+openapi: 3.1.0
+paths:
+  /assignments:
+    get:
+      description: List assignments, optionally filtered by resident or unit.
+      operationId: list_assignments_assignments_get
+      parameters:
+      - in: query
+        name: user_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: User Id
+      - in: query
+        name: unit_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Unit Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AssignmentRead'
+                title: Response List Assignments Assignments Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Assignments
+      tags:
+      - assignments
+    post:
+      description: 'Assign one resident to one unit.
+
+
+        Returns 404 when the user or unit does not exist, 409 when the unit is
+
+        already assigned, and 422 when the target user is not a resident.'
+      operationId: create_assignment_assignments_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignmentCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignmentRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Create Assignment
+      tags:
+      - assignments
+  /assignments/{assignment_id}:
+    delete:
+      description: Remove an assignment (the resident loses access to that unit).
+      operationId: delete_assignment_assignments__assignment_id__delete
+      parameters:
+      - in: path
+        name: assignment_id
+        required: true
+        schema:
+          title: Assignment Id
+          type: integer
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Delete Assignment
+      tags:
+      - assignments
+  /auth/me:
+    get:
+      description: Return the profile of the signed-in user.
+      operationId: read_current_user_auth_me_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+          description: Successful Response
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Read Current User
+      tags:
+      - auth
+  /auth/me/units:
+    get:
+      description: 'Return the units belonging to the signed-in user (the resident helper).
+
+
+        A resident can hold several units, so the response is always a list. The
+
+        endpoint only ever reads the caller''s own assignments, so no role check is
+
+        needed: an administrator calling it simply sees their own (usually empty)
+
+        list.'
+      operationId: read_my_units_auth_me_units_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/MyUnitRead'
+                title: Response Read My Units Auth Me Units Get
+                type: array
+          description: Successful Response
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Read My Units
+      tags:
+      - assignments
+  /auth/token:
+    post:
+      description: Authenticate a user and return a signed access token.
+      operationId: login_auth_token_post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Body_login_auth_token_post'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Login
+      tags:
+      - auth
+  /bills:
+    get:
+      description: 'List bills visible to the caller, optionally filtered.
+
+
+        Residents only see bills for their own units. ``status`` filters on the
+
+        computed status, so ``status=overdue`` returns pending bills past their
+
+        due date without changing anything in the database.'
+      operationId: list_bills_bills_get
+      parameters:
+      - in: query
+        name: unit_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Unit Id
+      - in: query
+        name: status
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/BillDisplayStatus'
+          - type: 'null'
+          title: Status
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BillRead'
+                title: Response List Bills Bills Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Bills
+      tags:
+      - bills
+    post:
+      description: 'Issue a manual bill for a unit the caller manages.
+
+
+        ``issue_date`` defaults to today. ``due_date`` before ``issue_date`` is
+
+        rejected with 422 because the bill would be overdue the moment it is
+
+        issued.'
+      operationId: create_bill_bills_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Create Bill
+      tags:
+      - bills
+  /bills/{bill_id}:
+    get:
+      description: Return one bill the caller may see (own unit, or managed community).
+      operationId: read_bill_bills__bill_id__get
+      parameters:
+      - in: path
+        name: bill_id
+        required: true
+        schema:
+          title: Bill Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Read Bill
+      tags:
+      - bills
+  /bills/{bill_id}/pay:
+    post:
+      description: 'Mark a bill paid. Manager action; the stored status becomes ``paid``.
+
+
+        Paying an already paid bill is rejected with 409: the transition is
+
+        one-way and idempotency here would hide a double payment.'
+      operationId: pay_bill_bills__bill_id__pay_post
+      parameters:
+      - in: path
+        name: bill_id
+        required: true
+        schema:
+          title: Bill Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Pay Bill
+      tags:
+      - bills
+  /buildings:
+    get:
+      description: List buildings in the communities the caller may read.
+      operationId: list_buildings_buildings_get
+      parameters:
+      - in: query
+        name: community_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Community Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BuildingRead'
+                title: Response List Buildings Buildings Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Buildings
+      tags:
+      - properties
+    post:
+      description: Create a building inside a community the caller may write to.
+      operationId: create_building_buildings_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuildingCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildingRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Create Building
+      tags:
+      - properties
+  /buildings/{building_id}:
+    delete:
+      description: Delete a building, cascading to its units and their records.
+      operationId: delete_building_buildings__building_id__delete
+      parameters:
+      - in: path
+        name: building_id
+        required: true
+        schema:
+          title: Building Id
+          type: integer
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Delete Building
+      tags:
+      - properties
+    get:
+      description: Return one building the caller may read.
+      operationId: read_building_buildings__building_id__get
+      parameters:
+      - in: path
+        name: building_id
+        required: true
+        schema:
+          title: Building Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildingRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Read Building
+      tags:
+      - properties
+    patch:
+      description: Rename a building or replace its tags, within the caller's scope.
+      operationId: update_building_buildings__building_id__patch
+      parameters:
+      - in: path
+        name: building_id
+        required: true
+        schema:
+          title: Building Id
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuildingUpdate'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildingRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Update Building
+      tags:
+      - properties
+  /communities:
+    get:
+      description: List the communities the caller may read, including nested buildings.
+      operationId: list_communities_communities_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CommunityRead'
+                title: Response List Communities Communities Get
+                type: array
+          description: Successful Response
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Communities
+      tags:
+      - properties
+    post:
+      description: Create a community. Administrator only, as it defines a manager's scope.
+      operationId: create_community_communities_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Create Community
+      tags:
+      - properties
+  /communities/{community_id}:
+    delete:
+      description: Delete a community, cascading to its buildings, units, and records.
+      operationId: delete_community_communities__community_id__delete
+      parameters:
+      - in: path
+        name: community_id
+        required: true
+        schema:
+          title: Community Id
+          type: integer
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Delete Community
+      tags:
+      - properties
+    get:
+      description: Return one community the caller may read.
+      operationId: read_community_communities__community_id__get
+      parameters:
+      - in: path
+        name: community_id
+        required: true
+        schema:
+          title: Community Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Read Community
+      tags:
+      - properties
+    patch:
+      description: Rename a community. Administrator only.
+      operationId: update_community_communities__community_id__patch
+      parameters:
+      - in: path
+        name: community_id
+        required: true
+        schema:
+          title: Community Id
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityUpdate'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Update Community
+      tags:
+      - properties
+  /healthz:
+    get:
+      description: Liveness probe used by Docker health checks and smoke tests.
+      operationId: healthz_healthz_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                title: Response Healthz Healthz Get
+                type: object
+          description: Successful Response
+      summary: Healthz
+  /incidences:
+    get:
+      description: List incidences visible to the caller, optionally filtered.
+      operationId: list_incidences_incidences_get
+      parameters:
+      - in: query
+        name: unit_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Unit Id
+      - in: query
+        name: status
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/IncidenceStatus'
+          - type: 'null'
+          title: Status
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/IncidenceRead'
+                title: Response List Incidences Incidences Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Incidences
+      tags:
+      - incidences
+    post:
+      description: 'Report an incidence against one of the caller''s own units.
+
+
+        Managers and administrators may also raise one (for a unit in their scope)
+
+        so staff can log issues they notice while inspecting a property.'
+      operationId: create_incidence_incidences_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidenceCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidenceRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Create Incidence
+      tags:
+      - incidences
+  /incidences/{incidence_id}:
+    get:
+      description: Return one incidence and its comment thread, if the caller may read it.
+      operationId: read_incidence_incidences__incidence_id__get
+      parameters:
+      - in: path
+        name: incidence_id
+        required: true
+        schema:
+          title: Incidence Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidenceRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Read Incidence
+      tags:
+      - incidences
+  /incidences/{incidence_id}/comments:
+    get:
+      description: Return the comment thread of an incidence the caller may read.
+      operationId: list_comments_incidences__incidence_id__comments_get
+      parameters:
+      - in: path
+        name: incidence_id
+        required: true
+        schema:
+          title: Incidence Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/CommentRead'
+                title: Response List Comments Incidences  Incidence Id  Comments Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Comments
+      tags:
+      - incidences
+    post:
+      description: 'Add a comment to an incidence thread.
+
+
+        A resident may comment on their own incidence; a manager may comment on
+
+        incidences for the units they manage. Comments stay open even after the
+
+        incidence is closed, so a final note can be recorded.'
+      operationId: create_comment_incidences__incidence_id__comments_post
+      parameters:
+      - in: path
+        name: incidence_id
+        required: true
+        schema:
+          title: Incidence Id
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Create Comment
+      tags:
+      - incidences
+  /incidences/{incidence_id}/status:
+    patch:
+      description: 'Advance an incidence one step along its lifecycle. Manager action.
+
+
+        Only the immediate next stage is accepted (``submitted -> in progress``,
+
+        ``in progress -> resolved``, ``resolved -> closed``); anything else,
+
+        including moving backwards or touching a closed incidence, returns 409
+
+        with the allowed next stage in the detail.'
+      operationId: update_incidence_status_incidences__incidence_id__status_patch
+      parameters:
+      - in: path
+        name: incidence_id
+        required: true
+        schema:
+          title: Incidence Id
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidenceStatusUpdate'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncidenceRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Update Incidence Status
+      tags:
+      - incidences
+  /initiatives:
+    get:
+      description: 'List initiatives, optionally limited to the ones open today.
+
+
+        Any signed-in user may list initiatives; ``?is_open=true`` is what the
+
+        resident screens use to show only the votes that are currently running.'
+      operationId: list_initiatives_initiatives_get
+      parameters:
+      - in: query
+        name: is_open
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Open
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/InitiativeRead'
+                title: Response List Initiatives Initiatives Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Initiatives
+      tags:
+      - initiatives
+    post:
+      description: Create an initiative with its options and eligible scope. Manager only.
+      operationId: create_initiative_initiatives_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitiativeCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitiativeRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Create Initiative
+      tags:
+      - initiatives
+  /initiatives/{initiative_id}:
+    get:
+      description: Return one initiative with its options and running ballot counts.
+      operationId: read_initiative_initiatives__initiative_id__get
+      parameters:
+      - in: path
+        name: initiative_id
+        required: true
+        schema:
+          title: Initiative Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitiativeRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Read Initiative
+      tags:
+      - initiatives
+  /initiatives/{initiative_id}/eligible-units:
+    get:
+      description: 'Return the caller''s units that may vote, and any ballot already cast.
+
+
+        This is what the resident voting form is built from: one row per unit the
+
+        user holds inside the scope, with the chosen option when a ballot exists so
+
+        the form can show it as already voted instead of offering a second ballot.'
+      operationId: list_eligible_units_initiatives__initiative_id__eligible_units_get
+      parameters:
+      - in: path
+        name: initiative_id
+        required: true
+        schema:
+          title: Initiative Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EligibleUnitRead'
+                title: Response List Eligible Units Initiatives  Initiative Id  Eligible Units Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Eligible Units
+      tags:
+      - initiatives
+  /initiatives/{initiative_id}/results:
+    get:
+      description: Aggregate ballots per option for one initiative.
+      operationId: read_results_initiatives__initiative_id__results_get
+      parameters:
+      - in: path
+        name: initiative_id
+        required: true
+        schema:
+          title: Initiative Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoteResult'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Read Results
+      tags:
+      - initiatives
+  /initiatives/{initiative_id}/votes:
+    post:
+      description: 'Cast one ballot for one eligible unit. Residents only.
+
+
+        Returns 409 when the initiative is not open, when the unit is outside the
+
+        scope, or when that unit has already voted; 404 when the initiative or
+
+        option does not exist (including an option from a different initiative).'
+      operationId: cast_vote_initiatives__initiative_id__votes_post
+      parameters:
+      - in: path
+        name: initiative_id
+        required: true
+        schema:
+          title: Initiative Id
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoteCast'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoteRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Cast Vote
+      tags:
+      - initiatives
+  /manager-assignments:
+    get:
+      description: List manager-to-community assignments (administrator only).
+      operationId: list_manager_assignments_manager_assignments_get
+      parameters:
+      - in: query
+        name: manager_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Manager Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ManagerAssignmentRead'
+                title: Response List Manager Assignments Manager Assignments Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Manager Assignments
+      tags:
+      - properties
+    post:
+      description: 'Give a manager write access to a community (administrator only).
+
+
+        Returns 404 for an unknown manager or community, 422 when the user is not
+
+        a manager, and 409 when the pair is already assigned.'
+      operationId: create_manager_assignment_manager_assignments_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManagerAssignmentCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ManagerAssignmentRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Create Manager Assignment
+      tags:
+      - properties
+  /manager-assignments/{assignment_id}:
+    delete:
+      description: Remove a manager's access to a community (administrator only).
+      operationId: delete_manager_assignment_manager_assignments__assignment_id__delete
+      parameters:
+      - in: path
+        name: assignment_id
+        required: true
+        schema:
+          title: Assignment Id
+          type: integer
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Delete Manager Assignment
+      tags:
+      - properties
+  /tags:
+    get:
+      description: List every tag. Tags are shared labels, so any signed-in user may read.
+      operationId: list_tags_tags_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/TagRead'
+                title: Response List Tags Tags Get
+                type: array
+          description: Successful Response
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Tags
+      tags:
+      - properties
+    post:
+      description: Create a tag. Managers and administrators only.
+      operationId: create_tag_tags_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Create Tag
+      tags:
+      - properties
+  /tags/{tag_id}:
+    delete:
+      description: Delete a tag, detaching it from every building and unit.
+      operationId: delete_tag_tags__tag_id__delete
+      parameters:
+      - in: path
+        name: tag_id
+        required: true
+        schema:
+          title: Tag Id
+          type: integer
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Delete Tag
+      tags:
+      - properties
+  /units:
+    get:
+      description: 'List units visible to the caller, with optional filters.
+
+
+        A resident only ever sees their own units; a manager sees the units in the
+
+        communities they manage; an administrator sees every unit.
+
+
+        Every filter is written as a correlated ``EXISTS`` (``.has()`` / ``.any()``)
+
+        rather than a join, so combining the scope rule with the ``community_id``
+
+        filter cannot join ``buildings`` twice.'
+      operationId: list_units_units_get
+      parameters:
+      - in: query
+        name: building_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Building Id
+      - in: query
+        name: community_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Community Id
+      - in: query
+        name: tag_id
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Tag Id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UnitRead'
+                title: Response List Units Units Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Units
+      tags:
+      - properties
+    post:
+      description: Create a unit inside a building the caller may write to.
+      operationId: create_unit_units_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnitCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnitRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Create Unit
+      tags:
+      - properties
+  /units/{unit_id}:
+    delete:
+      description: Delete a unit, cascading to its assignments, bills, and incidences.
+      operationId: delete_unit_units__unit_id__delete
+      parameters:
+      - in: path
+        name: unit_id
+        required: true
+        schema:
+          title: Unit Id
+          type: integer
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Delete Unit
+      tags:
+      - properties
+    get:
+      description: 'Return one unit, limited to the caller''s own scope.
+
+
+        A unit outside the caller''s scope is reported as 404 rather than 403 so
+
+        the endpoint does not reveal that it exists.'
+      operationId: read_unit_units__unit_id__get
+      parameters:
+      - in: path
+        name: unit_id
+        required: true
+        schema:
+          title: Unit Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnitRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Read Unit
+      tags:
+      - properties
+    patch:
+      description: Change a unit's identifier, type, or tags within the caller's scope.
+      operationId: update_unit_units__unit_id__patch
+      parameters:
+      - in: path
+        name: unit_id
+        required: true
+        schema:
+          title: Unit Id
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnitUpdate'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnitRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Update Unit
+      tags:
+      - properties
+  /users:
+    get:
+      description: List accounts, optionally filtered by role or activation state.
+      operationId: list_users_users_get
+      parameters:
+      - in: query
+        name: role
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/UserRole'
+          - type: 'null'
+          title: Role
+      - in: query
+        name: is_active
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Active
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserRead'
+                title: Response List Users Users Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Users
+      tags:
+      - users
+    post:
+      description: Create an account. Returns 409 when the email is already registered.
+      operationId: create_user_users_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Create User
+      tags:
+      - users
+  /users/{user_id}:
+    get:
+      description: Return one account.
+      operationId: read_user_users__user_id__get
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          title: User Id
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Read User
+      tags:
+      - users
+    patch:
+      description: 'Change a user''s role, activation state, or password.
+
+
+        An administrator cannot deactivate or demote their own account: doing so
+
+        would lock the firm out of user management with no way back in.'
+      operationId: update_user_users__user_id__patch
+      parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema:
+          title: User Id
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRead'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: Update User
+      tags:
+      - users
