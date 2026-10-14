@@ -21,4 +21,5 @@ export * as assignmentApi from "./assignments";
 export * as billingApi from "./billing";
 export * as maintenanceApi from "./maintenance";
 export * as governanceApi from "./governance";
+export * as userApi from "./users";
 

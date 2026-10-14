@@ -44,7 +44,7 @@ VITE_API_URL=http://localhost:9000
 | `/overview` | any signed-in role | Shared landing screen |
 | `/resident` | resident | Resident screens: units, bills, incidences, open initiatives |
 | `/manager` | manager | Manager screens: property tree, assignments, bills, incidences, initiatives |
-| `/admin` | administrator | Administrator screens (backlog task 17) |
+| `/admin` | administrator | Administrator screens: user management and the global property overview |
 | `/forbidden` | any signed-in role | Shown when a role lacks access |
 
 Guarding lives in `src/auth/RequireAuth.tsx`: a signed-out visitor is redirected
@@ -118,6 +118,26 @@ into the request body (the scope combines with AND, and an empty scope means
 "every unit"). Both have `*.test.ts` files beside them, with component-level
 tests for the transition controls and the scope form.
 
+## Administrator screens (backlog task 17)
+
+The administrator home screen stacks two independent sections:
+
+- **User accounts** — `GET /users` with filters by role and activation state, a
+  form to create an account (`POST /users`), a role selector per row
+  (`PATCH /users/{id}`), and an activate/deactivate action. Responses are always
+  the public `UserRead` shape, which never carries the password hash. An
+  administrator cannot demote or deactivate their own account: those controls
+  are refused with a short explanation instead of failing on the server, which
+  enforces the same rule.
+- **Global property overview** — `GET /communities`, `GET /buildings`, and
+  `GET /units`, grouped in memory into communities → buildings → units. The
+  administrator is unrestricted, so this shows the whole firm. It is read-only:
+  the property tree is the manager's to maintain.
+
+The create-form validation and self-action guards live in
+`src/pages/admin/userForm.ts` (with a `*.test.ts` beside it), keeping the
+components thin and the rules testable without rendering.
+
 ## Run the tests
 
 ```bash
@@ -159,11 +179,12 @@ src/
   pages/
     LoginPage.tsx         # email and password form
     AppShell.tsx          # header, sidebar, routed content
-    HomePages.tsx         # overview, admin, and error screens
+    HomePages.tsx         # overview and error screens
     ResidentHomePage.tsx  # resident screen container (task 15)
     ManagerHomePage.tsx   # manager screen container (task 16)
+    AdminHomePage.tsx     # administrator screen container (task 17)
     components.tsx        # shared presentational pieces
-    format.ts             # unit type, ownership, date, and money formatters
+    format.ts             # role, unit type, ownership, date, and money formatters
     resident/
       MyUnitsSection.tsx         # the resident's units
       MyBillsSection.tsx         # bills with a status filter
@@ -180,16 +201,22 @@ src/
       TagChecklist.tsx               # tag checklist and editor
       incidenceStatus.ts             # lifecycle transition mirror (tested)
       initiativeScope.ts             # draft validation and payload (tested)
+    admin/
+      UsersSection.tsx               # user management (create, roles, active)
+      GlobalOverviewSection.tsx      # read-only global property overview
+      userForm.ts                    # create validation and guards (tested)
   hooks/
     useAsync.ts           # minimal async loading state helper
   services/
     apiClient.ts          # centralized API client (all backend calls)
     auth.ts               # POST /auth/token plus GET /auth/me
     session.ts            # persistence of the token and profile
-    property.ts           # GET /auth/me/units
-    billing.ts            # GET /bills
+    property.ts           # property tree CRUD and GET /auth/me/units
+    billing.ts            # bills
     maintenance.ts        # incidences and comments
     governance.ts         # initiatives, eligible units, votes
+    assignments.ts        # assignments and the resident directory
+    users.ts              # administrator user management
     index.ts              # public re-exports
   types/
     auth.ts               # UserRole, User, and session types

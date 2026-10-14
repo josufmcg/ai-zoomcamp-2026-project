@@ -18,8 +18,8 @@ import { useAuth } from "./auth/AuthContext";
 import { homePathForRole, postLoginPath } from "./auth/navigation";
 import { RequireAuth } from "./auth/RequireAuth";
 import AppShell from "./pages/AppShell";
+import AdminHomePage from "./pages/AdminHomePage";
 import {
-  AdminHomePage,
   ForbiddenPage,
   NotFoundPage,
   OverviewPage,

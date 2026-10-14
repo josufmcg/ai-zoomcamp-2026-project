@@ -5,7 +5,20 @@
  * way everywhere and the tests can assert on a stable string.
  */
 
+import type { UserRole } from "../types/auth";
 import type { OwnershipType, UnitType } from "../types/property";
+
+/** Human-readable label for a user role (`"administrator"` → `"Administrator"`). */
+export function roleLabel(role: UserRole): string {
+  switch (role) {
+    case "administrator":
+      return "Administrator";
+    case "manager":
+      return "Manager";
+    case "resident":
+      return "Resident";
+  }
+}
 
 /** Human-readable label for a unit type (`"storage"` → `"Storage"`). */
 export function unitTypeLabel(unitType: UnitType): string {

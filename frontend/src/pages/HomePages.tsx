@@ -1,17 +1,17 @@
 /**
  * Shared landing and error screens (backlog task 14).
  *
- * The resident and manager home screens live in their own modules
- * (`ResidentHomePage.tsx`, `ManagerHomePage.tsx`); this file keeps the
- * role-independent overview plus the administrator placeholder that task 17
- * fills in, and the forbidden/not-found screens.
+ * The resident, manager, and administrator home screens live in their own
+ * modules (`ResidentHomePage.tsx`, `ManagerHomePage.tsx`, `AdminHomePage.tsx`);
+ * this file keeps the role-independent overview plus the forbidden and
+ * not-found screens.
  */
 
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../auth/AuthContext";
 import { homePathForRole } from "../auth/navigation";
-import { Card, CenteredPanel, PlaceholderSection } from "./components";
+import { Card, CenteredPanel } from "./components";
 
 function OverviewSection() {
   const { user } = useAuth();
@@ -22,7 +22,7 @@ function OverviewSection() {
   const tasksByRole = {
     resident: "Task 15 adds units, bills, incidences, and open initiatives.",
     manager: "Task 16 adds properties, assignments, bills, incidences, and initiatives.",
-    administrator: "Task 17 adds user management and the global property overview.",
+    administrator: "Your screens manage user accounts and show the global property tree.",
   } as const;
 
   return (
@@ -50,20 +50,6 @@ export function OverviewPage() {
         Overview
       </h1>
       <OverviewSection />
-    </div>
-  );
-}
-
-export function AdminHomePage() {
-  return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-        Users
-      </h1>
-      <PlaceholderSection
-        title="Administrator screens"
-        description="Backlog task 17: user management (create, change roles, deactivate) and a read-only global property overview."
-      />
     </div>
   );
 }
