@@ -42,7 +42,7 @@ VITE_API_URL=http://localhost:9000
 | `/login` | signed out | Email and password form (`POST /auth/token`) |
 | `/` | any | Redirects to the role's home screen, or to `/login` |
 | `/overview` | any signed-in role | Shared landing screen |
-| `/resident` | resident | Resident screens (backlog task 15) |
+| `/resident` | resident | Resident screens: units, bills, incidences, open initiatives |
 | `/manager` | manager | Manager screens (backlog task 16) |
 | `/admin` | administrator | Administrator screens (backlog task 17) |
 | `/forbidden` | any signed-in role | Shown when a role lacks access |
@@ -55,6 +55,32 @@ what the UI shows.
 
 The sidebar links come from `src/auth/navigation.ts`, which is a plain data
 model filtered by role, so the shell and the tests agree on what each role sees.
+
+## Resident screens (backlog task 15)
+
+The resident home screen stacks four independent sections, each of which loads
+its own data through the shared API client and renders its own loading, error,
+and empty state:
+
+- **Assigned units** — `GET /auth/me/units`, showing the ownership flag and tags.
+- **My bills** — `GET /bills`, with a status filter that includes the computed
+  `overdue` status. The backend computes `overdue` from the due date (a pending
+  bill past its due date); the frontend only selects on the value it was sent
+  and never derives a status from dates itself.
+- **My incidences** — `GET /incidences` with an embedded comment thread per
+  incidence, a form to report a new incidence against an owned unit, and a
+  comment box per thread. The status is manager-controlled, so the resident
+  screen shows it but never offers to change it.
+- **Open initiatives** — `GET /initiatives?is_open=true` plus
+  `GET /initiatives/{id}/eligible-units`. Voting is **one ballot per eligible
+owned unit**, so the form submits one `POST /initiatives/{id}/votes` request per
+  unit the resident selected; a unit that already voted is shown as voted and is
+  never sent a second ballot.
+
+The two rules that need focused tests live in their own modules:
+`src/pages/resident/billFilter.ts` (the status filter) and
+`src/pages/resident/ballot.ts` (the per-unit ballot selection and submission),
+with the corresponding `*.test.ts` files and component-level tests beside them.
 
 ## Run the tests
 
@@ -97,15 +123,34 @@ src/
   pages/
     LoginPage.tsx         # email and password form
     AppShell.tsx          # header, sidebar, routed content
-    HomePages.tsx         # overview and per-role landing screens
+    HomePages.tsx         # overview, manager, admin, and error screens
+    ResidentHomePage.tsx  # resident screen container (task 15)
     components.tsx        # shared presentational pieces
+    format.ts             # unit type, ownership, date, and money formatters
+    resident/
+      MyUnitsSection.tsx         # the resident's units
+      MyBillsSection.tsx         # bills with a status filter
+      MyIncidencesSection.tsx    # incidences and comment threads
+      OpenInitiativesSection.tsx # open initiatives and per-unit voting
+      billFilter.ts              # bill status filter logic (tested)
+      ballot.ts                  # per-unit ballot selection (tested)
+  hooks/
+    useAsync.ts           # minimal async loading state helper
   services/
     apiClient.ts          # centralized API client (all backend calls)
     auth.ts               # POST /auth/token plus GET /auth/me
     session.ts            # persistence of the token and profile
+    property.ts           # GET /auth/me/units
+    billing.ts            # GET /bills
+    maintenance.ts        # incidences and comments
+    governance.ts         # initiatives, eligible units, votes
     index.ts              # public re-exports
   types/
     auth.ts               # UserRole, User, and session types
+    property.ts           # UnitType, OwnershipType, Tag, MyUnit
+    billing.ts            # Bill and BillDisplayStatus
+    maintenance.ts        # Incidence, IncidenceStatus, Comment
+    governance.ts         # Initiative, EligibleUnit, Vote, VoteResult
   test/
     setup.ts              # Vitest setup (jest-dom matchers, cleanup)
     helpers.tsx           # render helpers and fixtures

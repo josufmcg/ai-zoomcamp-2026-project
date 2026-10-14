@@ -14,3 +14,10 @@ export { clearSession, readSession, saveSession, USER_STORAGE_KEY } from "./sess
 
 export { login } from "./auth";
 
+// Domain calls (backlog task 15 onward). Each screen imports the module it
+// needs; the barrel re-exports them so tests can import from one place.
+export * as propertyApi from "./property";
+export * as billingApi from "./billing";
+export * as maintenanceApi from "./maintenance";
+export * as governanceApi from "./governance";
+

@@ -24,9 +24,9 @@ import {
   ManagerHomePage,
   NotFoundPage,
   OverviewPage,
-  ResidentHomePage,
 } from "./pages/HomePages";
 import LoginPage from "./pages/LoginPage";
+import ResidentHomePage from "./pages/ResidentHomePage";
 
 /** Send a signed-in visitor from `/` to their home screen, others to `/login`. */
 function RedirectToHomeOrLogin() {

@@ -53,20 +53,6 @@ export function OverviewPage() {
   );
 }
 
-export function ResidentHomePage() {
-  return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-        My units
-      </h1>
-      <PlaceholderSection
-        title="Resident screens"
-        description="Backlog task 15: your units, bills with a status filter, incidences with comment threads, and open initiatives you can vote on."
-      />
-    </div>
-  );
-}
-
 export function ManagerHomePage() {
   return (
     <div className="flex flex-col gap-6">
