@@ -218,3 +218,8 @@ def test_ci_workflow_tests_and_deploys_the_stack() -> None:
     # Deploying proves the deployed database works: seed and read it back.
     assert "make seed" in steps
     assert "/auth/token" in steps and "/bills" in steps
+
+    # `make seed` shells out to `uv` on the runner, so the deploy job must
+    # install it (a missing uv broke a real CI run once).
+    uses = [step.get("uses", "") for step in deploy["steps"]]
+    assert any("setup-uv" in action for action in uses), "deploy job must install uv"

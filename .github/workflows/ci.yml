@@ -190,6 +190,18 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
 
+      # The `deploy` job runs the compose stack (which uses uv only inside the
+      # image) plus `make seed`, and `make seed` shells out to `uv` on the
+      # runner. Install the same uv version the backend job uses so the seed
+      # step has it; `uv run` creates the backend environment from uv.lock.
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.11.14"
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
       # Build every service, start it detached, and block until each health
       # check is passing (the compose file defines health checks for postgres,
       # backend, and frontend). `--wait` fails the step if a service does not
