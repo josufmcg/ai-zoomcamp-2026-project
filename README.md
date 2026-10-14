@@ -4,8 +4,105 @@ EFINGES is a residential property management platform for property management
 firms: property hierarchies, manual billing, maintenance incidences with
 comment threads, and community initiatives with per-unit voting.
 
-This repository is being built task by task from `docs/backlog.md`. The
-sections below cover what is implemented so far.
+## The problem EFINGES solves
+
+A property management firm runs many communities, each with several buildings
+and many units — apartments, garages, and storage units that are owned or
+rented individually by residents. Keeping that hierarchy, the billing per unit,
+the maintenance conversations, and community votes in one place usually means
+spreadsheets, email threads, and phone calls, with no single source of truth
+and no reliable way to keep each resident's data separate from the rest.
+
+EFINGES turns that into one system with three roles and a strict, server-side
+access boundary:
+
+- **Administrators** manage user accounts across the whole firm and see every
+  property.
+- **Managers** maintain the communities they are assigned to: the property
+  tree, tags, resident assignments, manual bills, incidence status, and
+  initiatives.
+- **Residents** see only their own units, bills, incidences, and votes, and
+  reach their manager only through comment threads on an incidence.
+
+### Expected behavior
+
+- Communities contain buildings, and buildings contain units; a unit is an
+  apartment, a garage, or a storage unit, and is billed individually.
+- A resident can hold several units. Each unit has at most one resident at a
+  time, so assigning the same unit twice is rejected.
+- Bills are issued manually by managers. A bill is `pending` or `paid`; a
+  pending bill past its due date is reported as **overdue** — a computed
+  value, never a stored status.
+- Maintenance incidences follow `submitted → in progress → resolved → closed`
+  in that order, only one step at a time, and `closed` is terminal. All
+  resident–manager communication happens in comment threads on the incidence.
+- Initiatives let managers run a vote with two or more options over an
+  eligible scope; a resident casts **one ballot per eligible owned unit**, a
+  second ballot for the same unit is rejected, and voting stops after the
+  close date.
+- Every role boundary is enforced on the server in `backend/app/access.py`;
+  the frontend guard is usability only.
+
+This repository is built task by task from `docs/backlog.md`. The sections
+below cover what is implemented so far.
+
+## Quick start
+
+The whole stack (backend, frontend, PostgreSQL, and the observability
+pipeline) starts with one command, then a single idempotent command fills it
+with demo data you can sign in to:
+
+```bash
+make up      # build the images, start every service, wait for health, print URLs
+make seed    # create the demo administrator, manager, residents, and domain data
+```
+
+Then open <http://127.0.0.1:3000> and sign in as `admin@efinges.demo`,
+`manager@efinges.demo`, or `alice@efinges.demo` (password `efinges-demo-123`).
+The API docs are at <http://127.0.0.1:8000/docs> and Grafana at
+<http://127.0.0.1:3001>. See [Run the full stack with Docker
+Compose](#run-the-full-stack-with-docker-compose) for the full command list and
+[Run the services without Docker](#run-the-services-without-docker) to develop
+without containers.
+
+## Architecture
+
+The system is a three-tier application plus a local observability pipeline,
+all orchestrated by Docker Compose on a single machine:
+
+```mermaid
+flowchart LR
+  browser["Browser\nReact SPA :3000"]
+  api["FastAPI backend :8000"]
+  db[("PostgreSQL\n:5432")]
+  otel["OTel Collector"]
+  prom["Prometheus"]
+  loki["Loki"]
+  tempo["Tempo"]
+  grafana["Grafana :3001"]
+
+  browser -->|"REST + JWT (CORS)"| api
+  api -->|"SQLAlchemy / Alembic"| db
+  api -->|"OTLP"| otel
+  otel --> prom
+  otel --> loki
+  otel --> tempo
+  grafana --> prom
+  grafana --> loki
+  grafana --> tempo
+```
+
+- **Presentation:** a React + Vite + TypeScript + Tailwind SPA served by nginx;
+  every call goes through one centralized API client that attaches the JWT.
+- **Application:** a FastAPI service (SQLAlchemy 2.0 + Alembic) that owns the
+  business rules, the role boundaries, and the exported OpenAPI contract.
+- **Data:** PostgreSQL in a named volume for the running system; the unit
+  suite uses in-memory SQLite and the integration suite a dedicated database.
+- **Observability:** the backend exports traces, metrics, and logs over OTLP to
+  the collector, which fans them out to Prometheus, Loki, and Tempo for Grafana.
+
+See [docs/architecture.md](docs/architecture.md) for the full stack rationale
+and [docs/specs.md](docs/specs.md) for the functional requirements.
 
 ## Repository layout
 
@@ -207,9 +304,25 @@ make integration      # run the workflows against it
 `postgresql+psycopg://efinges:efinges@127.0.0.1:5432/efinges_test` by default;
 override it with `INTEGRATION_DATABASE_URL=...`. The workflows wipe the
 application tables before each test, so always point it at a database you can
-clear — never your development data. The frontend suite runs with `npm test`
-(Vitest); see `frontend/README.md`. `backend/README.md` documents both backend
-suites in detail.
+clear — never your development data.
+
+The frontend (Vitest + React Testing Library) side runs as follows:
+
+```bash
+cd frontend
+npm test           # run the component and unit tests once
+npm run test:watch # re-run on change while developing
+```
+
+Both sides together, exactly as CI runs them:
+
+```bash
+make test    # backend unit suite + frontend Vitest suite
+make lint    # Ruff check + format check, then ESLint
+```
+
+See `frontend/README.md` and `backend/README.md` for each side's commands and
+test layout in detail.
 
 ## Database
 
