@@ -28,4 +28,12 @@ dev = [
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+# Unit tests only by default. The end-to-end integration workflows live in
+# tests/integration/ and are excluded here so `uv run pytest` stays a fast,
+# dependency-free unit run; run them explicitly with `uv run pytest
+# tests/integration` (backlog task 18).
 testpaths = ["tests"]
+norecursedirs = ["integration"]
+markers = [
+    "integration: end-to-end workflow against a dedicated database (backlog task 18)",
+]

@@ -15,9 +15,17 @@ TEMPO_PORT ?= 3200
 EFINGES_SUBNET ?= 10.215.25.0/24
 COMPOSE ?= docker compose
 
+# Dedicated database the integration workflows use (backlog task 18). It is
+# separate from the development database so the workflows can wipe their tables
+# without touching seeded or local data. Point it at any PostgreSQL server you
+# control; the default matches the compose postgres on its published port.
+INTEGRATION_DATABASE_URL ?= postgresql+psycopg://efinges:efinges@127.0.0.1:$(POSTGRES_PORT)/efinges_test
+
 .PHONY: install run test build \
-	backend-install backend-run backend-test backend-migrate backend-revision backend-openapi \
+	backend-install backend-run backend-test backend-test-integration \
+	backend-migrate backend-revision backend-openapi \
 	frontend-install frontend-run frontend-test frontend-build \
+	integration integration-db \
 	up down logs url
 
 ## Install backend and frontend dependencies
@@ -26,8 +34,16 @@ install: backend-install frontend-install
 ## Run the backend development server
 run: backend-run
 
-## Run all tests (backend and frontend)
+## Run all unit tests (backend and frontend)
 test: backend-test frontend-test
+
+## Run the integration workflows against a dedicated database (needs postgres up)
+integration: backend-test-integration
+
+## Create the dedicated integration test database in the compose postgres
+integration-db:
+	@$(COMPOSE) exec -T postgres psql -U efinges -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='efinges_test'" | grep -q 1 \
+		|| $(COMPOSE) exec -T postgres createdb -U efinges efinges_test
 
 ## Build the frontend for production
 build: frontend-build
@@ -75,6 +91,9 @@ backend-run:
 
 backend-test:
 	cd $(BACKEND_DIR) && uv run pytest
+
+backend-test-integration:
+	cd $(BACKEND_DIR) && TEST_DATABASE_URL="$(INTEGRATION_DATABASE_URL)" uv run pytest tests/integration
 
 backend-migrate:
 	cd $(BACKEND_DIR) && uv run alembic upgrade head

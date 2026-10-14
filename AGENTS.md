@@ -36,7 +36,7 @@ EFINGES is a residential property management platform for property management fi
 - Write new Alembic migrations by hand in the established style (explicit enum `drop()` in `downgrade`); autogenerate emits SQLite `CHECK` constraints twice.
 - Add a database constraint for every rule that must hold even under concurrent requests, and an application check for the friendly error message (for example the one-vote-per-unit unique constraint plus the 409).
 - The frontend must reach the backend only through the centralized API client in `frontend/src/services/`.
-- Add or update focused tests with every behavior change.
+- Add or update focused tests with every behavior change. Keep unit tests (in-memory SQLite, `backend/tests/`) separate from the end-to-end integration workflows (`backend/tests/integration/`, dedicated PostgreSQL); the integration suite must keep covering the three key workflows and stays out of the default `uv run pytest` run.
 - Keep secrets and local databases out of version control; configure through environment variables.
 - Update documentation when an endpoint, setup command, or user-visible behavior changes.
 
@@ -45,8 +45,10 @@ EFINGES is a residential property management platform for property management fi
 ```bash
 make install   # install backend dependencies (uv sync)
 make run       # run the backend dev server on port 8000
-make test      # run the backend pytest suite
+make test      # run the backend unit suite and the frontend Vitest suite
 cd backend && uv run pytest
+make integration   # run the backend end-to-end workflows against a dedicated database (backlog task 18)
+make integration-db   # create the dedicated integration database in the compose postgres
 make openapi   # re-export openapi.yaml from the backend schema (required after API changes)
 cd frontend && npm test
 cd frontend && npm run build

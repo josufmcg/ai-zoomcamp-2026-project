@@ -116,12 +116,39 @@ see live request and error rates.
 ```bash
 make install   # install backend (uv sync) and frontend (npm install) dependencies
 make run       # start the backend dev server on port 8000
-make test      # run the backend pytest suite and the frontend Vitest suite
+make test      # run the backend pytest unit suite and the frontend Vitest suite
+make integration   # run the backend end-to-end workflows (needs postgres up)
 make build     # type-check and build the frontend for production
 make openapi   # re-export the OpenAPI contract to openapi.yaml
 ```
 
 See `backend/README.md` and `frontend/README.md` for the individual commands.
+
+## Tests
+
+The backend has two suites, kept deliberately separate:
+
+- **Unit tests** (`make test`, or `cd backend && uv run pytest`) run against an
+  in-memory SQLite database and mock or seed nothing external. They are the fast
+  suite every change runs.
+- **Integration tests** (`make integration`) run the three key end-to-end
+  workflows — incidence lifecycle with comments, initiative creation with
+  property-weighted voting and aggregation, and manual billing from pending to
+  paid — against a **dedicated PostgreSQL database**, driving only the HTTP API.
+
+```bash
+make up               # start the stack (provides the PostgreSQL server)
+make integration-db   # create the dedicated integration database (once)
+make integration      # run the workflows against it
+```
+
+`make integration` points `TEST_DATABASE_URL` at
+`postgresql+psycopg://efinges:efinges@127.0.0.1:5432/efinges_test` by default;
+override it with `INTEGRATION_DATABASE_URL=...`. The workflows wipe the
+application tables before each test, so always point it at a database you can
+clear — never your development data. The frontend suite runs with `npm test`
+(Vitest); see `frontend/README.md`. `backend/README.md` documents both backend
+suites in detail.
 
 ## Database
 

@@ -22,8 +22,55 @@ at <http://127.0.0.1:8000/docs> and the health probe at
 ## Run the tests
 
 ```bash
-uv run pytest
+uv run pytest                 # unit suite (tests/, in-memory SQLite)
+uv run pytest tests/integration   # integration workflows (dedicated database)
 ```
+
+`uv run pytest` runs the unit suite only. The end-to-end integration workflows
+live in `tests/integration/` and are excluded by default (see `norecursedirs`
+in `pyproject.toml`) so the common test run stays fast and needs no database.
+They run explicitly, against a dedicated database, with the command below.
+
+### Integration tests (backlog task 18)
+
+`tests/integration/` holds three end-to-end workflows that drive the HTTP API
+against a **dedicated database** separate from the development one, proving the
+routes, the scoping rules, the migrations, and the real database behavior
+together:
+
+| Workflow | File | Covers |
+| --- | --- | --- |
+| Incidence lifecycle | `test_incidence_workflow.py` | Resident reports an incidence → manager advances the status → both exchange comments; cross-resident isolation and lifecycle rules |
+| Initiative voting | `test_voting_workflow.py` | Manager creates a scoped initiative → resident casts one ballot per eligible unit → aggregation; scope filtering, double-vote and closed-initiative prevention |
+| Manual billing | `test_billing_workflow.py` | Manager issues a bill → resident sees it move pending → paid; computed `overdue`, one-way transition, and bill scoping |
+
+Point `TEST_DATABASE_URL` at a dedicated PostgreSQL database. The workflows
+wipe the application tables before every test (they never drop the schema), so
+the database must be one you can safely clear — never your development data.
+
+```bash
+# One-off: create the dedicated database in the compose postgres.
+make integration-db
+
+# Run the workflows against it.
+make integration            # wraps: TEST_DATABASE_URL=... uv run pytest tests/integration
+```
+
+`make integration` uses `INTEGRATION_DATABASE_URL`, which defaults to
+`postgresql+psycopg://efinges:efinges@127.0.0.1:5432/efinges_test` and can be
+overridden:
+
+```bash
+make integration INTEGRATION_DATABASE_URL=postgresql+psycopg://user:pw@host/db
+# or directly:
+cd backend && TEST_DATABASE_URL=postgresql+psycopg://user:pw@host/db uv run pytest tests/integration
+```
+
+The suite's fixtures create any missing tables (`create_all`) and then wipe
+them, so the dedicated database only needs to exist and be safely clearable;
+no migration step is required. Everything the workflows create is made through
+the public API except the very first administrator, which is seeded directly
+because `POST /users` is administrator-only.
 
 ## Database and migrations
 
@@ -285,7 +332,9 @@ The repository root `Makefile` wraps the commands above:
 ```bash
 make install   # uv sync
 make run       # start the dev server on port 8000
-make test      # run the pytest suite
+make test      # run the pytest unit suite
+make integration      # run the integration workflows (needs postgres up)
+make integration-db   # create the dedicated integration database
 make migrate   # apply the database migrations (alembic upgrade head)
 make revision m="describe the change"   # create a new migration
 make openapi   # export the OpenAPI schema to ../openapi.yaml
