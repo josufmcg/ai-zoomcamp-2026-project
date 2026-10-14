@@ -1,0 +1,81 @@
+# EFINGES local development stack (backlog task 3).
+#
+# Starts the FastAPI backend, the React frontend, and PostgreSQL together.
+# The observability pipeline (otel-collector, prometheus, loki, tempo,
+# grafana) is added by backlog task 4.
+#
+# Usage:
+#   make up      # build and start everything, then print the URLs
+#   make down    # stop and remove the containers
+#   make logs    # follow the backend and frontend logs
+#   make url     # print the local URLs
+
+name: efinges
+
+services:
+  backend:
+    image: efinges-backend:${EFINGES_TAG:-local}
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    environment:
+      # Point the backend at the postgres service on the compose network.
+      DATABASE_URL: postgresql+psycopg://efinges:efinges@postgres:5432/efinges
+      SECRET_KEY: ${SECRET_KEY:-dev-only-secret-key-change-me}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  frontend:
+    image: efinges-frontend:${EFINGES_TAG:-local}
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        # Browser-facing backend URL, baked into the bundle at build time.
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: efinges
+      POSTGRES_PASSWORD: efinges
+      POSTGRES_DB: efinges
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U efinges -d efinges"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: ${EFINGES_SUBNET:-10.215.25.0/24}

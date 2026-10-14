@@ -1,0 +1,36 @@
+# Keep Docker build contexts small and reproducible (backlog task 3).
+
+# Version control and editor metadata
+.git
+.gitignore
+.github
+.vscode
+.cursorrules
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/.venv/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/*.egg-info/
+**/.coverage
+**/htmlcov/
+
+# Local databases and secrets
+**/*.db
+**/*.sqlite3
+.env
+.env.*
+
+# Node / frontend build output
+**/node_modules/
+**/dist/
+**/coverage/
+
+# Documentation and local artifacts
+docs/
+security/
+ops/
+*.md

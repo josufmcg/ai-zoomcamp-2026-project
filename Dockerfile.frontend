@@ -1,0 +1,33 @@
+# EFINGES frontend image (backlog task 3).
+#
+# Stage 1 builds the Vite production bundle; stage 2 serves the static files
+# with nginx. The backend URL is injected at build time through the
+# `VITE_API_URL` build argument (never `NEXT_PUBLIC_API_URL`).
+
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+# Install dependencies first so Docker can cache this layer across code edits.
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+# Copy the source and build the production bundle.
+COPY frontend/ ./
+
+# The backend URL is baked into the bundle at build time.
+ARG VITE_API_URL=http://localhost:8000
+ENV VITE_API_URL=$VITE_API_URL
+RUN npm run build
+
+FROM nginx:1.27-alpine AS runtime
+
+# Serve the SPA with client-side routing support. The nginx config is copied
+# from the build stage so the runtime stage does not depend on the repository
+# layout.
+COPY --from=build /app/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 3000
+
+CMD ["nginx", "-g", "daemon off;"]
