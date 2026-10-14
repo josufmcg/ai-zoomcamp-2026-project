@@ -14,6 +14,19 @@ from pathlib import Path
 # ``backend/tests/test_security_artifacts.py`` -> ``backend`` -> repository root.
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 SECURITY_DIR = REPOSITORY_ROOT / "security"
+PR_AUDITS_DIR = REPOSITORY_ROOT / "docs" / "pr_audits"
+
+# The section headings from ``.github/pull_request_template.md`` that every
+# completed audit must carry, so an audit is the template actually applied.
+AUDIT_SECTIONS = (
+    "## Summary",
+    "## Provenance (AI-assisted work)",
+    "## Correctness and tests",
+    "## API contract",
+    "## Security and privacy",
+    "## Database",
+    "## Documentation",
+)
 
 SEVERITIES = {"CRITICAL", "HIGH", "MEDIUM", "LOW", "UNKNOWN"}
 TRIVY_COLUMNS = 7
@@ -93,6 +106,26 @@ def test_pull_request_template_covers_the_review_checklist() -> None:
         "Reviewer sign-off",
     ):
         assert marker in template, f"pull request template is missing {marker!r}"
+
+
+def test_completed_pr_audits_apply_the_review_checklist() -> None:
+    """The evaluation asks for PR audit output, not only a blank template."""
+
+    audits = sorted(PR_AUDITS_DIR.glob("task-*.md"))
+    assert audits, "docs/pr_audits/ should hold at least one completed audit"
+
+    for audit in audits:
+        text = _read(audit)
+        for section in AUDIT_SECTIONS:
+            assert section in text, f"{audit.name} is missing section {section!r}"
+        # A completed audit states a verdict and is signed off by a reviewer.
+        assert "Verdict:" in text, f"{audit.name} has no verdict"
+        assert "Reviewer sign-off:" in text, f"{audit.name} is not signed off"
+
+    index = _read(PR_AUDITS_DIR / "README.md")
+    assert "pull_request_template.md" in index
+    for audit in audits:
+        assert audit.name in index, f"docs/pr_audits/README.md does not list {audit.name}"
 
 
 def test_operations_notes_cover_real_diagnosis_sessions() -> None:

@@ -1,6 +1,6 @@
 # EFINGES - Infrastructure & Technology Stack Specification
 
-This document defines the technology stack, system architecture, integration layers, and auxiliary engineering workflows for **EFINGES**, tailored to satisfy all evaluation criteria while maintaining a robust local containerized deployment setup with enterprise-grade observability.
+This document defines the technology stack, system architecture, integration layers, and auxiliary engineering workflows for **EFINGES**. It describes the system as it is actually built and run (local Docker Compose with a full observability pipeline); where it drifts from the code, the code and the root `README.md` win.
 
 ## 1. High-Level System Architecture
 
@@ -21,21 +21,22 @@ All components run locally via **Docker Compose** to guarantee environment parit
 | **Backend** | Python (FastAPI) | Automatically generates an **OpenAPI specification**, supports asynchronous requests, and ensures strict data validation via Pydantic. | 
 | **Database** | PostgreSQL (runtime) / SQLite (unit tests) | Relational data integrity required for complex property hierarchies (Communities -> Buildings -> Units -> Residents) and tagging relations. | 
 | **Containerization** | Docker & Docker Compose | Orchestrates frontend, backend, database, and observability services into a single local execution environment. | 
-| **Observability** | OTel, Prometheus, Loki, Tempo, Grafana | Production-grade metrics, log aggregation, and distributed tracing running locally for deep operational insights. |
-| **Testing** | Vitest (Frontend) & Pytest (Backend) | Fast, modern testing frameworks with native support for coverage and integration testing. | 
-| **CI/CD** | GitHub Actions | Automated linting, test execution, and Docker image build validation on push/PR. | 
+| **Observability** | OTel Collector, Prometheus, Loki, Tempo, Grafana | Traces, metrics, and logs exported over OTLP from the backend; collected once and fanned out to three storage backends and a provisioned dashboard. |
+| **Testing** | Pytest (backend unit + integration) & Vitest + React Testing Library (frontend) | Unit tests run on in-memory SQLite; the three key workflows run against a dedicated PostgreSQL; the frontend tests cover components and pure logic. |
+| **Linting** | Ruff (backend) & ESLint 9 flat config (frontend) | One fast formatter + linter per language, run identically locally (`make lint`) and in CI. |
+| **CI/CD** | GitHub Actions | Runs lint, both test suites, and the frontend build, then builds both Docker images once the other jobs pass. Deployment is intentionally out of scope (local Compose only). |
 
 ## 3. Detailed Component Specifications
 
 ### 3.1 Frontend Implementation & Structure
-* **Structure:** Feature-based directory organization (`/components`, `/services`, `/hooks`, `/pages`).
-* **API Communication:** Centralized API client module pointing to the backend base URL, managing interceptors, auth headers, and error handling uniformly.
-* **Testing:** Unit and component testing using Vitest and React Testing Library, covering core views (Dashboard, Bill checking, Incidence tracking, Voting).
+* **Structure:** Split by concern under `frontend/src/`: `pages/` (one file per role's home plus `pages/<role>/` sections), `services/` (the API layer), `auth/` (context, provider, route guard, navigation model), `hooks/`, `types/`, and `test/` helpers.
+* **API Communication:** Every call goes through one centralized client, `frontend/src/services/apiClient.ts`, which owns the base URL, attaches the Bearer token, and normalizes errors. The typed service modules (`property`, `billing`, `maintenance`, `governance`, `auth`, `users`, `assignments`) are thin wrappers over it; no component calls `fetch` directly.
+* **Testing:** Vitest + React Testing Library cover the login/navigation flow, each role's screens, and the pure logic seams (bill filtering, ballot handling, incidence transitions, initiative scoping, user-form validation), with a documented `npm test` / `npm run test:watch`.
 
 ### 3.2 API Contract & Backend Implementation
-* **API Contract:** FastAPI auto-generates a standards-compliant **OpenAPI 3.0 specification** (`/openapi.json` and interactive Swagger UI at `/docs`). This serves as the single source of truth for frontend-backend integration.
-* **Backend Structure:** Clean modular architecture (Routers, CRUD operations, Models, Schemas).
-* **Backend Testing:** Pytest suite covering core workflows (manual bill creation, role-based access checks, incidence state transitions, and property voting logic).
+* **API Contract:** FastAPI generates the OpenAPI schema served at `/openapi.json` and Swagger UI at `/docs`, and the same schema is exported to `openapi.yaml` at the repository root. That committed file is the single source of truth for frontend-backend integration; `backend/tests/test_openapi_contract.py` fails if it drifts, and `make openapi` regenerates it.
+* **Backend Structure:** Routers under `app/routers/`, Pydantic schemas in `app/schemas/` (split by area), SQLAlchemy models in `app/models/`, dependencies in `app/dependencies.py`, and all access rules centralized in `app/access.py`.
+* **Backend Testing:** The unit suite (`backend/tests/`, in-memory SQLite) covers CRUD, role boundaries, bill status, incidence transitions, and voting; the integration suite (`backend/tests/integration/`, dedicated PostgreSQL) drives the three key workflows over HTTP.
 
 ### 3.3 Database Integration
 * **ORM:** SQLAlchemy with Alembic for database migrations.
@@ -200,29 +201,32 @@ The `./observability/` directory structures the monitoring tools:
   3. Manager creates a manual bill -> Resident checks status (Pending/Paid/Overdue).
 
 ## 5. Agent Extension Pack & AI Workflow Documentation
-* **AI Tool & Data Policy (`docs/ai_policy.md`):** Guidelines on prompt construction, data privacy, and code review mandates.
-* **Project Instructions:** Custom markdown directives (`.cursorrules`) guiding LLM interactions for EFINGES.
-* **Reusable Workflows & Subagent Profile:** Pre-configured prompt templates for bug hunting and feature generation.
-* **Mock MCP Server:** A local script exposing database schema tools to LLM coding assistants.
-* **Guardrails & Hooks:** Pre-commit hooks checking for hardcoded secrets and validating OpenAPI contract adherence.
+* **Project Instructions:** `AGENTS.md` (context, required behavior, validation commands) with `.github/copilot-instructions.md` as the entry point and `.cursorrules` pointing back at `AGENTS.md`.
+* **Reusable Prompts & Subagent:** `.github/prompts/` (implement a backlog task, diagnose a failing check, review an API change) and a read-only `.github/agents/bug-hunter.agent.md` profile.
+* **Mock MCP Server:** `backend/scripts/mock_mcp_server.py` — a read-only, metadata-only stdio server exposing the SQLAlchemy table and column schema to LLM coding assistants (never a database connection or row data).
+* **Guardrails & Hooks:** `.pre-commit-config.yaml` blocks staged hard-coded secrets (`backend/scripts/check_staged_secrets.py`) and verifies the OpenAPI contract (`make openapi-check`).
+* **AI Tool & Data Policy (`docs/ai_policy.md`):** prompt construction, data privacy, permitted agent actions, and mandatory human review; the allow/deny list is in `docs/agent-permissions.md`.
+* **Workflow record (`docs/ai_workflow.md`):** the prompts, context files, review, and verification for the project's tasks, with completed audits in `docs/pr_audits/`.
 
 ## 6. Security, Audit, and DevOps Hardening
-* **Deterministic Security Scans:** Output reports from Bandit (Python) and container vulnerability scanners.
-* **PR Audit Template:** Standardized checklist for reviewing AI-generated pull requests.
-* **Operational Diagnosis Notes:** Troubleshooting logs for container communication, healthchecks, and telemetry exporters.
+* **Deterministic Security Scans:** Committed reports under `security/` — Bandit static analysis of the backend Python, plus Trivy vulnerability scans of both images — with a full triage in `security/README.md`; regenerate with `make security`.
+* **PR Audit:** `.github/pull_request_template.md` is the checklist every change is reviewed against; `docs/pr_audits/` holds completed examples of it applied to real tasks, including reviews that caught defects.
+* **Operational Diagnosis Notes:** `docs/operations.md` records real troubleshooting sessions with the containers and telemetry (symptom, evidence, root cause, fix, verification).
 
-## 7. Proposed folder structure
+## 7. Repository layout (as built)
 
 ```
 README.md
-product-spec.md
-AGENTS.md or equivalent project instructions
-frontend/
-backend/
-openapi.yaml
-docker-compose.yml
-.github/workflows/
-docs/
-security/
-ops/
+AGENTS.md               # project instructions (and .cursorrules, .github/copilot-instructions.md)
+.github/                # workflows/ci.yml, prompts/, agents/, pull_request_template.md
+backend/                # FastAPI app/ (routers, models, schemas, access), tests/, alembic/, scripts/
+frontend/               # React + Vite SPA (src/pages, services, auth, hooks, types)
+openapi.yaml            # exported API contract (single source of truth)
+docker-compose.yml      # backend, frontend, postgres + observability pipeline
+Dockerfile.backend
+Dockerfile.frontend
+observability/          # otel-collector, prometheus, loki, tempo, grafana config
+security/               # Bandit + Trivy reports and their triage
+Makefile                # install/run/test/lint/build/up/seed/security/...
+docs/                   # specs, architecture, backlog, ai_policy, ai_workflow, pr_audits, operations
 ```

@@ -291,7 +291,9 @@ To reconstruct any task in this project:
    `docs/specs.md`, and `docs/architecture.md`.
 3. Inspect the committed diff for that task and compare it with the
    "correction" noted here and with the review checklist in
-   `.github/pull_request_template.md`.
+   `.github/pull_request_template.md`. Two examples of that checklist applied to
+   a real change — both ending in "changes requested" after a defect was caught
+   — are in `docs/pr_audits/` (tasks 5 and 8).
 4. Re-run the acceptance commands from section 4 and confirm they pass.
 5. Where a defect was found, re-read the matching `docs/operations.md` entry,
    which records the symptom, evidence, root cause, fix, and verification.

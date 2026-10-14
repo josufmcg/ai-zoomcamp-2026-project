@@ -456,11 +456,13 @@ remediation steps, in `security/README.md`.
 
 Every pull request is reviewed with the checklist in
 `.github/pull_request_template.md`, which covers provenance, tests, the API
-contract, security and privacy, and the database migrations. AI-assisted work
-follows [docs/ai_policy.md](docs/ai_policy.md) (prompt construction, data
-privacy, and mandatory human review); real troubleshooting sessions with the
-containers and telemetry are recorded in
-[docs/operations.md](docs/operations.md).
+contract, security and privacy, and the database migrations. Completed examples
+of that checklist applied to real tasks — including reviews that caught a
+migration defect and a data-leak defect — are in
+[docs/pr_audits/](docs/pr_audits/). AI-assisted work follows
+[docs/ai_policy.md](docs/ai_policy.md) (prompt construction, data privacy, and
+mandatory human review); real troubleshooting sessions with the containers and
+telemetry are recorded in [docs/operations.md](docs/operations.md).
 
 ## Scope
 

@@ -5,6 +5,13 @@ triage of their results (backlog task 21). The reports are snapshots: they are
 committed so a reviewer can see exactly what the scanners found at the time of
 the scan, and every one of them can be reproduced with the commands below.
 
+The review side of the audit lives next to this directory: the pull-request
+checklist is `.github/pull_request_template.md`, and `docs/pr_audits/` holds
+completed examples of it applied to real tasks. One of those examples (task 8)
+is the review that caught the resident-scoping data leak — the same class of
+defect Bandit cannot see, which is why the review checklist and the static
+scans exist together.
+
 | File | What it is |
 | --- | --- |
 | `bandit-report.txt` | Static analysis of the backend Python code (Bandit). |
