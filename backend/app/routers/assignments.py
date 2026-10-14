@@ -15,6 +15,10 @@ a unit has at most one resident at a time.
 Residents cannot manage assignments. Instead, ``GET /auth/me/units`` returns
 the units belonging to the signed-in resident, which is the helper the resident
 screens and the later billing, incidence, and voting tasks build on.
+
+``GET /residents`` is the minimal resident lookup the manager screens need to
+pick whom to assign to a unit: it lists resident accounts (never their
+password), so a manager does not need the administrator-only ``GET /users``.
 """
 
 from __future__ import annotations
@@ -27,7 +31,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.dependencies import CurrentUser, get_db, require_role
 from app.models import Unit, UnitAssignment, User, UserRole
-from app.schemas import AssignmentCreate, AssignmentRead, MyUnitRead
+from app.schemas import AssignmentCreate, AssignmentRead, MyUnitRead, UserRead
 
 router = APIRouter(tags=["assignments"])
 
@@ -36,6 +40,26 @@ router = APIRouter(tags=["assignments"])
 ManagerUser = Annotated[
     User, Depends(require_role(UserRole.MANAGER, UserRole.ADMINISTRATOR))
 ]
+
+
+@router.get("/residents", response_model=list[UserRead])
+def list_residents(
+    _manager: ManagerUser,
+    session: Annotated[Session, Depends(get_db)],
+    is_active: Annotated[bool | None, Query()] = None,
+) -> list[User]:
+    """List resident accounts so a manager can pick whom to assign.
+
+    Only residents are returned (never managers or administrators) and the
+    response uses :class:`~app.schemas.auth.UserRead`, so a password hash can
+    never leak. ``is_active`` optionally filters to active or deactivated
+    residents; by default every resident is listed.
+    """
+    statement = select(User).where(User.role == UserRole.RESIDENT)
+    if is_active is not None:
+        statement = statement.where(User.is_active == is_active)
+    return list(session.scalars(statement.order_by(User.email)).all())
+
 
 
 def list_assignments_for_user(session: Session, user_id: int) -> list[UnitAssignment]:

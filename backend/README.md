@@ -111,9 +111,15 @@ manage assignments; residents only read their own through the shared helper.
 | Method | Path | Roles | Purpose |
 | --- | --- | --- | --- |
 | `GET` | `/auth/me/units` | any signed-in user | Units belonging to the caller, with the ownership flag |
+| `GET` | `/residents` | manager, administrator | List resident accounts for the manager picker (filter with `?is_active=`) |
 | `GET` | `/assignments` | manager, administrator | List assignments (filter with `?user_id=` or `?unit_id=`) |
 | `POST` | `/assignments` | manager, administrator | Assign a resident to a unit |
 | `DELETE` | `/assignments/{id}` | manager, administrator | Remove an assignment |
+
+`GET /residents` returns only resident accounts, using the same `UserRead`
+schema as the rest of the API, so a manager can pick whom to assign without
+accessing the administrator-only `/users` endpoints and a password hash can
+never leak.
 
 `POST /assignments` returns 404 for an unknown user or unit, 409 when the unit
 is already assigned, and 422 when the target user is not a resident:

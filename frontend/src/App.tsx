@@ -21,11 +21,11 @@ import AppShell from "./pages/AppShell";
 import {
   AdminHomePage,
   ForbiddenPage,
-  ManagerHomePage,
   NotFoundPage,
   OverviewPage,
 } from "./pages/HomePages";
 import LoginPage from "./pages/LoginPage";
+import ManagerHomePage from "./pages/ManagerHomePage";
 import ResidentHomePage from "./pages/ResidentHomePage";
 
 /** Send a signed-in visitor from `/` to their home screen, others to `/login`. */

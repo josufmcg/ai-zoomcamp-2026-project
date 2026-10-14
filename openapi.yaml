@@ -2185,6 +2185,49 @@ paths:
       summary: Delete Manager Assignment
       tags:
       - properties
+  /residents:
+    get:
+      description: 'List resident accounts so a manager can pick whom to assign.
+
+
+        Only residents are returned (never managers or administrators) and the
+
+        response uses :class:`~app.schemas.auth.UserRead`, so a password hash can
+
+        never leak. ``is_active`` optionally filters to active or deactivated
+
+        residents; by default every resident is listed.'
+      operationId: list_residents_residents_get
+      parameters:
+      - in: query
+        name: is_active
+        required: false
+        schema:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Active
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserRead'
+                title: Response List Residents Residents Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - OAuth2PasswordBearer: []
+      summary: List Residents
+      tags:
+      - assignments
   /tags:
     get:
       description: List every tag. Tags are shared labels, so any signed-in user may read.

@@ -145,12 +145,12 @@ export function Notice({
   } as const;
 
   return (
-    <p
+    <div
       className={`rounded-md border px-3 py-2 text-sm ${tones[tone]}`}
       role={tone === "red" ? "alert" : undefined}
     >
       {children}
-    </p>
+    </div>
   );
 }
 

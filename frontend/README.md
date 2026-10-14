@@ -43,7 +43,7 @@ VITE_API_URL=http://localhost:9000
 | `/` | any | Redirects to the role's home screen, or to `/login` |
 | `/overview` | any signed-in role | Shared landing screen |
 | `/resident` | resident | Resident screens: units, bills, incidences, open initiatives |
-| `/manager` | manager | Manager screens (backlog task 16) |
+| `/manager` | manager | Manager screens: property tree, assignments, bills, incidences, initiatives |
 | `/admin` | administrator | Administrator screens (backlog task 17) |
 | `/forbidden` | any signed-in role | Shown when a role lacks access |
 
@@ -81,6 +81,42 @@ The two rules that need focused tests live in their own modules:
 `src/pages/resident/billFilter.ts` (the status filter) and
 `src/pages/resident/ballot.ts` (the per-unit ballot selection and submission),
 with the corresponding `*.test.ts` files and component-level tests beside them.
+
+## Manager screens (backlog task 16)
+
+The manager home screen stacks five independent sections, each loading its own
+data through the shared API client and rendering its own loading, error, and
+empty state:
+
+- **Property tree** — `GET /communities`, `GET /buildings`, `GET /units`, and
+  `GET /tags`, grouped in memory into communities → buildings → units. A manager
+  adds buildings to a community and units to a building, and edits the tags of a
+  building or unit. Every write refreshes the affected lists, so the tree always
+  shows what the backend stored rather than an optimistic guess.
+- **Resident assignments** — `GET /assignments` with a form to assign an active
+  resident (`GET /residents`, a manager-accessible directory that never exposes
+  the administrator-only `/users` endpoints) to one of the manager's units, and
+  a remove action.
+- **Bills** — `GET /bills` (scoped to the manager's communities by the backend)
+  with a form to issue a manual bill (`POST /bills`) and a "Mark paid" action
+  (`POST /bills/{id}/pay`) offered only while the bill is unpaid, because the
+  backend rejects a second payment with 409. `overdue` is always the value the
+  API computed, never derived from dates on the client.
+- **Incidences** — `GET /incidences` with a status filter, a per-incidence
+  transition button (`PATCH /incidences/{id}/status`) that only offers the
+  immediate next stage, and a reply box per thread.
+- **Initiatives** — `GET /initiatives` with the options and running ballot
+  counts, and a form to create a new initiative with two or more options and an
+  eligible scope filter over communities, buildings, unit types, and tags
+  (`POST /initiatives`).
+
+The two rules that need focused tests live in their own modules:
+`src/pages/manager/incidenceStatus.ts` mirrors the backend lifecycle so the
+screen only offers a legal transition, and
+`src/pages/manager/initiativeScope.ts` validates an initiative draft and turns it
+into the request body (the scope combines with AND, and an empty scope means
+"every unit"). Both have `*.test.ts` files beside them, with component-level
+tests for the transition controls and the scope form.
 
 ## Run the tests
 
@@ -123,8 +159,9 @@ src/
   pages/
     LoginPage.tsx         # email and password form
     AppShell.tsx          # header, sidebar, routed content
-    HomePages.tsx         # overview, manager, admin, and error screens
+    HomePages.tsx         # overview, admin, and error screens
     ResidentHomePage.tsx  # resident screen container (task 15)
+    ManagerHomePage.tsx   # manager screen container (task 16)
     components.tsx        # shared presentational pieces
     format.ts             # unit type, ownership, date, and money formatters
     resident/
@@ -134,6 +171,15 @@ src/
       OpenInitiativesSection.tsx # open initiatives and per-unit voting
       billFilter.ts              # bill status filter logic (tested)
       ballot.ts                  # per-unit ballot selection (tested)
+    manager/
+      PropertyTreeSection.tsx        # communities, buildings, units, tags
+      AssignmentsSection.tsx         # resident assignments
+      ManagerBillsSection.tsx        # issue and pay bills
+      ManagerIncidencesSection.tsx   # lifecycle transitions and replies
+      InitiativesSection.tsx         # create initiatives with a scope
+      TagChecklist.tsx               # tag checklist and editor
+      incidenceStatus.ts             # lifecycle transition mirror (tested)
+      initiativeScope.ts             # draft validation and payload (tested)
   hooks/
     useAsync.ts           # minimal async loading state helper
   services/

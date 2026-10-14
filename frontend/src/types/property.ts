@@ -25,19 +25,61 @@ export interface Tag {
   name: string;
 }
 
-/** One of the signed-in resident's units (backend `MyUnitRead`). */
-export interface MyUnit {
+/** A community (backend `CommunityRead`). */
+export interface Community {
+  id: number;
+  name: string;
+}
+
+/** A building inside one community (backend `BuildingRead`). */
+export interface Building {
+  id: number;
+  community_id: number;
+  name: string;
+  tags: Tag[];
+}
+
+/** A unit in the property tree (backend `UnitRead`). */
+export interface Unit {
   id: number;
   building_id: number;
   identifier: string;
   unit_type: UnitType;
-  ownership_type: OwnershipType;
   tags: Tag[];
+}
+
+/** One of the signed-in resident's units (backend `MyUnitRead`). */
+export interface MyUnit extends Unit {
+  ownership_type: OwnershipType;
 }
 
 /** Narrow an unknown value to a {@link UnitType}. */
 export function isUnitType(value: unknown): value is UnitType {
   return typeof value === "string" && UNIT_TYPES.some((type) => type === value);
+}
+
+/** Narrow an unknown value to a {@link Community} that came from the API. */
+export function isCommunity(value: unknown): value is Community {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.id === "number" && typeof candidate.name === "string"
+  );
+}
+
+/** Narrow an unknown value to a {@link Building} that came from the API. */
+export function isBuilding(value: unknown): value is Building {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const candidate = value as Record<string, unknown>;
+  return (
+    typeof candidate.id === "number" &&
+    typeof candidate.community_id === "number" &&
+    typeof candidate.name === "string"
+  );
 }
 
 /** Narrow an unknown value to a {@link MyUnit} that came from the API. */

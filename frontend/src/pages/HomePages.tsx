@@ -1,9 +1,10 @@
 /**
- * Landing screens for the three roles (backlog task 14).
+ * Shared landing and error screens (backlog task 14).
  *
- * Each placeholder names the backlog task that fills it in, so the shell can be
- * exercised end to end before the feature work exists. They are deliberately
- * thin: tasks 15 to 17 replace the bodies, not the routes.
+ * The resident and manager home screens live in their own modules
+ * (`ResidentHomePage.tsx`, `ManagerHomePage.tsx`); this file keeps the
+ * role-independent overview plus the administrator placeholder that task 17
+ * fills in, and the forbidden/not-found screens.
  */
 
 import { Link } from "react-router-dom";
@@ -49,20 +50,6 @@ export function OverviewPage() {
         Overview
       </h1>
       <OverviewSection />
-    </div>
-  );
-}
-
-export function ManagerHomePage() {
-  return (
-    <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-        My properties
-      </h1>
-      <PlaceholderSection
-        title="Manager screens"
-        description="Backlog task 16: the assigned property tree with tags, resident assignments, bill issuing, incidence handling, and initiative creation."
-      />
     </div>
   );
 }

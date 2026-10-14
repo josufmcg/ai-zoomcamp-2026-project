@@ -1,8 +1,10 @@
 /**
- * Incidence and comment calls used by the resident screens (backlog task 15).
+ * Incidence and comment calls used by the resident and manager screens
+ * (backlog tasks 15-16).
  *
- * A resident reports incidences against their own units, reads the thread back,
- * and posts comments into it. The list endpoint scopes to the caller and embeds
+ * Residents report incidences against their own units, read the thread back,
+ * and post comments into it; managers advance the status along the strict
+ * lifecycle and comment too. The list endpoint scopes to the caller and embeds
  * each incidence's comment thread, so one request renders the whole screen.
  */
 
@@ -11,7 +13,7 @@ import type { Comment, Incidence, IncidenceStatus } from "../types/maintenance";
 
 /** Filters accepted by {@link listIncidences}. */
 export interface ListIncidencesParams {
-  /** Restrict to one of the caller's units. */
+  /** Restrict to one unit. */
   unitId?: number;
   /** Restrict to one lifecycle stage. */
   status?: IncidenceStatus;
@@ -41,6 +43,14 @@ export function createIncidence(payload: IncidenceCreate): Promise<Incidence> {
 /** Return one incidence and its comment thread. */
 export function getIncidence(incidenceId: number): Promise<Incidence> {
   return api.get<Incidence>(`/incidences/${incidenceId}`);
+}
+
+/** Advance an incidence one step along its lifecycle. Manager action. */
+export function updateIncidenceStatus(
+  incidenceId: number,
+  status: IncidenceStatus,
+): Promise<Incidence> {
+  return api.patch<Incidence>(`/incidences/${incidenceId}/status`, { status });
 }
 
 /** Add a comment to an incidence thread. */

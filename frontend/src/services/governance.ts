@@ -1,19 +1,36 @@
 /**
- * Initiative and voting calls used by the resident screens (backlog task 15).
+ * Initiative and voting calls used by the resident and manager screens
+ * (backlog tasks 15-16).
  *
- * The resident voting form is built from three calls: list the open
- * initiatives, ask which of the caller's units are eligible for one, and cast
- * one ballot per eligible unit. `castVote` sends exactly one unit/option pair;
- * the caller issues it once per unit because voting is one ballot per unit.
+ * Residents list the open initiatives, ask which of their units are eligible,
+ * and cast one ballot per eligible unit. Managers create initiatives, so this
+ * module also wraps `POST /initiatives`, whose scope is the eligibility filter
+ * the manager builds on screen.
  */
 
 import { api } from "./apiClient";
-import type { EligibleUnit, Initiative, Vote, VoteResult } from "../types/governance";
+import type {
+  EligibleUnit,
+  Initiative,
+  InitiativeScope,
+  Vote,
+  VoteResult,
+} from "../types/governance";
 
 /** Filters accepted by {@link listInitiatives}. */
 export interface ListInitiativesParams {
   /** Restrict to the initiatives that are currently open for voting. */
   isOpen?: boolean;
+}
+
+/** Request body for {@link createInitiative}. */
+export interface InitiativeCreate {
+  title: string;
+  description: string;
+  opens_at: string;
+  closes_at: string;
+  options: { label: string }[];
+  scope: InitiativeScope;
 }
 
 /** List initiatives, optionally limited to the ones open today. */
@@ -28,6 +45,13 @@ export function listInitiatives(
 /** Return one initiative with its options and running ballot counts. */
 export function getInitiative(initiativeId: number): Promise<Initiative> {
   return api.get<Initiative>(`/initiatives/${initiativeId}`);
+}
+
+/** Create an initiative with its options and eligible scope. Manager only. */
+export function createInitiative(
+  payload: InitiativeCreate,
+): Promise<Initiative> {
+  return api.post<Initiative>("/initiatives", payload);
 }
 
 /**

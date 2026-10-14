@@ -474,6 +474,104 @@ def test_reassigning_a_removed_unit_succeeds(
     assert reassigned.json()["user_id"] == second.id
 
 
+# --- Resident directory (the manager picker) --------------------------------
+
+
+def test_manager_lists_residents(
+    api_client: TestClient,
+    create_user: Callable[..., User],
+    login: Callable[[str], str],
+) -> None:
+    """The manager screen needs residents to assign; ``/users`` is admin-only."""
+    manager = create_user("manager@efinges.test", role=UserRole.MANAGER)
+    create_user("ana@efinges.test")
+    create_user("bea@efinges.test")
+
+    response = api_client.get(
+        "/residents", headers=auth_header(login(manager.email))
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert [row["email"] for row in body] == [
+        "ana@efinges.test",
+        "bea@efinges.test",
+    ]
+    assert all(row["role"] == "resident" for row in body)
+    assert "password" not in response.text
+
+
+def test_resident_directory_excludes_other_roles(
+    api_client: TestClient,
+    create_user: Callable[..., User],
+    login: Callable[[str], str],
+) -> None:
+    """Only residents are listed, so a manager cannot assign a peer."""
+    manager = create_user("manager@efinges.test", role=UserRole.MANAGER)
+    create_user("resident@efinges.test")
+    create_user("other-manager@efinges.test", role=UserRole.MANAGER)
+
+    response = api_client.get(
+        "/residents", headers=auth_header(login(manager.email))
+    )
+
+    assert response.status_code == 200
+    assert [row["email"] for row in response.json()] == ["resident@efinges.test"]
+
+
+def test_resident_directory_filters_by_activation(
+    api_client: TestClient,
+    create_user: Callable[..., User],
+    login: Callable[[str], str],
+) -> None:
+    manager = create_user("manager@efinges.test", role=UserRole.MANAGER)
+    create_user("active@efinges.test")
+    create_user("gone@efinges.test", is_active=False)
+    token = login(manager.email)
+
+    active = api_client.get("/residents?is_active=true", headers=auth_header(token))
+    inactive = api_client.get(
+        "/residents?is_active=false", headers=auth_header(token)
+    )
+
+    assert [row["email"] for row in active.json()] == ["active@efinges.test"]
+    assert [row["email"] for row in inactive.json()] == ["gone@efinges.test"]
+
+
+def test_an_administrator_can_list_residents_too(
+    api_client: TestClient,
+    create_user: Callable[..., User],
+    login: Callable[[str], str],
+) -> None:
+    admin = create_user("admin@efinges.test", role=UserRole.ADMINISTRATOR)
+    create_user("resident@efinges.test")
+
+    response = api_client.get(
+        "/residents", headers=auth_header(login(admin.email))
+    )
+
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+
+
+def test_a_resident_cannot_list_residents(
+    api_client: TestClient,
+    create_user: Callable[..., User],
+    login: Callable[[str], str],
+) -> None:
+    resident = create_user("resident@efinges.test")
+
+    response = api_client.get(
+        "/residents", headers=auth_header(login(resident.email))
+    )
+
+    assert response.status_code == 403
+
+
+def test_resident_directory_requires_a_token(api_client: TestClient) -> None:
+    assert api_client.get("/residents").status_code == 401
+
+
 # --- The helper reused by later tasks ---------------------------------------
 
 
