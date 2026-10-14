@@ -81,6 +81,8 @@ Some commands only exist once the corresponding backlog tasks are done; never ru
 `.github/workflows/ci.yml` runs on every push and pull request: a `backend` job
 (uv install, Ruff lint and format check, unit suite, integration workflows
 against a PostgreSQL service), a `frontend` job (npm ci, ESLint, Vitest,
-production build), and a `docker` job that builds both images once the other two
-pass. Keep the local checks that mirror those jobs green before pushing, and run
+production build), a `docker` job that builds both images once the other two
+pass, and a `deploy` job that brings the whole stack up with `docker compose up
+--wait`, seeds the demo data, and reads it back through the live HTTP API. Keep
+the local checks that mirror those jobs green before pushing, and run
 `make lint` together with the test suites after every change.

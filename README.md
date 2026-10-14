@@ -257,13 +257,27 @@ untouched. Run it directly against a different database with
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs on every push and every pull request and has
-three jobs:
+four jobs:
 
 | Job | What it does |
 | --- | --- |
 | **backend** | Installs dependencies with `uv`, runs `ruff check` and `ruff format --check`, runs the unit suite (`uv run pytest`), then runs the integration workflows (`uv run pytest tests/integration`) against a PostgreSQL service container |
 | **frontend** | Installs dependencies with `npm ci`, runs ESLint (`npm run lint`), runs Vitest (`npm test`), then produces the production build (`npm run build`, which type-checks first) |
 | **docker** | Runs only after both jobs pass, and builds both Docker images to prove they still build from the committed `Dockerfile.backend` and `Dockerfile.frontend` |
+| **deploy** | Runs only after `backend` and `frontend` pass, brings the whole stack up with `docker compose up --build --detach --wait`, seeds the demo data, and reads it back through the live HTTP API |
+
+The `deploy` job is the project's deployment step. Cloud deployment is out of
+scope (see [Scope](#scope)), so "deploy" means "bring the local Compose stack
+up from the committed images and prove the running system answers": both health
+checks pass, the backend serves `/healthz` after applying its migrations, the
+frontend serves, and the seeded demo manager can sign in and read `/bills`.
+
+```bash
+# the deploy job's steps, reproducible locally from a clean checkout
+docker compose up --build --detach --wait
+curl --fail http://127.0.0.1:8000/healthz
+make seed
+```
 
 The unit test step fails if `openapi.yaml` no longer matches the backend schema,
 so a forgotten re-export is caught in CI. Everything the pipeline checks can be
@@ -280,7 +294,7 @@ postgres. Because each job installs the dependencies, a run is a few minutes;
 uv, npm, and the Docker layers are all cached between runs.
 
 Every job must be green before a change is merged. The `backend`, `frontend`,
-and `docker` checks are the required status checks for `main`.
+`docker`, and `deploy` checks are the required status checks for `main`.
 
 ## Tests
 

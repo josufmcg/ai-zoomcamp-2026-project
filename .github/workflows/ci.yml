@@ -1,6 +1,6 @@
-# EFINGES continuous integration (backlog task 19).
+# EFINGES continuous integration (backlog tasks 19 and 21).
 #
-# Runs on every push and every pull request. Three jobs:
+# Runs on every push and every pull request. Four jobs:
 #
 #   backend   - install backend dependencies with uv, lint with Ruff, run the
 #               unit suite against in-memory SQLite, then run the end-to-end
@@ -9,6 +9,11 @@
 #               then produce the production build (which also type-checks).
 #   docker    - once both of the above pass, build both Docker images to prove
 #               the images still build from the committed Dockerfiles.
+#   deploy    - once backend and frontend pass, bring the whole stack up with
+#               `docker compose up --wait`, seed the demo data, and read it
+#               back through the live HTTP API. Cloud deployment is out of
+#               scope, so this is the project's deployment step: it proves the
+#               system the reviewer runs from the README actually works.
 #
 # Dependencies are cached (uv's cache and npm's cache, plus the Docker layer
 # cache) so the total runtime stays reasonable.
@@ -169,3 +174,58 @@ jobs:
             VITE_API_URL=http://localhost:8000
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,scope=frontend,mode=max
+
+  # Deploy the whole stack exactly as a reviewer would run it locally: one
+  # `docker compose up --build`, wait for health, then prove the running system
+  # answers. Cloud deployment is out of scope for this project, so "deploy"
+  # means "bring the local Compose stack up from the committed images and check
+  # the live endpoints". It runs only after every test job passes.
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+
+    needs: [backend, frontend]
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      # Build every service, start it detached, and block until each health
+      # check is passing (the compose file defines health checks for postgres,
+      # backend, and frontend). `--wait` fails the step if a service does not
+      # become healthy, so a broken image or a bad migration fails here.
+      - name: Deploy the stack with Docker Compose
+        run: docker compose up --build --detach --wait
+
+      # The backend applies `alembic upgrade head` on startup, so a fresh,
+      # migrated database must answer its liveness probe.
+      - name: Verify the backend is serving
+        run: |
+          curl --fail --silent --show-error http://127.0.0.1:8000/healthz
+          echo
+
+      - name: Verify the frontend is serving
+        run: curl --fail --silent --show-error --output /dev/null http://127.0.0.1:3000/
+
+      # Prove the deployed backend actually talks to its database by seeding and
+      # then reading the demo data back through the HTTP API.
+      - name: Deploy the demo data and read it back through the API
+        run: |
+          make seed
+          token="$(curl --fail --silent --show-error \
+            --request POST http://127.0.0.1:8000/auth/token \
+            --header 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode 'username=manager@efinges.demo' \
+            --data-urlencode 'password=efinges-demo-123' \
+            | python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])')"
+          curl --fail --silent --show-error \
+            --header "Authorization: Bearer ${token}" \
+            http://127.0.0.1:8000/bills > /dev/null
+
+      - name: Show the container logs on failure
+        if: failure()
+        run: docker compose logs
+
+      - name: Tear the stack down
+        if: always()
+        run: docker compose down --volumes

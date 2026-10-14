@@ -11,6 +11,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import yaml
+
 # ``backend/tests/test_security_artifacts.py`` -> ``backend`` -> repository root.
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 SECURITY_DIR = REPOSITORY_ROOT / "security"
@@ -189,3 +191,30 @@ def test_makefile_exposes_a_security_target() -> None:
     assert "bandit-report.txt" in makefile
     assert "trivy-backend.txt" in makefile
     assert "trivy-frontend.txt" in makefile
+
+
+def test_ci_workflow_tests_and_deploys_the_stack() -> None:
+    """The evaluation's CI/CD tier wants tests *and* a deploy when they pass."""
+
+    workflow = yaml.safe_load(
+        (REPOSITORY_ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    )
+    jobs = workflow["jobs"]
+
+    for job in ("backend", "frontend"):
+        assert job in jobs, f"ci.yml is missing the {job!r} job"
+
+    # A deploy job must exist and must actually run the deployed stack, not just
+    # build an image: bring the compose stack up, wait for health, and probe the
+    # live endpoints.
+    deploy = jobs.get("deploy")
+    assert deploy is not None, "ci.yml has no deploy job"
+    assert "backend" in deploy["needs"] and "frontend" in deploy["needs"]
+
+    steps = "\n".join(step.get("run", "") for step in deploy["steps"])
+    assert "docker compose up" in steps
+    assert "--wait" in steps
+    assert "/healthz" in steps
+    # Deploying proves the deployed database works: seed and read it back.
+    assert "make seed" in steps
+    assert "/auth/token" in steps and "/bills" in steps
