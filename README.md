@@ -122,7 +122,8 @@ See `backend/README.md` and `frontend/README.md` for the individual commands.
 The backend uses SQLAlchemy 2.0 with Alembic migrations. The property hierarchy
 is Community → Building → Unit (apartment, garage, or storage), with shared
 tags that managers can attach to buildings and units. The `users` table stores
-accounts with a role of `administrator`, `manager`, or `resident`.
+accounts with a role of `administrator`, `manager`, or `resident`, and the
+`unit_assignments` table links each resident to the units they own or rent.
 
 ```bash
 make migrate   # apply the migrations to the configured database
@@ -140,6 +141,14 @@ every protected request; `GET /auth/me` returns the signed-in user. Missing or
 invalid tokens return 401, and an insufficient role returns 403. Passwords are
 stored as Argon2 hashes and never returned. See `backend/README.md` for
 details.
+
+## Resident unit assignments
+
+A resident can own or rent several units. Managers and administrators manage
+those links through `/assignments` (list, create, remove), while a resident
+reads their own units through `GET /auth/me/units`. A unit has at most one
+resident at a time, so assigning the same unit twice returns 409. See
+`backend/README.md` for the endpoint table.
 
 ## Scope
 

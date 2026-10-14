@@ -12,7 +12,7 @@ from fastapi import FastAPI
 
 from app.config import Settings, get_settings
 from app.database import Database
-from app.routers import auth
+from app.routers import assignments, auth
 from app.telemetry import RequestMetricsMiddleware, Telemetry
 
 
@@ -46,6 +46,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     # Authentication and user endpoints (backlog task 6).
     app.include_router(auth.router)
+
+    # Resident and unit assignment endpoints (backlog task 7).
+    app.include_router(assignments.router)
 
     return app
 

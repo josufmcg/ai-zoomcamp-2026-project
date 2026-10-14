@@ -31,7 +31,8 @@ The backend uses SQLAlchemy 2.0 with Alembic for migrations. The property
 hierarchy is Community → Building → Unit, where a unit is an apartment, a
 garage, or a storage room, plus a shared `Tag` table that managers can attach
 to buildings and units. The `User` table (see **Authentication** below) stores
-accounts and roles.
+accounts and roles, and `UnitAssignment` links a resident to the units they own
+or rent (see **Resident unit assignments** below).
 
 Apply the migrations to the configured database:
 
@@ -91,6 +92,36 @@ def manager_area(
 
 There is no public sign-up endpoint: users are created by administrators
 (backlog task 9), so tests seed accounts directly against the database.
+
+## Resident unit assignments
+
+`UnitAssignment` links one user to one unit with an `ownership_type` of `owner`
+or `tenant`. A resident can hold several units (an apartment plus a garage and
+a storage room, for example), but a unit has at most one resident at a time,
+enforced by a unique constraint on `unit_id`. Managers and administrators
+manage assignments; residents only read their own through the shared helper.
+
+| Method | Path | Roles | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/auth/me/units` | any signed-in user | Units belonging to the caller, with the ownership flag |
+| `GET` | `/assignments` | manager, administrator | List assignments (filter with `?user_id=` or `?unit_id=`) |
+| `POST` | `/assignments` | manager, administrator | Assign a resident to a unit |
+| `DELETE` | `/assignments/{id}` | manager, administrator | Remove an assignment |
+
+`POST /assignments` returns 404 for an unknown user or unit, 409 when the unit
+is already assigned, and 422 when the target user is not a resident:
+
+```bash
+curl -s -X POST http://127.0.0.1:8000/assignments \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"user_id": 3, "unit_id": 7, "ownership_type": "owner"}'
+```
+
+The reusable helpers live in `app/routers/assignments.py`:
+`units_for_user(session, user_id)` returns a resident's units with their
+ownership flag (used by the resident screens and by the later billing,
+incidence, and voting tasks), and `list_assignments_for_user` returns the
+underlying assignment rows.
 
 ## Makefile shortcuts
 

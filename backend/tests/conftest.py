@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator
+from dataclasses import dataclass
 
 import pytest
 from fastapi import FastAPI
@@ -12,7 +13,16 @@ from sqlalchemy.orm import Session
 from app.config import Settings
 from app.database import Database
 from app.main import create_app
-from app.models import User, UserRole
+from app.models import (
+    Building,
+    Community,
+    OwnershipType,
+    Unit,
+    UnitAssignment,
+    UnitType,
+    User,
+    UserRole,
+)
 from app.security import hash_password
 
 
@@ -106,3 +116,106 @@ def create_user(api_app: FastAPI) -> Callable[..., User]:
         return user
 
     return _create_user
+
+
+@dataclass(frozen=True)
+class PropertyTree:
+    """A community with one building and three units of different types."""
+
+    community: Community
+    building: Building
+    apartment: Unit
+    garage: Unit
+    storage: Unit
+
+    @property
+    def units(self) -> tuple[Unit, Unit, Unit]:
+        """Every unit in the tree, in a stable order."""
+        return (self.apartment, self.garage, self.storage)
+
+
+@pytest.fixture
+def create_property_tree(api_app: FastAPI) -> Callable[..., PropertyTree]:
+    """Return a helper that inserts a small property hierarchy.
+
+    Backlog task 8 adds the property CRUD endpoints; until then tests seed the
+    hierarchy directly against the app database, mirroring ``create_user``.
+    """
+
+    def _create_property_tree(name: str = "Riverside") -> PropertyTree:
+        with api_app.state.db.session() as db_session:
+            community = Community(name=name)
+            building = Building(name="Block A", community=community)
+            apartment = Unit(
+                identifier="A-101",
+                unit_type=UnitType.APARTMENT,
+                building=building,
+            )
+            garage = Unit(
+                identifier="G-01",
+                unit_type=UnitType.GARAGE,
+                building=building,
+            )
+            storage = Unit(
+                identifier="S-01",
+                unit_type=UnitType.STORAGE,
+                building=building,
+            )
+            db_session.add(community)
+            db_session.commit()
+            for row in (community, building, apartment, garage, storage):
+                db_session.refresh(row)
+                db_session.expunge(row)
+        return PropertyTree(
+            community=community,
+            building=building,
+            apartment=apartment,
+            garage=garage,
+            storage=storage,
+        )
+
+    return _create_property_tree
+
+
+@pytest.fixture
+def assign_unit(api_app: FastAPI) -> Callable[..., UnitAssignment]:
+    """Return a helper that assigns a resident to a unit directly."""
+
+    def _assign_unit(
+        user: User,
+        unit: Unit,
+        ownership_type: OwnershipType = OwnershipType.OWNER,
+    ) -> UnitAssignment:
+        with api_app.state.db.session() as db_session:
+            assignment = UnitAssignment(
+                user_id=user.id,
+                unit_id=unit.id,
+                ownership_type=ownership_type,
+            )
+            db_session.add(assignment)
+            db_session.commit()
+            db_session.refresh(assignment)
+            db_session.expunge(assignment)
+        return assignment
+
+    return _assign_unit
+
+
+@pytest.fixture
+def login(api_client: TestClient) -> Callable[..., str]:
+    """Return a helper that logs a user in and returns the access token."""
+
+    def _login(email: str, password: str = "correct horse battery staple") -> str:
+        response = api_client.post(
+            "/auth/token",
+            data={"username": email, "password": password},
+        )
+        assert response.status_code == 200, response.text
+        return response.json()["access_token"]
+
+    return _login
+
+
+def auth_header(token: str) -> dict[str, str]:
+    """Return the ``Authorization`` header for a bearer token."""
+    return {"Authorization": f"Bearer {token}"}
