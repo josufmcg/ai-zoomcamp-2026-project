@@ -1,0 +1,161 @@
+CVE-2024-58251	MEDIUM	busybox	1.37.0-r12	1.37.0-r14	efinges-frontend:local (alpine 3.21.3)	In netstat in BusyBox through 1.37.0, local users can launch of networ ...
+CVE-2025-46394	LOW	busybox	1.37.0-r12	1.37.0-r14	efinges-frontend:local (alpine 3.21.3)	In tar in BusyBox through 1.37.0, a TAR archive can have filenames hid ...
+CVE-2024-58251	MEDIUM	busybox-binsh	1.37.0-r12	1.37.0-r14	efinges-frontend:local (alpine 3.21.3)	In netstat in BusyBox through 1.37.0, local users can launch of networ ...
+CVE-2025-46394	LOW	busybox-binsh	1.37.0-r12	1.37.0-r14	efinges-frontend:local (alpine 3.21.3)	In tar in BusyBox through 1.37.0, a TAR archive can have filenames hid ...
+CVE-2026-33630	HIGH	c-ares	1.34.5-r0	1.34.8-r0	efinges-frontend:local (alpine 3.21.3)	c-ares: c-ares: Use-after-free / double-free in query-completion handling
+CVE-2025-62408	MEDIUM	c-ares	1.34.5-r0	1.34.6-r0	efinges-frontend:local (alpine 3.21.3)	c-ares: c-ares: Denial of Service due to query termination after maximum attempts
+CVE-2025-4947	MEDIUM	curl	8.12.1-r1	8.14.0-r0	efinges-frontend:local (alpine 3.21.3)	libcurl: curl: QUIC certificate check skip with wolfSSL
+CVE-2025-5025	MEDIUM	curl	8.12.1-r1	8.14.0-r0	efinges-frontend:local (alpine 3.21.3)	curl: libcurl: QUIC Certificate Pinning Bypass
+CVE-2025-5399	MEDIUM	curl	8.12.1-r1	8.14.1-r0	efinges-frontend:local (alpine 3.21.3)	curl: libcurl: WebSocket endless loop
+CVE-2025-9086	MEDIUM	curl	8.12.1-r1	8.14.1-r2	efinges-frontend:local (alpine 3.21.3)	curl: libcurl: Curl out of bounds read for cookie path
+CVE-2025-10148	LOW	curl	8.12.1-r1	8.14.1-r2	efinges-frontend:local (alpine 3.21.3)	curl: predictable WebSocket mask
+CVE-2026-31789	CRITICAL	libcrypto3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing
+CVE-2025-15467	HIGH	libcrypto3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Remote code execution or Denial of Service via oversized Initialization Vector in CMS parsing
+CVE-2025-69421	HIGH	libcrypto3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via malformed PKCS#12 file processing
+CVE-2026-28387	HIGH	libcrypto3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Arbitrary code execution due to use-after-free in DANE TLSA authentication
+CVE-2026-28388	HIGH	libcrypto3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to NULL pointer dereference in delta CRL processing
+CVE-2026-28389	HIGH	libcrypto3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service vulnerability in CMS processing
+CVE-2026-28390	HIGH	libcrypto3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to NULL pointer dereference in CMS EnvelopedData processing
+CVE-2026-45447	HIGH	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()
+CVE-2026-84782	HIGH	libcrypto3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: compat-openssl: openssl: Information disclosure via DTLS handshake retransmission
+CVE-2025-69419	MEDIUM	libcrypto3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Arbitrary code execution due to out-of-bounds write in PKCS#12 processing
+CVE-2025-9230	MEDIUM	libcrypto3	3.3.3-r0	3.3.5-r0	efinges-frontend:local (alpine 3.21.3)	openssl: Out-of-bounds read & write in RFC 3211 KEK Unwrap
+CVE-2025-9231	MEDIUM	libcrypto3	3.3.3-r0	3.3.5-r0	efinges-frontend:local (alpine 3.21.3)	openssl: Timing side-channel in SM2 algorithm on 64 bit ARM
+CVE-2026-31790	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: Information Disclosure from Uninitialized Memory via Invalid RSA Public Key
+CVE-2026-34182	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: CMS AuthEnvelopedData Processing May Accept Forged Messages
+CVE-2026-34183	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: Unbounded Memory Growth in the QUIC PATH_CHALLENGE Handler
+CVE-2026-45445	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: AES-OCB IV Ignored on EVP_Cipher() Path
+CVE-2026-54872	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Private key recovery via timing side-channel in generic elliptic curve operations
+CVE-2026-54875	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: information disclosure via non-constant-time SM2 scalar multiplication on ARM64 and RISC-V
+CVE-2026-63072	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: heap buffer overflow in CMS key unwrapping
+CVE-2026-63076	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: invalid pointer dereference in CMP server via crafted protectionAlg
+CVE-2026-72897	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: Denial of Service via out-of-bounds write during TLS context switch
+CVE-2026-75804	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via unenforced QUIC connection flow control
+CVE-2026-75805	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: Denial of Service via crafted CMP certificate revocation response
+CVE-2026-75806	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via undersized DTLS record
+CVE-2026-77696	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Private key recovery via SM2 timing side-channel
+CVE-2026-84784	MEDIUM	libcrypto3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via unbounded QUIC connection identifier backlog
+CVE-2025-15468	LOW	libcrypto3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via NULL pointer dereference in QUIC protocol handling
+CVE-2025-66199	LOW	libcrypto3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to excessive memory allocation in TLS 1.3 certificate compression
+CVE-2025-68160	LOW	libcrypto3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to out-of-bounds write in BIO filter
+CVE-2025-69418	LOW	libcrypto3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Information disclosure and data tampering via specific low-level OCB encryption/decryption calls
+CVE-2025-69420	LOW	libcrypto3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via malformed TimeStamp Response
+CVE-2025-9232	LOW	libcrypto3	3.3.3-r0	3.3.5-r0	efinges-frontend:local (alpine 3.21.3)	openssl: Out-of-bounds read in HTTP client no_proxy handling
+CVE-2026-22795	LOW	libcrypto3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to type confusion in PKCS#12 file processing
+CVE-2026-22796	LOW	libcrypto3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via type confusion in PKCS#7 signature verification
+CVE-2026-35189	LOW	libcrypto3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: Denial of Service via excessive memory allocation in CRL distribution point processing
+CVE-2026-42766	LOW	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: Possible NULL Dereference in Password-Based CMS Decryption
+CVE-2026-42768	LOW	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: Multi-RecipientInfo Bleichenbacher Oracle in CMS_decrypt() and PKCS7_decrypt()
+CVE-2026-42770	LOW	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: FFC-DH Peer Validation Uses Attacker-Supplied q
+CVE-2026-45446	LOW	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: Incorrect Tag Processing for Empty Messages in AES-GCM-SIV and AES-SIV modes
+CVE-2026-63073	LOW	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: untrusted sender DN used as format string in CMP response validation
+CVE-2026-75803	LOW	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: AEAD forgeries possible with empty ciphertext in EVP_Cipher()
+CVE-2026-9076	LOW	libcrypto3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to heap out-of-bounds read in CMS password-based decryption
+CVE-2025-4947	MEDIUM	libcurl	8.12.1-r1	8.14.0-r0	efinges-frontend:local (alpine 3.21.3)	libcurl: curl: QUIC certificate check skip with wolfSSL
+CVE-2025-5025	MEDIUM	libcurl	8.12.1-r1	8.14.0-r0	efinges-frontend:local (alpine 3.21.3)	curl: libcurl: QUIC Certificate Pinning Bypass
+CVE-2025-5399	MEDIUM	libcurl	8.12.1-r1	8.14.1-r0	efinges-frontend:local (alpine 3.21.3)	curl: libcurl: WebSocket endless loop
+CVE-2025-9086	MEDIUM	libcurl	8.12.1-r1	8.14.1-r2	efinges-frontend:local (alpine 3.21.3)	curl: libcurl: Curl out of bounds read for cookie path
+CVE-2025-10148	LOW	libcurl	8.12.1-r1	8.14.1-r2	efinges-frontend:local (alpine 3.21.3)	curl: predictable WebSocket mask
+CVE-2025-59375	HIGH	libexpat	2.7.0-r0	2.7.2-r0	efinges-frontend:local (alpine 3.21.3)	firefox: thunderbird: expat: libexpat in Expat allows attackers to trigger large dynamic memory allocations via a small document that is submitted for parsing
+CVE-2026-25210	HIGH	libexpat	2.7.0-r0	2.7.4-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Information disclosure and data integrity issues due to integer overflow in buffer reallocation
+CVE-2026-45186	HIGH	libexpat	2.7.0-r0	2.8.1-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: denial of service via crafted XML input
+CVE-2026-66046	HIGH	libexpat	2.7.0-r0	2.8.4-r0	efinges-frontend:local (alpine 3.21.3)	expat: Expat: Denial of Service via quadratic complexity in attribute processing
+CVE-2026-76641	HIGH	libexpat	2.7.0-r0	2.8.4-r0	efinges-frontend:local (alpine 3.21.3)	expat: Expat: Denial of Service via XML external entity parsing
+CVE-2026-76956	HIGH	libexpat	2.7.0-r0	2.8.4-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Denial of Service via hash flooding attack with crafted XML
+CVE-2026-76957	HIGH	libexpat	2.7.0-r0	2.8.4-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Memory corruption vulnerability allows arbitrary code execution or denial of service
+CVE-2026-32776	MEDIUM	libexpat	2.7.0-r0	2.7.5-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Denial of Service due to NULL pointer dereference
+CVE-2026-32777	MEDIUM	libexpat	2.7.0-r0	2.7.5-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Denial of Service via infinite loop in DTD content parsing
+CVE-2026-32778	MEDIUM	libexpat	2.7.0-r0	2.7.5-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Denial of Service via NULL pointer dereference after out-of-memory condition
+CVE-2026-50219	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	expat: libexpat: Use-after-free vulnerability due to improper handler call depth tracking
+CVE-2026-56131	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Use-after-free vulnerability due to insufficient handler call depth tracking
+CVE-2026-56132	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	expat: libexpat: Arbitrary Code Execution via Heap-based Buffer Overflow
+CVE-2026-56403	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Arbitrary code execution due to integer overflow in storeAtts
+CVE-2026-56404	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Arbitrary Code Execution via integer overflow in addBinding
+CVE-2026-56405	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Information disclosure and arbitrary code execution via integer overflow
+CVE-2026-56406	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Arbitrary code execution via integer overflow in XML_ParseBuffer
+CVE-2026-56407	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Arbitrary code execution due to integer overflow
+CVE-2026-56408	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	libexpat before 2.8.2 has an integer overflow in copyString.
+CVE-2026-56409	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	xmlwf in libexpat before 2.8.2 has an integer overflow for the output  ...
+CVE-2026-56410	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Integer overflow in xmlwf can lead to information disclosure and arbitrary code execution.
+CVE-2026-56411	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	expat: libexpat: Integer Overflow Vulnerability Leading to Information Disclosure or Code Execution
+CVE-2026-56412	MEDIUM	libexpat	2.7.0-r0	2.8.2-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat: Use-after-free vulnerability due to improper handling of XML CDATA sections
+CVE-2026-24515	LOW	libexpat	2.7.0-r0	2.7.4-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: libexpat null pointer dereference
+CVE-2026-41080	LOW	libexpat	2.7.0-r0	2.8.1-r0	efinges-frontend:local (alpine 3.21.3)	libexpat: expat: libexpat: Denial of Service via hash flooding with crafted XML
+CVE-2025-64720	HIGH	libpng	1.6.47-r0	1.6.53-r0	efinges-frontend:local (alpine 3.21.3)	libpng: LIBPNG buffer overflow
+CVE-2025-65018	HIGH	libpng	1.6.47-r0	1.6.53-r0	efinges-frontend:local (alpine 3.21.3)	libpng: LIBPNG heap buffer overflow
+CVE-2025-66293	HIGH	libpng	1.6.47-r0	1.6.53-r0	efinges-frontend:local (alpine 3.21.3)	libpng: LIBPNG out-of-bounds read in png_image_read_composite
+CVE-2026-22695	HIGH	libpng	1.6.47-r0	1.6.54-r0	efinges-frontend:local (alpine 3.21.3)	libpng: libpng: Denial of service and information disclosure via heap buffer over-read in png_image_finish_read
+CVE-2026-22801	HIGH	libpng	1.6.47-r0	1.6.54-r0	efinges-frontend:local (alpine 3.21.3)	libpng: libpng: Information disclosure and denial of service via integer truncation in simplified write API
+CVE-2026-25646	HIGH	libpng	1.6.47-r0	1.6.55-r0	efinges-frontend:local (alpine 3.21.3)	libpng: LIBPNG has a heap buffer overflow in png_set_quantize
+CVE-2025-64505	MEDIUM	libpng	1.6.47-r0	1.6.53-r0	efinges-frontend:local (alpine 3.21.3)	libpng: LIBPNG heap buffer overflow via malformed palette index
+CVE-2025-64506	MEDIUM	libpng	1.6.47-r0	1.6.53-r0	efinges-frontend:local (alpine 3.21.3)	libpng: LIBPNG heap buffer over-read
+CVE-2026-33416	MEDIUM	libpng	1.6.47-r0	1.6.56-r0	efinges-frontend:local (alpine 3.21.3)	libpng: libpng: Arbitrary code execution due to use-after-free vulnerability
+CVE-2026-33636	MEDIUM	libpng	1.6.47-r0	1.6.56-r0	efinges-frontend:local (alpine 3.21.3)	libpng: libpng: Information disclosure and denial of service via out-of-bounds read/write in Neon palette expansion
+CVE-2026-34757	MEDIUM	libpng	1.6.47-r0	1.6.57-r0	efinges-frontend:local (alpine 3.21.3)	libpng: libpng: Information disclosure and data corruption via use-after-free vulnerability
+CVE-2026-40930	MEDIUM	libpng	1.6.47-r0	1.6.59-r0	efinges-frontend:local (alpine 3.21.3)	libpng: libpng: Data integrity and availability impact due to improper APNG chunk handling
+CVE-2026-46675	MEDIUM	libpng	1.6.47-r0	1.6.59-r0	efinges-frontend:local (alpine 3.21.3)	[Use-after-free of zlib input in `png_read_end` after incomplete zTXt, iTXt or iCCP decompression]
+CVE-2026-31789	CRITICAL	libssl3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing
+CVE-2025-15467	HIGH	libssl3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Remote code execution or Denial of Service via oversized Initialization Vector in CMS parsing
+CVE-2025-69421	HIGH	libssl3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via malformed PKCS#12 file processing
+CVE-2026-28387	HIGH	libssl3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Arbitrary code execution due to use-after-free in DANE TLSA authentication
+CVE-2026-28388	HIGH	libssl3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to NULL pointer dereference in delta CRL processing
+CVE-2026-28389	HIGH	libssl3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service vulnerability in CMS processing
+CVE-2026-28390	HIGH	libssl3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to NULL pointer dereference in CMS EnvelopedData processing
+CVE-2026-45447	HIGH	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: Heap Use-After-Free in OpenSSL PKCS7_verify()
+CVE-2026-84782	HIGH	libssl3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: compat-openssl: openssl: Information disclosure via DTLS handshake retransmission
+CVE-2025-69419	MEDIUM	libssl3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Arbitrary code execution due to out-of-bounds write in PKCS#12 processing
+CVE-2025-9230	MEDIUM	libssl3	3.3.3-r0	3.3.5-r0	efinges-frontend:local (alpine 3.21.3)	openssl: Out-of-bounds read & write in RFC 3211 KEK Unwrap
+CVE-2025-9231	MEDIUM	libssl3	3.3.3-r0	3.3.5-r0	efinges-frontend:local (alpine 3.21.3)	openssl: Timing side-channel in SM2 algorithm on 64 bit ARM
+CVE-2026-31790	MEDIUM	libssl3	3.3.3-r0	3.3.7-r0	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: Information Disclosure from Uninitialized Memory via Invalid RSA Public Key
+CVE-2026-34182	MEDIUM	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: CMS AuthEnvelopedData Processing May Accept Forged Messages
+CVE-2026-34183	MEDIUM	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: Unbounded Memory Growth in the QUIC PATH_CHALLENGE Handler
+CVE-2026-45445	MEDIUM	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: AES-OCB IV Ignored on EVP_Cipher() Path
+CVE-2026-54872	MEDIUM	libssl3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Private key recovery via timing side-channel in generic elliptic curve operations
+CVE-2026-54875	MEDIUM	libssl3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: information disclosure via non-constant-time SM2 scalar multiplication on ARM64 and RISC-V
+CVE-2026-63072	MEDIUM	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: heap buffer overflow in CMS key unwrapping
+CVE-2026-63076	MEDIUM	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: invalid pointer dereference in CMP server via crafted protectionAlg
+CVE-2026-72897	MEDIUM	libssl3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: Denial of Service via out-of-bounds write during TLS context switch
+CVE-2026-75804	MEDIUM	libssl3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via unenforced QUIC connection flow control
+CVE-2026-75805	MEDIUM	libssl3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: Denial of Service via crafted CMP certificate revocation response
+CVE-2026-75806	MEDIUM	libssl3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via undersized DTLS record
+CVE-2026-77696	MEDIUM	libssl3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Private key recovery via SM2 timing side-channel
+CVE-2026-84784	MEDIUM	libssl3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via unbounded QUIC connection identifier backlog
+CVE-2025-15468	LOW	libssl3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via NULL pointer dereference in QUIC protocol handling
+CVE-2025-66199	LOW	libssl3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to excessive memory allocation in TLS 1.3 certificate compression
+CVE-2025-68160	LOW	libssl3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to out-of-bounds write in BIO filter
+CVE-2025-69418	LOW	libssl3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Information disclosure and data tampering via specific low-level OCB encryption/decryption calls
+CVE-2025-69420	LOW	libssl3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via malformed TimeStamp Response
+CVE-2025-9232	LOW	libssl3	3.3.3-r0	3.3.5-r0	efinges-frontend:local (alpine 3.21.3)	openssl: Out-of-bounds read in HTTP client no_proxy handling
+CVE-2026-22795	LOW	libssl3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to type confusion in PKCS#12 file processing
+CVE-2026-22796	LOW	libssl3	3.3.3-r0	3.3.6-r0	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service via type confusion in PKCS#7 signature verification
+CVE-2026-35189	LOW	libssl3	3.3.3-r0	3.3.7-r2	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: Denial of Service via excessive memory allocation in CRL distribution point processing
+CVE-2026-42766	LOW	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: Possible NULL Dereference in Password-Based CMS Decryption
+CVE-2026-42768	LOW	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: Multi-RecipientInfo Bleichenbacher Oracle in CMS_decrypt() and PKCS7_decrypt()
+CVE-2026-42770	LOW	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: FFC-DH Peer Validation Uses Attacker-Supplied q
+CVE-2026-45446	LOW	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: Incorrect Tag Processing for Empty Messages in AES-GCM-SIV and AES-SIV modes
+CVE-2026-63073	LOW	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: untrusted sender DN used as format string in CMP response validation
+CVE-2026-75803	LOW	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: openssl: AEAD forgeries possible with empty ciphertext in EVP_Cipher()
+CVE-2026-9076	LOW	libssl3	3.3.3-r0	3.3.7-r1	efinges-frontend:local (alpine 3.21.3)	openssl: OpenSSL: Denial of Service due to heap out-of-bounds read in CMS password-based decryption
+CVE-2025-32414	HIGH	libxml2	2.13.4-r5	2.13.4-r6	efinges-frontend:local (alpine 3.21.3)	libxml2: Out-of-Bounds Read in libxml2
+CVE-2025-32415	HIGH	libxml2	2.13.4-r5	2.13.4-r6	efinges-frontend:local (alpine 3.21.3)	libxml2: Out-of-bounds Read in xmlSchemaIDCFillNodeTables
+CVE-2025-49794	HIGH	libxml2	2.13.4-r5	2.13.9-r0	efinges-frontend:local (alpine 3.21.3)	libxml: Heap use after free (UAF) leads to Denial of service (DoS)
+CVE-2025-49795	HIGH	libxml2	2.13.4-r5	2.13.9-r0	efinges-frontend:local (alpine 3.21.3)	libxml: Null pointer dereference leads to Denial of service (DoS)
+CVE-2025-49796	HIGH	libxml2	2.13.4-r5	2.13.9-r0	efinges-frontend:local (alpine 3.21.3)	libxml: Type confusion leads to Denial of service (DoS)
+CVE-2026-6732	HIGH	libxml2	2.13.4-r5	2.13.9-r1	efinges-frontend:local (alpine 3.21.3)	libxml2: libxml2: Denial of Service via crafted XSD-validated document
+CVE-2025-6021	MEDIUM	libxml2	2.13.4-r5	2.13.9-r0	efinges-frontend:local (alpine 3.21.3)	libxml2: Integer Overflow in xmlBuildQName() Leads to Stack Buffer Overflow in libxml2
+CVE-2025-6170	LOW	libxml2	2.13.4-r5	2.13.9-r0	efinges-frontend:local (alpine 3.21.3)	libxml2: Stack Buffer Overflow in xmllint Interactive Shell Command Handling
+CVE-2026-4367	MEDIUM	libxpm	3.5.17-r0	3.5.19-r0	efinges-frontend:local (alpine 3.21.3)	libXpm: libXpm: Denial of Service via out-of-bounds read in XPM file parsing
+CVE-2026-40200	HIGH	musl	1.2.5-r9	1.2.5-r11	efinges-frontend:local (alpine 3.21.3)	musl: musl libc: Arbitrary code execution and denial of service via stack-based memory corruption in qsort
+CVE-2026-6042	MEDIUM	musl	1.2.5-r9	1.2.5-r10	efinges-frontend:local (alpine 3.21.3)	musl libc: GB18030 4-byte Decoder: musl libc: Denial of Service via inefficient algorithmic complexity in iconv
+CVE-2026-40200	HIGH	musl-utils	1.2.5-r9	1.2.5-r11	efinges-frontend:local (alpine 3.21.3)	musl: musl libc: Arbitrary code execution and denial of service via stack-based memory corruption in qsort
+CVE-2026-6042	MEDIUM	musl-utils	1.2.5-r9	1.2.5-r10	efinges-frontend:local (alpine 3.21.3)	musl libc: GB18030 4-byte Decoder: musl libc: Denial of Service via inefficient algorithmic complexity in iconv
+CVE-2026-27135	HIGH	nghttp2-libs	1.64.0-r0	1.68.1	efinges-frontend:local (alpine 3.21.3)	nghttp2: nghttp2: Denial of Service via malformed HTTP/2 frames after session termination
+CVE-2024-58251	MEDIUM	ssl_client	1.37.0-r12	1.37.0-r14	efinges-frontend:local (alpine 3.21.3)	In netstat in BusyBox through 1.37.0, local users can launch of networ ...
+CVE-2025-46394	LOW	ssl_client	1.37.0-r12	1.37.0-r14	efinges-frontend:local (alpine 3.21.3)	In tar in BusyBox through 1.37.0, a TAR archive can have filenames hid ...
+CVE-2026-4775	HIGH	tiff	4.7.0-r0	4.7.2-r0	efinges-frontend:local (alpine 3.21.3)	libtiff: libtiff: Arbitrary code execution or denial of service via signed integer overflow in TIFF file processing
+CVE-2025-8961	LOW	tiff	4.7.0-r0	4.7.1-r0	efinges-frontend:local (alpine 3.21.3)	libtiff: LibTIFF memory corruption
+CVE-2025-9165	LOW	tiff	4.7.0-r0	4.7.1-r0	efinges-frontend:local (alpine 3.21.3)	libtiff: LibTIFF memory leak
+CVE-2026-34743	MEDIUM	xz-libs	5.6.3-r1	5.8.3-r0	efinges-frontend:local (alpine 3.21.3)	xz: XZ Utils: Denial of Service via buffer overflow in index decoding
+CVE-2026-22184	HIGH	zlib	1.3.1-r2	1.3.2-r0	efinges-frontend:local (alpine 3.21.3)	zlib: zlib: Arbitrary code execution via buffer overflow in untgz utility
+CVE-2026-27171	MEDIUM	zlib	1.3.1-r2	1.3.2-r0	efinges-frontend:local (alpine 3.21.3)	zlib: zlib: Denial of Service via infinite loop in CRC32 combine functions
+CVE-2026-85091	MEDIUM	zlib	1.3.1-r2	1.3.2-r1	efinges-frontend:local (alpine 3.21.3)	zlib versions 1.3.1.2 through 1.3.2 contain a heap buffer overflow vul ...

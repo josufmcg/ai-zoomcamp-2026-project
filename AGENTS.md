@@ -51,12 +51,25 @@ cd backend && uv run pytest
 make integration   # run the backend end-to-end workflows against a dedicated database (backlog task 18)
 make integration-db   # create the dedicated integration database in the compose postgres
 make openapi   # re-export openapi.yaml from the backend schema (required after API changes)
+make security   # run Bandit and Trivy and refresh the reports under security/ (backlog task 21)
 cd frontend && npm test
 cd frontend && npm run build
 make up        # start the full stack with Docker Compose (backlog task 3)
 ```
 
 Some commands only exist once the corresponding backlog tasks are done; never run commands that the current project configuration does not define.
+
+## Security and audit
+
+- Security scans and their triage live under `security/`; `make security`
+  regenerates the Bandit and Trivy reports. Keep them committed and in sync with
+  the code they describe.
+- Review and treat as untrusted every AI-produced change: check the diff, run
+  the relevant tests, and follow `docs/ai_policy.md` and the checklist in
+  `.github/pull_request_template.md` before accepting it.
+- Real troubleshooting sessions with the stack are recorded in
+  `docs/operations.md`; add a concise entry when you solve a new operational
+  problem.
 
 ## Continuous integration
 

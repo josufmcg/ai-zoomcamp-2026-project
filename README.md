@@ -285,6 +285,36 @@ The optional stdio MCP server is launched from `backend/` with
 `uv run python -m scripts.mock_mcp_server`. It only publishes SQLAlchemy table
 and column metadata; it does not connect to the database or expose row data.
 
+## Security and audit
+
+The committed security artifacts live under `security/`:
+
+| File | What it is |
+| --- | --- |
+| `security/bandit-report.txt` | Bandit static analysis of the backend Python code |
+| `security/trivy-backend.txt` | Trivy vulnerability scan of the backend image |
+| `security/trivy-frontend.txt` | Trivy vulnerability scan of the frontend image |
+| `security/README.md` | Triage of every finding and how to reproduce the scans |
+
+Regenerate all three reports with one command (needs `trivy` on the `PATH` and
+the built images):
+
+```bash
+make security   # Bandit (backend) + Trivy (both images) -> security/
+```
+
+The backend application code in `app/` produces no Bandit findings; the
+remaining Low findings and the container findings are triaged, with the
+remediation steps, in `security/README.md`.
+
+Every pull request is reviewed with the checklist in
+`.github/pull_request_template.md`, which covers provenance, tests, the API
+contract, security and privacy, and the database migrations. AI-assisted work
+follows [docs/ai_policy.md](docs/ai_policy.md) (prompt construction, data
+privacy, and mandatory human review); real troubleshooting sessions with the
+containers and telemetry are recorded in
+[docs/operations.md](docs/operations.md).
+
 ## Scope
 
 Cloud deployment is intentionally out of scope: the system runs locally with

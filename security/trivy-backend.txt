@@ -1,0 +1,172 @@
+CVE-2011-3374	LOW	apt	3.0.3	-	efinges-backend:local (debian 13.7)	It was found that apt-key in apt, all versions, do not correctly valid ...
+TEMP-0841856-B18BAF	LOW	bash	5.2.37-2+b10	-	efinges-backend:local (debian 13.7)	[Privilege escalation possible to other user than root]
+CVE-2026-76642	HIGH	bsdutils	1:2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks
+CVE-2026-78408	HIGH	bsdutils	1:2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority
+CVE-2026-78409	HIGH	bsdutils	1:2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: X-mount.subdir detached-tree resolution can escape via intermediate symlinks
+CVE-2026-78410	HIGH	bsdutils	1:2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection
+CVE-2026-3184	MEDIUM	bsdutils	1:2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: Access control bypass due to improper hostname canonicalization
+CVE-2022-0563	LOW	bsdutils	1:2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline
+CVE-2017-18018	LOW	coreutils	9.7-3	-	efinges-backend:local (debian 13.7)	coreutils: race condition vulnerability in chown and chgrp
+CVE-2025-5278	LOW	coreutils	9.7-3	-	efinges-backend:local (debian 13.7)	coreutils: Heap Buffer Under-Read in GNU Coreutils sort via Key Specification
+CVE-2026-56391	LOW	coreutils	9.7-3	-	efinges-backend:local (debian 13.7)	coreutils: GNU coreutils uniq: Denial of Service and information disclosure via out-of-bounds read with multibyte input
+CVE-2026-56392	LOW	coreutils	9.7-3	-	efinges-backend:local (debian 13.7)	coreutils: GNU coreutils unexpand: Denial of Service via crafted tab stop values
+CVE-2026-102473	LOW	dash	0.5.12-12	-	efinges-backend:local (debian 13.7)	dash: dash: Super-polynomial backtracking in pmatch when libc fnmatch is disabled
+CVE-2026-102474	LOW	dash	0.5.12-12	-	efinges-backend:local (debian 13.7)	dash: dash: Heap out-of-bounds write in conv_escape via undersized Unicode escape reservation
+CVE-2026-53910	LOW	diffutils	1:3.10-4	-	efinges-backend:local (debian 13.7)	diffutils: heap‑based buffer overflow due to multiple signed integer overflows in line‑mapping calculations
+CVE-2026-102010	MEDIUM	gcc-14-base	14.2.0-19	-	efinges-backend:local (debian 13.7)	gcc-toolset-15-gcc: gcc: gcc-toolset-16: gcc: Denial of Service via use-after-free in binary heap erase_if
+CVE-2026-95619	MEDIUM	gcc-14-base	14.2.0-19	-	efinges-backend:local (debian 13.7)	gcc: libstdc++ integer overflow in `new` operator
+CVE-2026-54369	HIGH	libacl1	2.3.2-2+b1	-	efinges-backend:local (debian 13.7)	acl: Symlink traversal privilege escalation via libacl functions
+CVE-2026-54370	MEDIUM	libacl1	2.3.2-2+b1	-	efinges-backend:local (debian 13.7)	acl: TOCTOU Symlink Traversal via getfacl/setfacl
+CVE-2011-3374	LOW	libapt-pkg7.0	3.0.3	-	efinges-backend:local (debian 13.7)	It was found that apt-key in apt, all versions, do not correctly valid ...
+CVE-2026-54371	MEDIUM	libattr1	1:2.5.2-3	-	efinges-backend:local (debian 13.7)	attr: attr: Symlink Traversal Privilege Escalation via getfattr and setfattr
+CVE-2026-76642	HIGH	libblkid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks
+CVE-2026-78408	HIGH	libblkid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority
+CVE-2026-78409	HIGH	libblkid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: X-mount.subdir detached-tree resolution can escape via intermediate symlinks
+CVE-2026-78410	HIGH	libblkid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection
+CVE-2026-3184	MEDIUM	libblkid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: Access control bypass due to improper hostname canonicalization
+CVE-2022-0563	LOW	libblkid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline
+CVE-2026-42250	MEDIUM	libbz2-1.0	1.0.8-6	-	efinges-backend:local (debian 13.7)	bzip2: bzip2: Denial of Service in bzip2recover via a specially crafted file
+CVE-2026-18374	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Heap buffer overflow via attacker-controlled fopen mode string
+CVE-2026-19499	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: Buffer Overflow in strfmon right-justification padding
+CVE-2026-19542	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: Fix out-of-bounds array write in tdelete
+CVE-2026-5435	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Out-of-bounds write via TSIG record processing
+CVE-2026-6238	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Application crash or uninitialized memory read via crafted DNS response
+CVE-2026-6368	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Process abort due to invalid memory in wordexp
+CVE-2026-6791	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: Glibc: Denial of Service via stack exhaustion during tilde expansion
+CVE-2026-77117	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: Non-progress DoS in SHIFT_JISX0213 -&gt
+CVE-2026-80489	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: Non-progress DoS in EUC_JISX0213 -> UCS-4 conversion state
+CVE-2026-8674	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc DNS stub resolver: Denial of Service via long search domain in configuration
+CVE-2026-86805	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Privilege escalation and arbitrary code execution via TOCTOU race condition in dynamic loader
+CVE-2026-89092	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: nscd stack overflow leads to degraded DNS resolution
+CVE-2026-95818	MEDIUM	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Local attacker can cause denial of service and information disclosure via stack-based buffer overflow.
+CVE-2010-4756	LOW	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glob implementation can cause excessive CPU and memory consumption due to crafted glob expressions
+CVE-2018-20796	LOW	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: uncontrolled recursion in function check_dst_limits_calc_pos_1 in posix/regexec.c
+CVE-2019-1010022	LOW	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: stack guard protection bypass
+CVE-2019-1010023	LOW	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: running ldd on malicious ELF leads to code execution because of wrong size computation
+CVE-2019-1010024	LOW	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: ASLR bypass using cache of thread stack and heap
+CVE-2019-1010025	LOW	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: information disclosure of heap addresses of pthread_created thread
+CVE-2019-9192	LOW	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: uncontrolled recursion in function check_dst_limits_calc_pos_1 in posix/regexec.c
+CVE-2026-97399	LOW	libc-bin	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Denial of Service via out-of-bounds read in strncasecmp
+CVE-2026-18374	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Heap buffer overflow via attacker-controlled fopen mode string
+CVE-2026-19499	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: Buffer Overflow in strfmon right-justification padding
+CVE-2026-19542	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: Fix out-of-bounds array write in tdelete
+CVE-2026-5435	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Out-of-bounds write via TSIG record processing
+CVE-2026-6238	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Application crash or uninitialized memory read via crafted DNS response
+CVE-2026-6368	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Process abort due to invalid memory in wordexp
+CVE-2026-6791	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: Glibc: Denial of Service via stack exhaustion during tilde expansion
+CVE-2026-77117	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: Non-progress DoS in SHIFT_JISX0213 -&gt
+CVE-2026-80489	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: Non-progress DoS in EUC_JISX0213 -> UCS-4 conversion state
+CVE-2026-8674	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc DNS stub resolver: Denial of Service via long search domain in configuration
+CVE-2026-86805	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Privilege escalation and arbitrary code execution via TOCTOU race condition in dynamic loader
+CVE-2026-89092	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: nscd stack overflow leads to degraded DNS resolution
+CVE-2026-95818	MEDIUM	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Local attacker can cause denial of service and information disclosure via stack-based buffer overflow.
+CVE-2010-4756	LOW	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glob implementation can cause excessive CPU and memory consumption due to crafted glob expressions
+CVE-2018-20796	LOW	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: uncontrolled recursion in function check_dst_limits_calc_pos_1 in posix/regexec.c
+CVE-2019-1010022	LOW	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: stack guard protection bypass
+CVE-2019-1010023	LOW	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: running ldd on malicious ELF leads to code execution because of wrong size computation
+CVE-2019-1010024	LOW	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: ASLR bypass using cache of thread stack and heap
+CVE-2019-1010025	LOW	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: information disclosure of heap addresses of pthread_created thread
+CVE-2019-9192	LOW	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: uncontrolled recursion in function check_dst_limits_calc_pos_1 in posix/regexec.c
+CVE-2026-97399	LOW	libc6	2.41-12+deb13u4	-	efinges-backend:local (debian 13.7)	glibc: glibc: Denial of Service via out-of-bounds read in strncasecmp
+CVE-2026-102010	MEDIUM	libgcc-s1	14.2.0-19	-	efinges-backend:local (debian 13.7)	gcc-toolset-15-gcc: gcc: gcc-toolset-16: gcc: Denial of Service via use-after-free in binary heap erase_if
+CVE-2026-95619	MEDIUM	libgcc-s1	14.2.0-19	-	efinges-backend:local (debian 13.7)	gcc: libstdc++ integer overflow in `new` operator
+CVE-2026-76642	HIGH	liblastlog2-2	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks
+CVE-2026-78408	HIGH	liblastlog2-2	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority
+CVE-2026-78409	HIGH	liblastlog2-2	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: X-mount.subdir detached-tree resolution can escape via intermediate symlinks
+CVE-2026-78410	HIGH	liblastlog2-2	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection
+CVE-2026-3184	MEDIUM	liblastlog2-2	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: Access control bypass due to improper hostname canonicalization
+CVE-2022-0563	LOW	liblastlog2-2	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline
+DSA-6549-1	UNKNOWN	liblzma5	5.8.1-1+deb13u1	5.8.1-1+deb13u2	efinges-backend:local (debian 13.7)	xz-utils - security update
+TEMP-1147318-639065	UNKNOWN	liblzma5	5.8.1-1+deb13u1	5.8.1-1+deb13u2	efinges-backend:local (debian 13.7)	[GHSA-5qpq-xqfv-j9pg: Invalid write if a decoder is reinitialized after allocation failure]
+CVE-2026-76642	HIGH	libmount1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks
+CVE-2026-78408	HIGH	libmount1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority
+CVE-2026-78409	HIGH	libmount1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: X-mount.subdir detached-tree resolution can escape via intermediate symlinks
+CVE-2026-78410	HIGH	libmount1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection
+CVE-2026-3184	MEDIUM	libmount1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: Access control bypass due to improper hostname canonicalization
+CVE-2022-0563	LOW	libmount1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline
+CVE-2025-69720	HIGH	libncursesw6	6.5+20250216-2	-	efinges-backend:local (debian 13.7)	ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution.
+CVE-2025-6141	LOW	libncursesw6	6.5+20250216-2	-	efinges-backend:local (debian 13.7)	gnu-ncurses: ncurses Stack Buffer Overflow
+CVE-2026-54411	MEDIUM	libpam-modules	1.7.0-5	-	efinges-backend:local (debian 13.7)	linux-pam: Plaintext password recovery via timing discrepancy in pam_userdb module
+CVE-2026-54411	MEDIUM	libpam-modules-bin	1.7.0-5	-	efinges-backend:local (debian 13.7)	linux-pam: Plaintext password recovery via timing discrepancy in pam_userdb module
+CVE-2026-54411	MEDIUM	libpam-runtime	1.7.0-5	-	efinges-backend:local (debian 13.7)	linux-pam: Plaintext password recovery via timing discrepancy in pam_userdb module
+CVE-2026-54411	MEDIUM	libpam0g	1.7.0-5	-	efinges-backend:local (debian 13.7)	linux-pam: Plaintext password recovery via timing discrepancy in pam_userdb module
+CVE-2026-76642	HIGH	libsmartcols1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks
+CVE-2026-78408	HIGH	libsmartcols1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority
+CVE-2026-78409	HIGH	libsmartcols1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: X-mount.subdir detached-tree resolution can escape via intermediate symlinks
+CVE-2026-78410	HIGH	libsmartcols1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection
+CVE-2026-3184	MEDIUM	libsmartcols1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: Access control bypass due to improper hostname canonicalization
+CVE-2022-0563	LOW	libsmartcols1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline
+CVE-2026-50812	MEDIUM	libsqlite3-0	3.46.1-7+deb13u2	-	efinges-backend:local (debian 13.7)	sqlite: SQLite: Denial of Service via malformed changeset in Session Extension
+CVE-2026-50813	MEDIUM	libsqlite3-0	3.46.1-7+deb13u2	-	efinges-backend:local (debian 13.7)	sqlite: SQLite: Information disclosure via Session Extension changeset merge path
+CVE-2021-45346	LOW	libsqlite3-0	3.46.1-7+deb13u2	-	efinges-backend:local (debian 13.7)	sqlite: crafted SQL query allows a malicious user to obtain sensitive information
+CVE-2025-70873	LOW	libsqlite3-0	3.46.1-7+deb13u2	-	efinges-backend:local (debian 13.7)	sqlite: SQLite: Information Disclosure via Crafted ZIP File
+CVE-2026-102010	MEDIUM	libstdc++6	14.2.0-19	-	efinges-backend:local (debian 13.7)	gcc-toolset-15-gcc: gcc: gcc-toolset-16: gcc: Denial of Service via use-after-free in binary heap erase_if
+CVE-2026-95619	MEDIUM	libstdc++6	14.2.0-19	-	efinges-backend:local (debian 13.7)	gcc: libstdc++ integer overflow in `new` operator
+CVE-2026-16742	HIGH	libsystemd0	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	systemd: systemd-homed: Local privilege escalation via missing home-record signature verification
+CVE-2026-15059	MEDIUM	libsystemd0	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	systemd: systemd-oomd: Unprivileged users can terminate arbitrary processes via IPC API
+CVE-2013-4392	LOW	libsystemd0	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	systemd: TOCTOU race condition when updating file permissions and SELinux security contexts
+CVE-2023-31437	LOW	libsystemd0	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	An issue was discovered in systemd 253. An attacker can modify a seale ...
+CVE-2023-31438	LOW	libsystemd0	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	An issue was discovered in systemd 253. An attacker can truncate a sea ...
+CVE-2023-31439	LOW	libsystemd0	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	An issue was discovered in systemd 253. An attacker can modify the con ...
+CVE-2026-40228	LOW	libsystemd0	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	systemd: systemd-journald: Unintended output to user terminals via logger command
+CVE-2025-69720	HIGH	libtinfo6	6.5+20250216-2	-	efinges-backend:local (debian 13.7)	ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution.
+CVE-2025-6141	LOW	libtinfo6	6.5+20250216-2	-	efinges-backend:local (debian 13.7)	gnu-ncurses: ncurses Stack Buffer Overflow
+CVE-2026-16742	HIGH	libudev1	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	systemd: systemd-homed: Local privilege escalation via missing home-record signature verification
+CVE-2026-15059	MEDIUM	libudev1	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	systemd: systemd-oomd: Unprivileged users can terminate arbitrary processes via IPC API
+CVE-2013-4392	LOW	libudev1	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	systemd: TOCTOU race condition when updating file permissions and SELinux security contexts
+CVE-2023-31437	LOW	libudev1	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	An issue was discovered in systemd 253. An attacker can modify a seale ...
+CVE-2023-31438	LOW	libudev1	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	An issue was discovered in systemd 253. An attacker can truncate a sea ...
+CVE-2023-31439	LOW	libudev1	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	An issue was discovered in systemd 253. An attacker can modify the con ...
+CVE-2026-40228	LOW	libudev1	257.13-1~deb13u1	-	efinges-backend:local (debian 13.7)	systemd: systemd-journald: Unintended output to user terminals via logger command
+CVE-2026-76642	HIGH	libuuid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks
+CVE-2026-78408	HIGH	libuuid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority
+CVE-2026-78409	HIGH	libuuid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: X-mount.subdir detached-tree resolution can escape via intermediate symlinks
+CVE-2026-78410	HIGH	libuuid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection
+CVE-2026-3184	MEDIUM	libuuid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: Access control bypass due to improper hostname canonicalization
+CVE-2022-0563	LOW	libuuid1	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline
+CVE-2026-76642	HIGH	login	1:4.16.0-2+really2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks
+CVE-2026-78408	HIGH	login	1:4.16.0-2+really2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority
+CVE-2026-78409	HIGH	login	1:4.16.0-2+really2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: X-mount.subdir detached-tree resolution can escape via intermediate symlinks
+CVE-2026-78410	HIGH	login	1:4.16.0-2+really2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection
+CVE-2026-3184	MEDIUM	login	1:4.16.0-2+really2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: Access control bypass due to improper hostname canonicalization
+CVE-2022-0563	LOW	login	1:4.16.0-2+really2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline
+CVE-2007-5686	LOW	login.defs	1:4.17.4-2	-	efinges-backend:local (debian 13.7)	initscripts in rPath Linux 1 sets insecure permissions for the /var/lo ...
+CVE-2024-56433	LOW	login.defs	1:4.17.4-2	-	efinges-backend:local (debian 13.7)	shadow-utils: Default subordinate ID configuration in /etc/login.defs could lead to compromise
+TEMP-0628843-DBAD28	LOW	login.defs	1:4.17.4-2	-	efinges-backend:local (debian 13.7)	[more related to CVE-2005-4890]
+CVE-2026-76642	HIGH	mount	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks
+CVE-2026-78408	HIGH	mount	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority
+CVE-2026-78409	HIGH	mount	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: X-mount.subdir detached-tree resolution can escape via intermediate symlinks
+CVE-2026-78410	HIGH	mount	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection
+CVE-2026-3184	MEDIUM	mount	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: Access control bypass due to improper hostname canonicalization
+CVE-2022-0563	LOW	mount	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline
+CVE-2025-69720	HIGH	ncurses-base	6.5+20250216-2	-	efinges-backend:local (debian 13.7)	ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution.
+CVE-2025-6141	LOW	ncurses-base	6.5+20250216-2	-	efinges-backend:local (debian 13.7)	gnu-ncurses: ncurses Stack Buffer Overflow
+CVE-2025-69720	HIGH	ncurses-bin	6.5+20250216-2	-	efinges-backend:local (debian 13.7)	ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution.
+CVE-2025-6141	LOW	ncurses-bin	6.5+20250216-2	-	efinges-backend:local (debian 13.7)	gnu-ncurses: ncurses Stack Buffer Overflow
+CVE-2007-5686	LOW	passwd	1:4.17.4-2	-	efinges-backend:local (debian 13.7)	initscripts in rPath Linux 1 sets insecure permissions for the /var/lo ...
+CVE-2024-56433	LOW	passwd	1:4.17.4-2	-	efinges-backend:local (debian 13.7)	shadow-utils: Default subordinate ID configuration in /etc/login.defs could lead to compromise
+TEMP-0628843-DBAD28	LOW	passwd	1:4.17.4-2	-	efinges-backend:local (debian 13.7)	[more related to CVE-2005-4890]
+CVE-2026-9538	HIGH	perl-base	5.40.1-6+deb13u1	-	efinges-backend:local (debian 13.7)	perl-Archive-Tar: perl-Archive-Tar: Denial of Service via crafted tar header with large entry size
+CVE-2026-15534	MEDIUM	perl-base	5.40.1-6+deb13u1	-	efinges-backend:local (debian 13.7)	perl: Perl: Arbitrary code execution via out-of-bounds memory access in regular expression engine.
+CVE-2011-4116	LOW	perl-base	5.40.1-6+deb13u1	-	efinges-backend:local (debian 13.7)	perl: File:: Temp insecure temporary file handling
+CVE-2026-82560	UNKNOWN	perl-base	5.40.1-6+deb13u1	-	efinges-backend:local (debian 13.7)	Pod::Text versions before 6.1.1 for Perl allow CPU and memory exhausti ...
+TEMP-0517018-A83CE6	LOW	sysvinit-utils	3.14-4	-	efinges-backend:local (debian 13.7)	[sysvinit: no-root option in expert installer exposes locally exploitable security flaw]
+CVE-2026-18477	MEDIUM	tar	1.35+dfsg-3.1	-	efinges-backend:local (debian 13.7)	tar: tar: TOCTOU in incremental dumpdir 'X' rename handling allows restore path escape
+CVE-2026-18508	MEDIUM	tar	1.35+dfsg-3.1	-	efinges-backend:local (debian 13.7)	tar: tar: --one-top-level hardlink targets not confined to top-level directory enabling arbitrary file overwrite
+CVE-2026-5704	MEDIUM	tar	1.35+dfsg-3.1	-	efinges-backend:local (debian 13.7)	tar: tar: Hidden file injection via crafted archives
+CVE-2005-2541	LOW	tar	1.35+dfsg-3.1	-	efinges-backend:local (debian 13.7)	tar: does not properly warn the user when extracting setuid or setgid files
+TEMP-0290435-0B57B5	LOW	tar	1.35+dfsg-3.1	-	efinges-backend:local (debian 13.7)	[tar's rmt command may have undesired side effects]
+CVE-2026-76642	HIGH	util-linux	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks
+CVE-2026-78408	HIGH	util-linux	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority
+CVE-2026-78409	HIGH	util-linux	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: X-mount.subdir detached-tree resolution can escape via intermediate symlinks
+CVE-2026-78410	HIGH	util-linux	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection
+CVE-2026-3184	MEDIUM	util-linux	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: util-linux: Access control bypass due to improper hostname canonicalization
+CVE-2022-0563	LOW	util-linux	2.41.5-0+deb13u1	-	efinges-backend:local (debian 13.7)	util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline
+CVE-2026-27171	MEDIUM	zlib1g	1:1.3.dfsg+really1.3.1-1+b1	-	efinges-backend:local (debian 13.7)	zlib: zlib: Denial of Service via infinite loop in CRC32 combine functions
+CVE-2026-85091	MEDIUM	zlib1g	1:1.3.dfsg+really1.3.1-1+b1	-	efinges-backend:local (debian 13.7)	zlib versions 1.3.1.2 through 1.3.2 contain a heap buffer overflow vul ...
+CVE-2025-8869	MEDIUM	pip	25.0.1	25.3	Python	pip: pip missing checks on symbolic link extraction
+CVE-2026-13346	MEDIUM	pip	25.0.1	26.2.0	Python	pip: pip: Arbitrary file installation via malicious package indexes
+CVE-2026-3219	MEDIUM	pip	25.0.1	26.1	Python	pip: pip: Incorrect file installation due to improper archive handling
+CVE-2026-6357	MEDIUM	pip	25.0.1	26.1	Python	pip: pip: Arbitrary code execution or information disclosure via malicious wheel package installation
+CVE-2026-8643	MEDIUM	pip	25.0.1	26.1.2	Python	python-pip: Path traversal via malicious entry point name in pip wheel installation allows arbitrary file overwrite
+CVE-2026-1703	LOW	pip	25.0.1	26.0	Python	pip: pip: Information disclosure via path traversal when installing crafted wheel archives

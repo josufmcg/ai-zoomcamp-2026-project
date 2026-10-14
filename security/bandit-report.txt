@@ -1,0 +1,315 @@
+Run started:2026-10-14 18:25:56.402777+00:00
+
+Test results:
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: scripts/check_staged_secrets.py:6:0
+5	import re
+6	import subprocess
+7	import sys
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: scripts/check_staged_secrets.py:66:13
+65	    """Exit nonzero when the staged diff contains likely credentials."""
+66	    result = subprocess.run(
+67	        ["git", "diff", "--cached", "--no-ext-diff", "--unified=0", "--"],
+68	        check=True,
+69	        capture_output=True,
+70	        text=True,
+71	    )
+72	    findings = staged_secret_findings(result.stdout)
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: scripts/check_staged_secrets.py:66:13
+65	    """Exit nonzero when the staged diff contains likely credentials."""
+66	    result = subprocess.run(
+67	        ["git", "diff", "--cached", "--no-ext-diff", "--unified=0", "--"],
+68	        check=True,
+69	        capture_output=True,
+70	        text=True,
+71	    )
+72	    findings = staged_secret_findings(result.stdout)
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'password123'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: scripts/e2e_smoke.py:39:11
+38	DATABASE_URL = "postgresql+psycopg://efinges:efinges@127.0.0.1:5432/efinges"
+39	PASSWORD = "password123"
+40	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:84:4
+83	    response = client.post("/auth/token", data={"username": email, "password": PASSWORD})
+84	    assert response.status_code == 200, response.text
+85	    return {"Authorization": f"Bearer {response.json()['access_token']}"}
+
+--------------------------------------------------
+>> Issue: [B106:hardcoded_password_funcarg] Possible hardcoded password: 'e2e-secret-key-at-least-32-bytes-long'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b106_hardcoded_password_funcarg.html
+   Location: scripts/e2e_smoke.py:92:15
+91	        database_url=DATABASE_URL,
+92	        secret_key="e2e-secret-key-at-least-32-bytes-long",
+93	    )
+94	    app = create_app(settings)
+95	    app.state.db.create_all()
+96	    admin, manager, resident = _seed_users(app)
+97	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:112:8
+111	        )
+112	        assert denied.status_code == 403, denied.text
+113	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:144:8
+143	        ).json()
+144	        assert apartment["tags"][0]["name"] == "E2E Downtown"
+145	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:156:12
+155	            )
+156	            assert response.status_code == 201, response.text
+157	        mine = client.get("/auth/me/units", headers=resident_h).json()
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:158:8
+157	        mine = client.get("/auth/me/units", headers=resident_h).json()
+158	        assert {row["identifier"] for row in mine} == {"A-101", "G-01"}, mine
+159	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:172:8
+171	        ).json()
+172	        assert bill["status"] == "overdue", bill
+173	        filtered = client.get(
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:176:8
+175	        ).json()
+176	        assert [row["id"] for row in filtered] == [bill["id"]], filtered
+177	        paid = client.post(f"/bills/{bill['id']}/pay", headers=manager_h).json()
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:178:8
+177	        paid = client.post(f"/bills/{bill['id']}/pay", headers=manager_h).json()
+178	        assert paid["status"] == "paid", paid
+179	        assert client.get(f"/bills/{bill['id']}", headers=resident_h).json()["status"] == "paid"
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:179:8
+178	        assert paid["status"] == "paid", paid
+179	        assert client.get(f"/bills/{bill['id']}", headers=resident_h).json()["status"] == "paid"
+180	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:191:8
+190	        ).json()
+191	        assert incidence["status"] == "submitted"
+192	        illegal = client.patch(
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:197:8
+196	        )
+197	        assert illegal.status_code == 409, illegal.text
+198	        for stage in ("in progress", "resolved", "closed"):
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:204:12
+203	            )
+204	            assert response.status_code == 200, response.text
+205	        for body, headers in (
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:215:8
+214	        thread = client.get(f"/incidences/{incidence['id']}/comments", headers=resident_h).json()
+215	        assert [row["body"] for row in thread] == [
+216	            "Any update?",
+217	            "Fixed today.",
+218	        ], thread
+219	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:240:12
+239	            )
+240	            assert response.status_code == 201, response.text
+241	        duplicate = client.post(
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:246:8
+245	        )
+246	        assert duplicate.status_code == 409, duplicate.text
+247	        results = client.get(f"/initiatives/{initiative['id']}/results", headers=resident_h).json()
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:248:8
+247	        results = client.get(f"/initiatives/{initiative['id']}/results", headers=resident_h).json()
+248	        assert results["total_votes"] == 2, results
+249	        assert {row["label"]: row["votes"] for row in results["tallies"]} == {
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/e2e_smoke.py:249:8
+248	        assert results["total_votes"] == 2, results
+249	        assert {row["label"]: row["votes"] for row in results["tallies"]} == {
+250	            "Yes": 1,
+251	            "No": 1,
+252	        }, results
+253	
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'password123'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: scripts/scope_audit.py:42:11
+41	
+42	PASSWORD = "password123"
+43	WIPE_ORDER = (
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/scope_audit.py:62:4
+61	    response = client.post("/auth/token", data={"username": email, "password": PASSWORD})
+62	    assert response.status_code == 200, response.text
+63	    return {"Authorization": f"Bearer {response.json()['access_token']}"}
+
+--------------------------------------------------
+>> Issue: [B106:hardcoded_password_funcarg] Possible hardcoded password: 'audit-secret-key-at-least-32-bytes-long'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b106_hardcoded_password_funcarg.html
+   Location: scripts/scope_audit.py:170:15
+169	        database_url="postgresql+psycopg://efinges:efinges@127.0.0.1:5432/efinges",
+170	        secret_key="audit-secret-key-at-least-32-bytes-long",
+171	    )
+172	    app = create_app(settings)
+173	    app.state.db.create_all()
+174	    fixtures = build_fixtures(app)
+175	    db = app.state.db
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/scope_audit.py:193:12
+192	            response = client.get(path, headers=headers[who])
+193	            assert response.status_code == 200, f"{path} ({who}): {response.text}"
+194	            got = {row[key] for row in response.json()}
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: scripts/scope_audit.py:295:4
+294	        print(f"MISMATCH {label}: {path} as {who}\n  got  {sorted(got)}\n  want {sorted(want)}")
+295	    assert not failures, f"{len(failures)} scope mismatches"
+296	    app.state.db.dispose()
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 3845
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 27
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 4
+		High: 23
+Files skipped (0):

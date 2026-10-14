@@ -15,13 +15,22 @@ TEMPO_PORT ?= 3200
 EFINGES_SUBNET ?= 10.215.25.0/24
 COMPOSE ?= docker compose
 
+# Security scans (backlog task 21). The reports are committed under
+# $(SECURITY_DIR); `make security` regenerates all of them. Bandit runs ad hoc
+# through uvx (no project dependency) and Trivy is a separate binary.
+SECURITY_DIR ?= security
+EFINGES_TAG ?= local
+BACKEND_IMAGE ?= efinges-backend:$(EFINGES_TAG)
+FRONTEND_IMAGE ?= efinges-frontend:$(EFINGES_TAG)
+TRIVY ?= trivy
+
 # Dedicated database the integration workflows use (backlog task 18). It is
 # separate from the development database so the workflows can wipe their tables
 # without touching seeded or local data. Point it at any PostgreSQL server you
 # control; the default matches the compose postgres on its published port.
 INTEGRATION_DATABASE_URL ?= postgresql+psycopg://efinges:efinges@127.0.0.1:$(POSTGRES_PORT)/efinges_test
 
-.PHONY: install run test build lint openapi-check \
+.PHONY: install run test build lint openapi-check security \
 	backend-install backend-run backend-test backend-test-integration \
 	backend-migrate backend-revision backend-openapi backend-lint \
 	frontend-install frontend-run frontend-test frontend-build frontend-lint \
@@ -63,6 +72,12 @@ openapi: backend-openapi
 ## Verify openapi.yaml matches the backend application schema
 openapi-check:
 	cd $(BACKEND_DIR) && uv run python -m scripts.export_openapi --check
+
+## Run the security scans and refresh the reports under security/ (needs trivy and the built images)
+security:
+	cd $(BACKEND_DIR) && uvx bandit --exit-zero -r app scripts alembic --exclude alembic/versions -f txt > ../$(SECURITY_DIR)/bandit-report.txt
+	$(TRIVY) image --scanners vuln --format template --template '@$(SECURITY_DIR)/trivy-report.tpl' $(BACKEND_IMAGE) > $(SECURITY_DIR)/trivy-backend.txt
+	$(TRIVY) image --scanners vuln --format template --template '@$(SECURITY_DIR)/trivy-report.tpl' $(FRONTEND_IMAGE) > $(SECURITY_DIR)/trivy-frontend.txt
 
 ## Build and start the full stack (backend, frontend, postgres, observability)
 up:
