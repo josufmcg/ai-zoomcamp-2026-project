@@ -18,6 +18,7 @@ EFINGES is a residential property management platform for property management fi
 - Three roles only: administrator, manager, resident. Enforce every role boundary server-side; never trust the frontend to hide access.
 - Property hierarchy: Community → Building → Unit. Unit types are apartment, garage, and storage. Units are assigned, managed, and billed individually.
 - Authentication is OAuth2 password flow returning a JWT with user id and role. Return 401 for missing or invalid tokens and 403 for insufficient role.
+- The SPA and the API are different origins (ports 3000 and 8000), so the backend must allow the frontend origin via `CORS_ALLOW_ORIGINS`. Keep that list in sync with wherever the SPA is served; without it the browser discards every API response even though the request succeeded.
 - Bills are created manually by managers only. Stored status is pending or paid; overdue is always computed from the due date, never stored.
 - Incidence statuses follow submitted → in progress → resolved → closed, in that order; only the immediate next stage is allowed and "closed" is terminal.
 - All resident-manager communication happens in comment threads attached to incidences. There is no direct messaging.

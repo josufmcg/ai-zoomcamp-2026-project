@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   api,
@@ -25,10 +25,6 @@ function jsonResponse(
 }
 
 describe("apiClient", () => {
-  beforeEach(() => {
-    window.localStorage.clear();
-  });
-
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -140,6 +136,35 @@ describe("apiClient", () => {
     expect(headers["Content-Type"]).toBe("application/json");
     expect(init?.body).toBe(JSON.stringify({ username: "a", password: "b" }));
   });
+
+  it("serializes a form body for the OAuth2 password flow", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(jsonResponse({}));
+
+    await apiFetch("/auth/token", {
+      method: "POST",
+      form: { username: "ana@efinges.test", password: "p@ss word&more" },
+      skipAuth: true,
+    });
+
+    const init = fetchMock.mock.calls[0][1];
+    const headers = init?.headers as Record<string, string>;
+    expect(headers["Content-Type"]).toBe("application/x-www-form-urlencoded");
+    expect(init?.body).toBe(
+      "username=ana%40efinges.test&password=p%40ss+word%26more",
+    );
+  });
+
+  it("rejects a request that passes both a JSON body and a form body", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch");
+
+    await expect(
+      apiFetch("/auth/token", { method: "POST", body: {}, form: { a: "b" } }),
+    ).rejects.toThrow(/either `body` or `form`/);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
 
   it("builds a query string and skips empty values", async () => {
     const fetchMock = vi

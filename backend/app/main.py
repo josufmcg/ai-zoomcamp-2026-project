@@ -9,6 +9,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import Settings, get_settings
 from app.database import Database
@@ -46,6 +47,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     # Count every request by matched route and response status code.
     app.add_middleware(RequestMetricsMiddleware, telemetry=telemetry)
+
+    # Allow the browser SPA to call the API (backlog task 14). The SPA runs on
+    # a different origin than the API, so without this the browser blocks every
+    # cross-origin response even though the request reached the server.
+    if settings.cors_origins:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=settings.cors_origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
     @app.get("/healthz")
     def healthz() -> dict[str, str]:

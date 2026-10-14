@@ -38,6 +38,29 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
 
+    # Browser origins allowed to call the API (backlog task 14).
+    #
+    # The SPA is served from a different origin than the API (port 3000 versus
+    # port 8000), so the browser sends every call as a cross-origin request and
+    # refuses the response without an `Access-Control-Allow-Origin` header. The
+    # list is explicit rather than `*` so credentials and the Authorization
+    # header stay scoped to known frontends.
+    #
+    # Comma-separated in the environment, for example:
+    # ``CORS_ALLOW_ORIGINS=http://localhost:3000,https://app.example.com``.
+    cors_allow_origins: str = (
+        "http://localhost:3000,http://127.0.0.1:3000"
+    )
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """The allowed origins as a list, ignoring empty entries."""
+        return [
+            origin.strip()
+            for origin in self.cors_allow_origins.split(",")
+            if origin.strip()
+        ]
+
     # OpenTelemetry OTLP endpoint. When unset, telemetry is disabled.
     otel_exporter_otlp_endpoint: str | None = None
 

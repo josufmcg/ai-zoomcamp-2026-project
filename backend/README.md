@@ -299,11 +299,24 @@ Settings are read from environment variables (or a `.env` file):
 | `SECRET_KEY` | `dev-only-secret-key-change-me-in-production` | Secret used to sign JWTs |
 | `JWT_ALGORITHM` | `HS256` | Signing algorithm for access tokens |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | `60` | Access-token lifetime in minutes |
+| `CORS_ALLOW_ORIGINS` | `http://localhost:3000,http://127.0.0.1:3000` | Comma-separated browser origins allowed to call the API; empty disables the middleware |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | *(unset)* | OpenTelemetry OTLP endpoint; telemetry disabled when unset |
 | `OTEL_SERVICE_NAME` | `efinges-backend` | Service name reported to the observability pipeline |
 
 The defaults are for local development only. Production must set a strong
 `SECRET_KEY` and a PostgreSQL `DATABASE_URL`.
+
+### Cross-origin requests
+
+The SPA is served from a different origin than the API (port 3000 versus port
+8000), so the browser treats every call as cross-origin and discards the
+response unless the API echoes the frontend origin in
+`Access-Control-Allow-Origin`. `CORS_ALLOW_ORIGINS` controls that list; it is
+explicit rather than `*` so the `Authorization` header and credentials stay
+scoped to known frontends. Add every deployed frontend origin to the list.
+Requests from an unlisted origin still reach the server and succeed there — the
+browser is what refuses to hand the body to the page. `tests/test_cors.py`
+pins down the preflight and response headers.
 
 ## Telemetry
 

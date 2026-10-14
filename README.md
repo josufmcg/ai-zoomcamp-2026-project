@@ -63,6 +63,7 @@ make up POSTGRES_PORT=5434   # use a different host port for PostgreSQL
 | `GRAFANA_ADMIN_USER` | `admin` | Grafana admin username |
 | `GRAFANA_ADMIN_PASSWORD` | `admin` | Grafana admin password |
 | `VITE_API_URL` | `http://localhost:8000` | Backend URL baked into the frontend bundle at build time |
+| `CORS_ALLOW_ORIGINS` | `http://localhost:3000,http://127.0.0.1:3000` | Browser origins allowed to call the API |
 | `SECRET_KEY` | `dev-only-secret-key-change-me-in-production` | Secret used to sign JWTs |
 | `EFINGES_SUBNET` | `10.215.25.0/24` | Docker Compose network subnet |
 | `EFINGES_TAG` | `local` | Image tag for the backend and frontend images |
@@ -83,6 +84,10 @@ make up VITE_API_URL=http://localhost:9000
   `DATABASE_URL=postgresql+psycopg://efinges:efinges@postgres:5432/efinges`.
 - `frontend` is a static nginx image serving the Vite build; it calls the
   backend at the browser-facing `VITE_API_URL`.
+- The SPA and the API run on different origins (ports 3000 and 8000), so the
+  backend answers cross-origin requests from the origins listed in
+  `CORS_ALLOW_ORIGINS`. Add a deployed frontend origin to that list or the
+  browser will discard every API response.
 - All services publish their ports on `127.0.0.1` only and share the
   `10.215.25.0/24` subnet.
 
@@ -149,6 +154,14 @@ every protected request; `GET /auth/me` returns the signed-in user. Missing or
 invalid tokens return 401, and an insufficient role returns 403. Passwords are
 stored as Argon2 hashes and never returned. See `backend/README.md` for
 details.
+
+The frontend opens on a login page, calls `/auth/token`, and stores the JWT plus
+the user profile in local storage, so a page refresh stays signed in. The shared
+API client attaches the Bearer token to every request, and a navigation shell
+shows only the links allowed for the signed-in role. Visiting a route your role
+does not own redirects to a "not allowed" screen. That guard is for usability
+only: the backend re-checks the role on every request. See
+`frontend/README.md` for the route table.
 
 ## Resident unit assignments
 

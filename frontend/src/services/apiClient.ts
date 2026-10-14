@@ -22,6 +22,15 @@ export interface RequestOptions {
   method?: HttpMethod;
   /** Request body. Plain objects are serialized to JSON automatically. */
   body?: unknown;
+  /**
+   * Form-encoded body. The client serializes it with `URLSearchParams` and sets
+   * `Content-Type: application/x-www-form-urlencoded`.
+   *
+   * Required for the OAuth2 password flow (`POST /auth/token`), which is the
+   * only endpoint that reads a form body instead of JSON. It cannot be combined
+   * with `body`.
+   */
+  form?: Record<string, string>;
   /** Extra headers merged over the defaults. */
   headers?: Record<string, string>;
   /** Query string parameters; `undefined` values are skipped. */
@@ -140,8 +149,19 @@ export async function apiFetch<T = unknown>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { method = "GET", body, headers = {}, query, skipAuth = false, signal } =
-    options;
+  const {
+    method = "GET",
+    body,
+    form,
+    headers = {},
+    query,
+    skipAuth = false,
+    signal,
+  } = options;
+
+  if (body !== undefined && form !== undefined) {
+    throw new Error("Pass either `body` or `form` to apiFetch, never both.");
+  }
 
   const url = `${API_BASE_URL}${path}${buildQueryString(query)}`;
 
@@ -156,7 +176,10 @@ export async function apiFetch<T = unknown>(
   }
 
   let requestBody: BodyInit | undefined;
-  if (body !== undefined && body !== null) {
+  if (form !== undefined) {
+    requestHeaders["Content-Type"] = "application/x-www-form-urlencoded";
+    requestBody = new URLSearchParams(form).toString();
+  } else if (body !== undefined && body !== null) {
     requestHeaders["Content-Type"] = "application/json";
     requestBody = JSON.stringify(body);
   }
