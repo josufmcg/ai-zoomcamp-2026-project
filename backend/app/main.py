@@ -12,6 +12,7 @@ from fastapi import FastAPI
 
 from app.config import Settings, get_settings
 from app.database import Database
+from app.routers import auth
 from app.telemetry import RequestMetricsMiddleware, Telemetry
 
 
@@ -42,6 +43,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def healthz() -> dict[str, str]:
         """Liveness probe used by Docker health checks and smoke tests."""
         return {"status": "ok"}
+
+    # Authentication and user endpoints (backlog task 6).
+    app.include_router(auth.router)
 
     return app
 

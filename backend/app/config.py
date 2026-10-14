@@ -28,9 +28,15 @@ class Settings(BaseSettings):
     # this at a dedicated PostgreSQL database.
     test_database_url: str = "sqlite:///:memory:"
 
-    # Secret used to sign JWTs. The default is a development-only value;
-    # production must set a strong random SECRET_KEY.
-    secret_key: str = "dev-only-secret-key-change-me"
+    # Secret used to sign JWTs. The default is a development-only placeholder
+    # that is long enough for HMAC-SHA256 (which needs at least 32 bytes);
+    # production must still replace SECRET_KEY with a strong random value.
+    secret_key: str = "dev-only-secret-key-change-me-in-production"
+
+    # Signing algorithm and token lifetime for the access tokens issued by
+    # ``POST /auth/token`` (backlog task 6).
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
 
     # OpenTelemetry OTLP endpoint. When unset, telemetry is disabled.
     otel_exporter_otlp_endpoint: str | None = None

@@ -29,5 +29,5 @@ def test_settings_read_from_environment(monkeypatch) -> None:
 def test_settings_have_safe_defaults() -> None:
     settings = Settings(_env_file=None)
     assert settings.database_url == "sqlite:///./efinges.db"
-    assert settings.secret_key == "dev-only-secret-key-change-me"
+    assert settings.secret_key == "dev-only-secret-key-change-me-in-production"
     assert settings.otel_exporter_otlp_endpoint is None

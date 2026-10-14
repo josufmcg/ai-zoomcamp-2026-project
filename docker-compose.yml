@@ -22,7 +22,7 @@ services:
     environment:
       # Point the backend at the postgres service on the compose network.
       DATABASE_URL: postgresql+psycopg://efinges:efinges@postgres:5432/efinges
-      SECRET_KEY: ${SECRET_KEY:-dev-only-secret-key-change-me}
+      SECRET_KEY: ${SECRET_KEY:-dev-only-secret-key-change-me-in-production}
       # Send traces, metrics, and logs to the collector (backlog task 4).
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_SERVICE_NAME: efinges-backend

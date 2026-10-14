@@ -11,7 +11,10 @@ dependencies = [
     "opentelemetry-exporter-otlp>=1.29,<2",
     "opentelemetry-sdk>=1.29,<2",
     "psycopg[binary]>=3.2,<4.0",
+    "pwdlib[argon2]>=0.2,<1.0",
     "pydantic-settings>=2.15.0",
+    "pyjwt>=2.9,<3.0",
+    "python-multipart>=0.0.9,<1.0",
     "sqlalchemy>=2.0,<3.0",
     "uvicorn[standard]>=0.30,<1.0",
 ]

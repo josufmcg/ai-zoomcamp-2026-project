@@ -5,6 +5,9 @@ garage, or a storage room, and is managed and billed individually. Managers can
 attach free-text :class:`Tag` labels to buildings and units for grouping and
 scoping.
 
+Backlog task 6 adds :class:`User`, whose :class:`UserRole` is restricted to
+administrator, manager, or resident.
+
 The unit type is restricted to the three allowed values both in Python (the
 :class:`UnitType` enum) and in the database (a native enum on PostgreSQL, a
 ``VARCHAR`` with a ``CHECK`` constraint on SQLite), so an invalid type is
@@ -17,6 +20,7 @@ import enum
 from datetime import datetime
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     Enum,
     ForeignKey,
@@ -25,6 +29,7 @@ from sqlalchemy import (
     Column,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -37,6 +42,14 @@ class UnitType(str, enum.Enum):
     APARTMENT = "apartment"
     GARAGE = "garage"
     STORAGE = "storage"
+
+
+class UserRole(str, enum.Enum):
+    """The three roles a user can hold (backlog task 6)."""
+
+    ADMINISTRATOR = "administrator"
+    MANAGER = "manager"
+    RESIDENT = "resident"
 
 
 # Association tables for the many-to-many tag relationships. Tags are shared
@@ -190,3 +203,39 @@ class Tag(Base):
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid
         return f"Tag(id={self.id!r}, name={self.name!r})"
+
+
+class User(Base):
+    """A person who can sign in, with one of three roles (backlog task 6).
+
+    Passwords are stored as an Argon2 hash, never in clear text. The role is
+    restricted to administrator, manager, or resident both in Python (the
+    :class:`UserRole` enum) and in the database (a native enum on PostgreSQL, a
+    ``VARCHAR`` with a ``CHECK`` constraint on SQLite).
+    """
+
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    email: Mapped[str] = mapped_column(String(320), nullable=False, unique=True)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    role: Mapped[UserRole] = mapped_column(
+        Enum(
+            UserRole,
+            name="user_role",
+            native_enum=True,
+            create_constraint=True,
+            validate_strings=True,
+            values_callable=lambda enum_cls: [member.value for member in enum_cls],
+        ),
+        nullable=False,
+    )
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, server_default=text("true")
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    def __repr__(self) -> str:  # pragma: no cover - debugging aid
+        return f"User(id={self.id!r}, email={self.email!r}, role={self.role.value!r})"

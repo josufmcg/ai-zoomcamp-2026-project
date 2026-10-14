@@ -63,7 +63,7 @@ make up POSTGRES_PORT=5434   # use a different host port for PostgreSQL
 | `GRAFANA_ADMIN_USER` | `admin` | Grafana admin username |
 | `GRAFANA_ADMIN_PASSWORD` | `admin` | Grafana admin password |
 | `VITE_API_URL` | `http://localhost:8000` | Backend URL baked into the frontend bundle at build time |
-| `SECRET_KEY` | `dev-only-secret-key-change-me` | Secret used to sign JWTs |
+| `SECRET_KEY` | `dev-only-secret-key-change-me-in-production` | Secret used to sign JWTs |
 | `EFINGES_SUBNET` | `10.215.25.0/24` | Docker Compose network subnet |
 | `EFINGES_TAG` | `local` | Image tag for the backend and frontend images |
 
@@ -121,7 +121,8 @@ See `backend/README.md` and `frontend/README.md` for the individual commands.
 
 The backend uses SQLAlchemy 2.0 with Alembic migrations. The property hierarchy
 is Community → Building → Unit (apartment, garage, or storage), with shared
-tags that managers can attach to buildings and units.
+tags that managers can attach to buildings and units. The `users` table stores
+accounts with a role of `administrator`, `manager`, or `resident`.
 
 ```bash
 make migrate   # apply the migrations to the configured database
@@ -130,6 +131,15 @@ make revision m="describe the change"   # create a migration from the models
 
 `DATABASE_URL` configures the application and Alembic; `TEST_DATABASE_URL`
 configures the test suite and defaults to an in-memory SQLite database.
+
+## Authentication
+
+`POST /auth/token` implements the OAuth2 password flow and returns a signed JWT
+carrying the user id and role. Send it as `Authorization: Bearer <token>` on
+every protected request; `GET /auth/me` returns the signed-in user. Missing or
+invalid tokens return 401, and an insufficient role returns 403. Passwords are
+stored as Argon2 hashes and never returned. See `backend/README.md` for
+details.
 
 ## Scope
 

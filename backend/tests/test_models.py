@@ -9,7 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings
 from app.database import Database
-from app.models import Building, Community, Tag, Unit, UnitType
+from app.models import Building, Community, Tag, Unit, UnitType, User, UserRole
+from app.security import hash_password, verify_password
 
 
 def _make_hierarchy(session: Session) -> tuple[Community, Building, Unit]:
@@ -167,3 +168,74 @@ def test_in_memory_database_is_shared_across_sessions(database: Database) -> Non
 
     with database.session() as second:
         assert second.scalars(select(Community.name)).all() == ["Riverside"]
+
+
+# --- Users and roles (backlog task 6) ---------------------------------------
+
+
+def test_user_creation_persists_a_hashed_password(session: Session) -> None:
+    password = "correct horse battery staple"
+    user = User(
+        email="manager@efinges.test",
+        hashed_password=hash_password(password),
+        role=UserRole.MANAGER,
+    )
+    session.add(user)
+    session.commit()
+
+    assert user.id is not None
+    assert user.role is UserRole.MANAGER
+    assert user.is_active is True
+    assert password not in user.hashed_password
+    assert verify_password(password, user.hashed_password)
+
+
+def test_all_user_roles_are_accepted(session: Session) -> None:
+    for email, role in (
+        ("admin@efinges.test", UserRole.ADMINISTRATOR),
+        ("manager@efinges.test", UserRole.MANAGER),
+        ("resident@efinges.test", UserRole.RESIDENT),
+    ):
+        session.add(
+            User(email=email, hashed_password="hash", role=role)
+        )
+    session.commit()
+
+    stored = session.scalars(select(User.role).order_by(User.email)).all()
+    assert stored == [UserRole.ADMINISTRATOR, UserRole.MANAGER, UserRole.RESIDENT]
+
+
+def test_invalid_role_is_rejected_by_the_orm(session: Session) -> None:
+    session.add(User(email="x@efinges.test", hashed_password="hash", role="owner"))
+    with pytest.raises(StatementError):
+        session.commit()
+    session.rollback()
+
+
+def test_invalid_role_is_rejected_by_the_database(session: Session) -> None:
+    """A direct SQL insert bypassing the ORM is still rejected by the CHECK."""
+    with pytest.raises(IntegrityError):
+        session.execute(
+            text(
+                "INSERT INTO users (email, hashed_password, role, is_active) "
+                "VALUES (:email, :hashed_password, :role, :is_active)"
+            ),
+            {
+                "email": "x@efinges.test",
+                "hashed_password": "hash",
+                "role": "owner",
+                "is_active": True,
+            },
+        )
+        session.commit()
+    session.rollback()
+
+
+def test_user_emails_are_unique(session: Session) -> None:
+    session.add(User(email="dup@efinges.test", hashed_password="h", role=UserRole.RESIDENT))
+    session.commit()
+
+    session.add(User(email="dup@efinges.test", hashed_password="h", role=UserRole.MANAGER))
+    with pytest.raises(IntegrityError):
+        session.commit()
+    session.rollback()
