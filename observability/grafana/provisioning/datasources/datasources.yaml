@@ -1,0 +1,27 @@
+# Grafana datasources for EFINGES (backlog task 4).
+#
+# Prometheus (metrics), Loki (logs), and Tempo (traces) are all provisioned
+# with fixed UIDs so the dashboard can reference them.
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+  - name: Loki
+    uid: loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: false
+  - name: Tempo
+    uid: tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    editable: false

@@ -12,11 +12,13 @@ sections below cover what is implemented so far.
 - `backend/`: FastAPI application (see `backend/README.md`).
 - `frontend/`: React + Vite + TypeScript + Tailwind SPA (see `frontend/README.md`).
 - `docs/`: functional spec, architecture, and backlog.
-- `docker-compose.yml`: local stack with the backend, frontend, and PostgreSQL.
+- `observability/`: OpenTelemetry Collector, Prometheus, Loki, Tempo, and Grafana configuration.
+- `docker-compose.yml`: local stack with the backend, frontend, PostgreSQL, and the observability pipeline.
 
 ## Run the full stack with Docker Compose
 
-The backend, frontend, and PostgreSQL run together with one command:
+The backend, frontend, PostgreSQL, and the observability pipeline run together
+with one command:
 
 ```bash
 make up      # build the images, start the stack, wait for health, print URLs
@@ -33,7 +35,11 @@ is ready to use as soon as the command finishes.
 | Frontend | <http://127.0.0.1:3000> |
 | Backend | <http://127.0.0.1:8000> |
 | API docs (Swagger UI) | <http://127.0.0.1:8000/docs> |
-| PostgreSQL | `postgresql://efinges:efinges@127.0.0.1:5433/efinges` |
+| Grafana | <http://127.0.0.1:3001> (`admin` / `admin`) |
+| Prometheus | <http://127.0.0.1:9090> |
+| Loki | <http://127.0.0.1:3100> |
+| Tempo | <http://127.0.0.1:3200> |
+| PostgreSQL | `postgresql://efinges:efinges@127.0.0.1:5432/efinges` |
 
 ### Configuration
 
@@ -49,7 +55,13 @@ make up POSTGRES_PORT=5434   # use a different host port for PostgreSQL
 | --- | --- | --- |
 | `BACKEND_PORT` | `8000` | Host port for the backend |
 | `FRONTEND_PORT` | `3000` | Host port for the frontend |
-| `POSTGRES_PORT` | `5433` | Host port for PostgreSQL |
+| `POSTGRES_PORT` | `5432` | Host port for PostgreSQL |
+| `GRAFANA_PORT` | `3001` | Host port for Grafana |
+| `PROMETHEUS_PORT` | `9090` | Host port for Prometheus |
+| `LOKI_PORT` | `3100` | Host port for Loki |
+| `TEMPO_PORT` | `3200` | Host port for Tempo |
+| `GRAFANA_ADMIN_USER` | `admin` | Grafana admin username |
+| `GRAFANA_ADMIN_PASSWORD` | `admin` | Grafana admin password |
 | `VITE_API_URL` | `http://localhost:8000` | Backend URL baked into the frontend bundle at build time |
 | `SECRET_KEY` | `dev-only-secret-key-change-me` | Secret used to sign JWTs |
 | `EFINGES_SUBNET` | `10.215.25.0/24` | Docker Compose network subnet |
@@ -73,6 +85,26 @@ make up VITE_API_URL=http://localhost:9000
   backend at the browser-facing `VITE_API_URL`.
 - All services publish their ports on `127.0.0.1` only and share the
   `10.215.25.0/24` subnet.
+
+### Observability
+
+The backend exports OpenTelemetry traces, metrics, and logs to the
+`otel-collector` service, which fans them out to the storage backends:
+
+- **Metrics** go to Prometheus (scraped from the collector's Prometheus
+  exporter) and are visualized in the provisioned **EFINGES** Grafana
+  dashboard, which shows the HTTP request rate and error rate by status code.
+- **Logs** go to Loki.
+- **Traces** go to Tempo.
+
+The backend only exports when `OTEL_EXPORTER_OTLP_ENDPOINT` is set, which the
+Compose stack sets to `http://otel-collector:4317`. When the variable is unset
+(for example when running the backend directly with `make run`), telemetry is
+disabled and nothing is exported. The service name reported to the pipeline is
+`OTEL_SERVICE_NAME` (default `efinges-backend`).
+
+Open Grafana at <http://127.0.0.1:3001> and select the **EFINGES** dashboard to
+see live request and error rates.
 
 ## Run the services without Docker
 

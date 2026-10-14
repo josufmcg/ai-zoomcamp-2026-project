@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     # OpenTelemetry OTLP endpoint. When unset, telemetry is disabled.
     otel_exporter_otlp_endpoint: str | None = None
 
+    # Service name reported to the observability pipeline.
+    otel_service_name: str = "efinges-backend"
+
 
 @lru_cache
 def get_settings() -> Settings:

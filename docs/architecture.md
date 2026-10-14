@@ -91,7 +91,7 @@ services:
       POSTGRES_PASSWORD: efinges
       POSTGRES_DB: efinges
     ports:
-      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped

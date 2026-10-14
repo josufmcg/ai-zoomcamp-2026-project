@@ -1,0 +1,15 @@
+# Grafana dashboard provider for EFINGES (backlog task 4).
+#
+# Loads every dashboard JSON file from the mounted dashboards directory.
+
+apiVersion: 1
+
+providers:
+  - name: EFINGES
+    orgId: 1
+    folder: EFINGES
+    type: file
+    disableDeletion: true
+    editable: false
+    options:
+      path: /var/lib/grafana/dashboards
