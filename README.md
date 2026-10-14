@@ -125,6 +125,38 @@ make openapi   # re-export the OpenAPI contract to openapi.yaml
 
 See `backend/README.md` and `frontend/README.md` for the individual commands.
 
+## Demo data
+
+A reviewer can explore a populated system immediately after startup. With the
+stack running, one idempotent command creates a complete demo scenario:
+
+```bash
+make seed   # populate the demo data (re-running creates nothing)
+```
+
+The seed creates one administrator, one manager, and three residents; a
+community with two buildings and apartments, garages, and storage units; tags;
+resident assignments; bills in all three display statuses (pending, paid, and
+computed overdue); one incidence per lifecycle stage with comment threads; and
+one open initiative with a few ballots already cast.
+
+Sign in with any of these accounts (password `efinges-demo-123`):
+
+| Role | Email |
+| --- | --- |
+| Administrator | `admin@efinges.demo` |
+| Manager | `manager@efinges.demo` |
+| Resident | `alice@efinges.demo` |
+| Resident | `bob@efinges.demo` |
+| Resident | `carol@efinges.demo` |
+
+The script is idempotent: every row is matched by a stable natural key (email,
+name, identifier, title, description) before it is created, so running it again
+adds nothing. To restore the demo to its initial state, `make seed-reset`
+deletes only the demo rows and recreates them, leaving any hand-made data
+untouched. Run it directly against a different database with
+`cd backend && uv run python -m scripts.seed_demo --database-url <url>`.
+
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs on every push and every pull request and has

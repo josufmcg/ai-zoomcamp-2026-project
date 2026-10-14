@@ -122,6 +122,34 @@ suite and defaults to an in-memory SQLite database that is created fresh for
 every test. Point `TEST_DATABASE_URL` at a dedicated PostgreSQL database to run
 the integration suite against a real server.
 
+## Demo data
+
+`scripts/seed_demo.py` populates a complete demo scenario so a reviewer can log
+in and click through the product right after `make up`. Run it from the
+repository root or from `backend/`:
+
+```bash
+make seed   # idempotent; re-running creates nothing
+
+# or directly, against any database:
+cd backend && uv run python -m scripts.seed_demo
+cd backend && uv run python -m scripts.seed_demo --database-url sqlite:///./demo.db
+```
+
+It creates one administrator, one manager, and three residents (all sharing the
+password `efinges-demo-123`), a community with two buildings and apartments,
+garages, and storage units, four tags, seven resident assignments, four bills
+covering the pending, paid, and computed-overdue display statuses, one
+incidence per lifecycle stage with comment threads, and one open initiative
+scoped to the garages with two ballots already cast.
+
+The script is idempotent: every row is looked up by a stable natural key
+(email, name, identifier, title, description) before it is created, so running
+it again is a no-op. `--reset` deletes only the demo rows (matched by the same
+natural keys) and seeds them again, leaving hand-made data alone. Because the
+whole seed runs in one transaction and commits once, a failure leaves the
+database untouched.
+
 ## Authentication
 
 `POST /auth/token` implements the OAuth2 password flow. Send a form body with

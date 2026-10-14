@@ -30,9 +30,15 @@ TRIVY ?= trivy
 # control; the default matches the compose postgres on its published port.
 INTEGRATION_DATABASE_URL ?= postgresql+psycopg://efinges:efinges@127.0.0.1:$(POSTGRES_PORT)/efinges_test
 
-.PHONY: install run test build lint openapi-check security \
+# Database the demo seed fills (backlog task 23). It defaults to the compose
+# postgres the running stack uses, so `make seed` populates the very database
+# the frontend and API read from. Override it to seed a different server.
+SEED_DATABASE_URL ?= postgresql+psycopg://efinges:efinges@127.0.0.1:$(POSTGRES_PORT)/efinges
+
+.PHONY: install run test build lint openapi-check security seed seed-reset \
 	backend-install backend-run backend-test backend-test-integration \
-	backend-migrate backend-revision backend-openapi backend-lint \
+	backend-migrate backend-revision backend-openapi backend-seed backend-seed-reset \
+	backend-lint \
 	frontend-install frontend-run frontend-test frontend-build frontend-lint \
 	integration integration-db \
 	up down logs url
@@ -65,6 +71,12 @@ migrate: backend-migrate
 
 ## Create a new migration from the current models (use m="message")
 revision: backend-revision
+
+## Seed the demo data (idempotent; re-running creates nothing)
+seed: backend-seed
+
+## Reset the demo rows and seed them again (leaves all other data alone)
+seed-reset: backend-seed-reset
 
 ## Export the FastAPI OpenAPI schema to openapi.yaml at the repository root
 openapi: backend-openapi
@@ -122,6 +134,12 @@ backend-migrate:
 
 backend-revision:
 	cd $(BACKEND_DIR) && uv run alembic revision --autogenerate -m "$(m)"
+
+backend-seed:
+	cd $(BACKEND_DIR) && uv run python -m scripts.seed_demo --database-url "$(SEED_DATABASE_URL)"
+
+backend-seed-reset:
+	cd $(BACKEND_DIR) && uv run python -m scripts.seed_demo --database-url "$(SEED_DATABASE_URL)" --reset
 
 backend-openapi:
 	cd $(BACKEND_DIR) && uv run python -m scripts.export_openapi

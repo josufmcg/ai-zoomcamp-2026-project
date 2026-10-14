@@ -214,6 +214,29 @@ pinned the GitHub Actions versions to the newest majors that still run on
 Node 20 runners. Approved after `make lint`, both suites, and the frontend build
 passed locally and mirrored what CI runs.
 
+A third Phase E example is task 23 (demo seed data). **Prompt.** "Add an
+idempotent seed script, runnable with one documented command, that creates one
+administrator, one manager, and three residents, a two-building community with
+apartments, garages, and storage units, tags, resident assignments, bills in all
+three statuses, one incidence per lifecycle stage with comments, and one open
+initiative with a few votes. Ensure re-running the script does not duplicate
+data."
+
+**Result.** `backend/scripts/seed_demo.py` with per-row natural-key lookups, a
+`run()` that commits once, a `--reset` flag, and tests in
+`backend/tests/test_seed_demo.py`.
+
+**Correction.** The idempotent path was green on the first run, but the human
+ran the script a second time (twice) and then exercised `--reset`: deleting the
+community relied on `ON DELETE CASCADE`, which SQLite does **not** enforce
+unless foreign keys are switched on, so the initiative options survived and the
+re-insert hit the `(initiative_id, position)` unique constraint. The reset was
+rewritten to delete every level explicitly (options, votes, comments, bills,
+assignments, and the tag association rows) before the parents, and the tests
+were extended to assert that a second run creates zero rows and that `--reset`
+leaves a hand-made community and account untouched. Verified against both
+SQLite and the live Compose PostgreSQL. Approved.
+
 ## 4. Verification evidence (acceptance commands)
 
 Every change was accepted only when the commands it affected passed. The
@@ -256,6 +279,7 @@ tests pass":
 | 14 | Login and routes with green tests | CORS middleware missing; competing navigations lost the redirect target |
 | 18 | Session-scoped integration app | Lifespan `dispose()` destroyed the in-memory DB; client no longer used as a context manager |
 | 19 | Ruff/CI configuration | `F821` fixed with `TYPE_CHECKING` imports; action versions pinned for Node 20 runners |
+| 23 | Idempotent demo seed | Second run and `--reset` re-tested by hand; reset rewritten to delete every level explicitly because SQLite skips `ON DELETE CASCADE` |
 
 ## 6. Reproducing and auditing a change
 

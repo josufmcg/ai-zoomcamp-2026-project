@@ -51,6 +51,8 @@ cd backend && uv run pytest
 make integration   # run the backend end-to-end workflows against a dedicated database (backlog task 18)
 make integration-db   # create the dedicated integration database in the compose postgres
 make openapi   # re-export openapi.yaml from the backend schema (required after API changes)
+make seed      # populate the idempotent demo data (backlog task 23)
+make seed-reset   # delete and recreate only the demo rows
 make security   # run Bandit and Trivy and refresh the reports under security/ (backlog task 21)
 cd frontend && npm test
 cd frontend && npm run build
