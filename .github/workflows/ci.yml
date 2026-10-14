@@ -56,11 +56,6 @@ jobs:
           --health-timeout 3s
           --health-retries 12
 
-    env:
-      # Point the integration suite at the service container above. The suite
-      # wipes the application tables between tests, which is safe here because
-      # this database exists only for the job.
-      TEST_DATABASE_URL: postgresql+psycopg://efinges:efinges@127.0.0.1:5432/efinges_test
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -88,14 +83,22 @@ jobs:
         working-directory: backend
         run: uv run ruff format --check .
 
-      # The unit suite also re-exports openapi.yaml in a test, so a forgotten
-      # re-export after an API change fails here.
+      # The unit suite re-exports openapi.yaml in a test, so a forgotten
+      # re-export after an API change fails here. It also asserts the in-memory
+      # SQLite default of TEST_DATABASE_URL and relies on SQLite enum/CHECK
+      # behaviour, so it must NOT see the PostgreSQL URL. That variable is
+      # scoped to the integration step below instead of the whole job.
       - name: Run unit tests
         working-directory: backend
         run: uv run pytest
 
       - name: Run integration workflows
         working-directory: backend
+        # Point the integration suite at the PostgreSQL service container above.
+        # The suite wipes the application tables between tests, which is safe
+        # here because this database exists only for the job.
+        env:
+          TEST_DATABASE_URL: postgresql+psycopg://efinges:efinges@127.0.0.1:5432/efinges_test
         run: uv run pytest tests/integration
 
   frontend:
