@@ -16,7 +16,7 @@ EFINGES_SUBNET ?= 10.215.25.0/24
 COMPOSE ?= docker compose
 
 .PHONY: install run test build \
-	backend-install backend-run backend-test \
+	backend-install backend-run backend-test backend-migrate backend-revision \
 	frontend-install frontend-run frontend-test frontend-build \
 	up down logs url
 
@@ -31,6 +31,12 @@ test: backend-test frontend-test
 
 ## Build the frontend for production
 build: frontend-build
+
+## Apply the database migrations (alembic upgrade head)
+migrate: backend-migrate
+
+## Create a new migration from the current models (use m="message")
+revision: backend-revision
 
 ## Build and start the full stack (backend, frontend, postgres, observability)
 up:
@@ -66,6 +72,12 @@ backend-run:
 
 backend-test:
 	cd $(BACKEND_DIR) && uv run pytest
+
+backend-migrate:
+	cd $(BACKEND_DIR) && uv run alembic upgrade head
+
+backend-revision:
+	cd $(BACKEND_DIR) && uv run alembic revision --autogenerate -m "$(m)"
 
 frontend-install:
 	cd $(FRONTEND_DIR) && npm install

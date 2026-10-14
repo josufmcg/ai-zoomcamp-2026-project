@@ -117,6 +117,20 @@ make build     # type-check and build the frontend for production
 
 See `backend/README.md` and `frontend/README.md` for the individual commands.
 
+## Database
+
+The backend uses SQLAlchemy 2.0 with Alembic migrations. The property hierarchy
+is Community → Building → Unit (apartment, garage, or storage), with shared
+tags that managers can attach to buildings and units.
+
+```bash
+make migrate   # apply the migrations to the configured database
+make revision m="describe the change"   # create a migration from the models
+```
+
+`DATABASE_URL` configures the application and Alembic; `TEST_DATABASE_URL`
+configures the test suite and defaults to an in-memory SQLite database.
+
 ## Scope
 
 Cloud deployment is intentionally out of scope: the system runs locally with

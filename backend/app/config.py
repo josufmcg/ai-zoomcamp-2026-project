@@ -22,6 +22,12 @@ class Settings(BaseSettings):
     # development; production and Docker use PostgreSQL.
     database_url: str = "sqlite:///./efinges.db"
 
+    # SQLAlchemy database URL used by the test suite. Kept separate from
+    # ``database_url`` so tests never touch the development database. The
+    # default is an in-memory SQLite database; integration tests can point
+    # this at a dedicated PostgreSQL database.
+    test_database_url: str = "sqlite:///:memory:"
+
     # Secret used to sign JWTs. The default is a development-only value;
     # production must set a strong random SECRET_KEY.
     secret_key: str = "dev-only-secret-key-change-me"

@@ -11,6 +11,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.config import Settings, get_settings
+from app.database import Database
 from app.telemetry import RequestMetricsMiddleware, Telemetry
 
 
@@ -18,6 +19,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     """Build and return a configured FastAPI application."""
     settings = settings or get_settings()
     telemetry = Telemetry(settings)
+    database = Database(settings.database_url)
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -26,10 +28,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         telemetry.log_startup()
         yield
         telemetry.shutdown()
+        database.dispose()
 
     app = FastAPI(title="EFINGES API", version="0.1.0", lifespan=lifespan)
     app.state.settings = settings
     app.state.telemetry = telemetry
+    app.state.db = database
 
     # Count every request by matched route and response status code.
     app.add_middleware(RequestMetricsMiddleware, telemetry=telemetry)
