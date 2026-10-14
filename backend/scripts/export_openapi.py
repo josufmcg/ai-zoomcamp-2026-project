@@ -11,6 +11,7 @@ change, so the document is dumped with sorted keys and a stable block style.
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 from typing import Any
@@ -54,8 +55,30 @@ def write_schema(output: Path = DEFAULT_OUTPUT, app: FastAPI | None = None) -> P
     return output
 
 
+def check_schema(output: Path = DEFAULT_OUTPUT, app: FastAPI | None = None) -> bool:
+    """Return whether the checked-in schema matches the current application."""
+    return output.is_file() and output.read_text(encoding="utf-8") == render_yaml(build_schema(app))
+
+
 def main() -> None:
-    """Entry point for ``python -m scripts.export_openapi`` and ``make openapi``."""
+    """Export the schema, or check that the committed contract is up to date."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="fail instead of writing when the committed contract is stale",
+    )
+    args = parser.parse_args()
+
+    if args.check:
+        if not check_schema():
+            parser.exit(
+                1,
+                "openapi.yaml is missing or stale; run `make openapi` to update it\n",
+            )
+        print("openapi.yaml matches the current backend schema")
+        return
+
     path = write_schema()
     print(f"Wrote {path.relative_to(REPOSITORY_ROOT)}")
 

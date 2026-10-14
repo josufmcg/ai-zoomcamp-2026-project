@@ -21,7 +21,7 @@ COMPOSE ?= docker compose
 # control; the default matches the compose postgres on its published port.
 INTEGRATION_DATABASE_URL ?= postgresql+psycopg://efinges:efinges@127.0.0.1:$(POSTGRES_PORT)/efinges_test
 
-.PHONY: install run test build lint \
+.PHONY: install run test build lint openapi-check \
 	backend-install backend-run backend-test backend-test-integration \
 	backend-migrate backend-revision backend-openapi backend-lint \
 	frontend-install frontend-run frontend-test frontend-build frontend-lint \
@@ -59,6 +59,10 @@ revision: backend-revision
 
 ## Export the FastAPI OpenAPI schema to openapi.yaml at the repository root
 openapi: backend-openapi
+
+## Verify openapi.yaml matches the backend application schema
+openapi-check:
+	cd $(BACKEND_DIR) && uv run python -m scripts.export_openapi --check
 
 ## Build and start the full stack (backend, frontend, postgres, observability)
 up:

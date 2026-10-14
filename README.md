@@ -260,6 +260,31 @@ Run it after every API change and commit the result. `cd backend && uv run
 pytest` fails if the committed file no longer matches the live schema, so a
 forgotten re-export is caught immediately.
 
+## AI assistant extensions
+
+Repository-specific assistant instructions are in `AGENTS.md`; reusable
+prompts and the bug-hunter profile are under `.github/prompts/` and
+`.github/agents/`. See [docs/agent-permissions.md](docs/agent-permissions.md)
+for permission boundaries and setup.
+
+Install and enable the local pre-commit checks:
+
+```bash
+python3 -m pip install pre-commit
+pre-commit install
+```
+
+The hooks scan staged additions for likely hard-coded credentials and verify
+the generated API contract:
+
+```bash
+make openapi-check   # fail if openapi.yaml needs to be regenerated
+```
+
+The optional stdio MCP server is launched from `backend/` with
+`uv run python -m scripts.mock_mcp_server`. It only publishes SQLAlchemy table
+and column metadata; it does not connect to the database or expose row data.
+
 ## Scope
 
 Cloud deployment is intentionally out of scope: the system runs locally with

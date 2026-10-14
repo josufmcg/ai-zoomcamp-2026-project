@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: staged-secret-check
+        name: Check staged additions for hard-coded secrets
+        entry: python3 backend/scripts/check_staged_secrets.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: openapi-contract
+        name: Check OpenAPI contract matches backend
+        entry: make openapi-check
+        language: system
+        pass_filenames: false
+        always_run: true
