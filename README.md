@@ -265,7 +265,9 @@ forgotten re-export is caught immediately.
 Repository-specific assistant instructions are in `AGENTS.md`; reusable
 prompts and the bug-hunter profile are under `.github/prompts/` and
 `.github/agents/`. See [docs/agent-permissions.md](docs/agent-permissions.md)
-for permission boundaries and setup.
+for permission boundaries and setup. The record of how AI tools were used —
+prompts, context files, manual review, and verification — is in
+[docs/ai_workflow.md](docs/ai_workflow.md).
 
 Install and enable the local pre-commit checks:
 

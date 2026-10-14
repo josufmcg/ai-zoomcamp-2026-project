@@ -123,6 +123,30 @@ def test_ai_policy_covers_prompting_privacy_and_review() -> None:
     assert "credentials" in policy.lower()
 
 
+def test_ai_workflow_record_covers_prompts_context_and_verification() -> None:
+    workflow = _read(REPOSITORY_ROOT / "docs" / "ai_workflow.md")
+
+    for marker in (
+        "## 3. Worked examples per phase",
+        "## 4. Verification evidence",
+    ):
+        assert marker in workflow, f"ai_workflow.md is missing {marker!r}"
+
+    # The record must name the reusable delegation templates and the context
+    # files the model is given, so a change can be reproduced.
+    for marker in (
+        "AGENTS.md",
+        "docs/specs.md",
+        "docs/architecture.md",
+        "implement-backlog-task.prompt.md",
+        "make openapi",
+    ):
+        assert marker in workflow, f"ai_workflow.md is missing {marker!r}"
+
+    # Every phase must carry a concrete example (prompt -> result -> correction).
+    assert workflow.count("**Correction") >= 5
+
+
 def test_makefile_exposes_a_security_target() -> None:
     makefile = _read(REPOSITORY_ROOT / "Makefile")
 

@@ -9,7 +9,7 @@ EFINGES is a residential property management platform for property management fi
 - `backend/`: FastAPI, SQLAlchemy, Alembic. Use `uv` for dependencies and commands. Models live in `backend/app/models/` and schemas in `backend/app/schemas/`, both split by area and re-exported for short imports.
 - `frontend/`: React + Vite + TypeScript + Tailwind. Follow the scripts in its `package.json`.
 - `observability/`: OpenTelemetry Collector, Prometheus, Loki, Tempo, and Grafana configuration.
-- `docs/`: functional spec, architecture, backlog, AI policy.
+- `docs/`: functional spec, architecture, backlog, AI policy, and the AI workflow record (`docs/ai_workflow.md`).
 - `security/`: scan reports and audit artifacts.
 - `openapi.yaml`: exported API contract at the repository root; the single source of truth for the API surface. Regenerate with `make openapi`; `backend/tests/test_openapi_contract.py` fails if it drifts.
 
@@ -67,6 +67,9 @@ Some commands only exist once the corresponding backlog tasks are done; never ru
 - Review and treat as untrusted every AI-produced change: check the diff, run
   the relevant tests, and follow `docs/ai_policy.md` and the checklist in
   `.github/pull_request_template.md` before accepting it.
+- Record what a change was asked for: keep the prompt, the context files given,
+  the review, and the verification in `docs/ai_workflow.md` so AI-assisted work
+  stays auditable.
 - Real troubleshooting sessions with the stack are recorded in
   `docs/operations.md`; add a concise entry when you solve a new operational
   problem.
