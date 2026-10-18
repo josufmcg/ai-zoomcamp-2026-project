@@ -14,8 +14,11 @@ describe("navigation shell", () => {
 
     const nav = screen.getByRole("navigation", { name: "Main navigation" });
     expect(nav).toHaveTextContent("Overview");
-    expect(nav).toHaveTextContent("My units");
-    expect(nav).not.toHaveTextContent("My properties");
+    expect(nav).toHaveTextContent("My properties");
+    expect(nav).toHaveTextContent("My bills");
+    expect(nav).toHaveTextContent("My incidences");
+    expect(nav).toHaveTextContent("Open initiatives");
+    expect(nav.querySelector('a[href="/manager/properties"]')).toBeNull();
     expect(nav).not.toHaveTextContent("Users");
   });
 
@@ -24,8 +27,12 @@ describe("navigation shell", () => {
 
     const nav = screen.getByRole("navigation", { name: "Main navigation" });
     expect(nav).toHaveTextContent("My properties");
+    expect(nav).toHaveTextContent("Assignments");
+    expect(nav).toHaveTextContent("Bills");
+    expect(nav).toHaveTextContent("Incidences");
+    expect(nav).toHaveTextContent("Initiatives");
     expect(nav).not.toHaveTextContent("Users");
-    expect(nav).not.toHaveTextContent("My units");
+    expect(nav.querySelector('a[href="/resident/units"]')).toBeNull();
   });
 
   it("shows an administrator only the administrator links", () => {
@@ -33,8 +40,9 @@ describe("navigation shell", () => {
 
     const nav = screen.getByRole("navigation", { name: "Main navigation" });
     expect(nav).toHaveTextContent("Users");
-    expect(nav).not.toHaveTextContent("My units");
-    expect(nav).not.toHaveTextContent("My properties");
+    expect(nav).toHaveTextContent("Global overview");
+    expect(nav.querySelector('a[href="/resident/units"]')).toBeNull();
+    expect(nav.querySelector('a[href="/manager/properties"]')).toBeNull();
   });
 
   it("filters the navigation model exactly as the rendered shell does", () => {
@@ -44,6 +52,9 @@ describe("navigation shell", () => {
       for (const item of navItemsForRole(role)) {
         expect(nav).toHaveTextContent(item.label);
       }
+      expect(nav.querySelectorAll("svg")).toHaveLength(
+        navItemsForRole(role).length,
+      );
       unmount();
     }
   });
@@ -56,6 +67,7 @@ describe("navigation shell", () => {
 
     expect(screen.getByText("ana@efinges.test")).toBeInTheDocument();
     expect(screen.getByTestId("current-role")).toHaveTextContent("manager");
+    expect(document.querySelector("header svg")).toBeInTheDocument();
   });
 });
 

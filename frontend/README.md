@@ -42,9 +42,10 @@ VITE_API_URL=http://localhost:9000
 | `/login` | signed out | Email and password form (`POST /auth/token`) |
 | `/` | any | Redirects to the role's home screen, or to `/login` |
 | `/overview` | any signed-in role | Shared landing screen |
-| `/resident` | resident | Resident screens: units, bills, incidences, open initiatives |
-| `/manager` | manager | Manager screens: property tree, assignments, bills, incidences, initiatives |
-| `/admin` | administrator | Administrator screens: user management and the global property overview |
+| `/resident/units`, `/resident/bills`, `/resident/incidences`, `/resident/initiatives` | resident | Separate properties, bills, incidences, and open initiatives screens |
+| `/manager/properties`, `/manager/assignments`, `/manager/bills`, `/manager/incidences`, `/manager/initiatives` | manager | Separate property tree, assignments, bills, incidences, and initiatives screens |
+| `/admin/users`, `/admin/properties` | administrator | Separate user management and global property overview screens |
+| `/resident`, `/manager`, `/admin` | matching role | Redirects to that role's first screen |
 | `/forbidden` | any signed-in role | Shown when a role lacks access |
 
 Guarding lives in `src/auth/RequireAuth.tsx`: a signed-out visitor is redirected
@@ -58,24 +59,24 @@ model filtered by role, so the shell and the tests agree on what each role sees.
 
 ## Resident screens (backlog task 15)
 
-The resident home screen stacks four independent sections, each of which loads
-its own data through the shared API client and renders its own loading, error,
-and empty state:
+The resident's four areas are separate sidebar destinations and routes. Each
+screen loads its own data through the shared API client and renders its own
+loading, error, and empty state:
 
-- **Assigned units** — `GET /auth/me/units`, showing the ownership flag and tags.
+- **My properties** — `GET /auth/me/units`, showing the ownership flag and tags.
 - **My bills** — `GET /bills`, with a status filter that includes the computed
   `overdue` status. The backend computes `overdue` from the due date (a pending
   bill past its due date); the frontend only selects on the value it was sent
   and never derives a status from dates itself.
 - **My incidences** — `GET /incidences` with an embedded comment thread per
-  incidence, a form to report a new incidence against an owned unit, and a
+  incidence, a form to report a new incidence against a property you own or rent, and a
   comment box per thread. The status is manager-controlled, so the resident
   screen shows it but never offers to change it.
 - **Open initiatives** — `GET /initiatives?is_open=true` plus
   `GET /initiatives/{id}/eligible-units`. Voting is **one ballot per eligible
-owned unit**, so the form submits one `POST /initiatives/{id}/votes` request per
-  unit the resident selected; a unit that already voted is shown as voted and is
-  never sent a second ballot.
+property** (stored as a unit by the API), so the form submits one
+`POST /initiatives/{id}/votes` request per property the resident selected; a
+property that already voted is shown as voted and is never sent a second ballot.
 
 The two rules that need focused tests live in their own modules:
 `src/pages/resident/billFilter.ts` (the status filter) and
@@ -84,18 +85,18 @@ with the corresponding `*.test.ts` files and component-level tests beside them.
 
 ## Manager screens (backlog task 16)
 
-The manager home screen stacks five independent sections, each loading its own
-data through the shared API client and rendering its own loading, error, and
-empty state:
+The manager's five areas are separate sidebar destinations and routes. Each
+screen loads its own data through the shared API client and renders its own
+loading, error, and empty state:
 
 - **Property tree** — `GET /communities`, `GET /buildings`, `GET /units`, and
-  `GET /tags`, grouped in memory into communities → buildings → units. A manager
-  adds buildings to a community and units to a building, and edits the tags of a
-  building or unit. Every write refreshes the affected lists, so the tree always
+  `GET /tags`, grouped in memory into communities → buildings → properties. A manager
+  adds buildings to a community and properties to a building, and edits the tags
+  of a building or property. Every write refreshes the affected lists, so the tree always
   shows what the backend stored rather than an optimistic guess.
 - **Resident assignments** — `GET /assignments` with a form to assign an active
   resident (`GET /residents`, a manager-accessible directory that never exposes
-  the administrator-only `/users` endpoints) to one of the manager's units, and
+  the administrator-only `/users` endpoints) to one of the manager's properties, and
   a remove action.
 - **Bills** — `GET /bills` (scoped to the manager's communities by the backend)
   with a form to issue a manual bill (`POST /bills`) and a "Mark paid" action
@@ -107,20 +108,22 @@ empty state:
   immediate next stage, and a reply box per thread.
 - **Initiatives** — `GET /initiatives` with the options and running ballot
   counts, and a form to create a new initiative with two or more options and an
-  eligible scope filter over communities, buildings, unit types, and tags
-  (`POST /initiatives`).
+  eligible scope filter over communities, buildings, property types, and tags
+  (`POST /initiatives`). Property wording in the interface maps to the API's
+  existing unit terminology.
 
 The two rules that need focused tests live in their own modules:
 `src/pages/manager/incidenceStatus.ts` mirrors the backend lifecycle so the
 screen only offers a legal transition, and
 `src/pages/manager/initiativeScope.ts` validates an initiative draft and turns it
 into the request body (the scope combines with AND, and an empty scope means
-"every unit"). Both have `*.test.ts` files beside them, with component-level
+"every property"; the API represents each property as a unit). Both have
+`*.test.ts` files beside them, with component-level
 tests for the transition controls and the scope form.
 
 ## Administrator screens (backlog task 17)
 
-The administrator home screen stacks two independent sections:
+The administrator's two areas are separate sidebar destinations and routes:
 
 - **User accounts** — `GET /users` with filters by role and activation state, a
   form to create an account (`POST /users`), a role selector per row
@@ -198,6 +201,7 @@ src/
     ResidentHomePage.tsx  # resident screen container (task 15)
     ManagerHomePage.tsx   # manager screen container (task 16)
     AdminHomePage.tsx     # administrator screen container (task 17)
+    SectionPages.tsx      # dedicated routes for the additional role sections
     components.tsx        # shared presentational pieces
     format.ts             # role, unit type, ownership, date, and money formatters
     resident/

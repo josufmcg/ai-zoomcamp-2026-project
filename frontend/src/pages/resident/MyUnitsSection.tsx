@@ -1,5 +1,5 @@
 /**
- * "My units" resident section (backlog task 15).
+ * The resident's properties (backlog task 15).
  *
  * Lists the units assigned to the signed-in resident via `GET /auth/me/units`,
  * showing the ownership flag and the tags so the resident can tell an owned
@@ -20,12 +20,12 @@ export function MyUnitsSection() {
 
   return (
     <SectionCard
-      title="Assigned units"
-      description="The apartments, garages, and storage units assigned to you."
+      title="Properties assigned to you"
+      description="Apartments, garages, and storage properties linked to your account."
     >
       <AsyncSection
         state={units}
-        emptyMessage="You have no units assigned yet. Ask your manager to assign one."
+        emptyMessage="You have no properties linked to you yet. Ask your manager for help."
         render={(rows) => (
           <ul className="flex flex-col gap-3" data-testid="my-units">
             {rows.map((unit) => (

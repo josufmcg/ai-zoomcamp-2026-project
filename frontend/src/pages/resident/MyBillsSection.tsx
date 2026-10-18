@@ -1,7 +1,7 @@
 /**
  * "My bills" resident section (backlog task 15).
  *
- * Shows the bills for the resident's own units with a status filter that
+ * Shows the bills for the resident's own properties with a status filter that
  * includes the computed `overdue` status. The backend already computed that
  * status (a pending bill past its due date), so this section only *selects* the
  * rows it was sent — it never derives a status from the dates itself. The
@@ -56,7 +56,7 @@ export function MyBillsSection() {
   return (
     <SectionCard
       title="My bills"
-      description="Bills issued for your units. Overdue is computed from the due date."
+      description="Bills issued for your properties. Overdue is computed from the due date."
     >
       <div
         className="mb-4 flex flex-wrap gap-2"

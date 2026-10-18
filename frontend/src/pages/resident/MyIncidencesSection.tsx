@@ -1,7 +1,7 @@
 /**
  * "My incidences" resident section (backlog task 15).
  *
- * A resident reports maintenance issues against their own units and discusses
+ * A resident reports maintenance issues against their own properties and discusses
  * them with managers in a single comment thread per incidence. The list
  * endpoint scopes to the caller and embeds each thread, so one fetch renders
  * the whole section; creating an incidence or posting a comment refreshes it.
@@ -171,7 +171,7 @@ export function MyIncidencesSection() {
     }
     const parsedUnitId = Number(unitId);
     if (!parsedUnitId || !title.trim() || !description.trim()) {
-      setError("Choose a unit and fill in both fields.");
+      setError("Choose a property and fill in both fields.");
       return;
     }
     setSubmitting(true);
@@ -205,14 +205,14 @@ export function MyIncidencesSection() {
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-            Unit
+            Property
             <select
-              aria-label="Unit"
+              aria-label="Property"
               value={unitId}
               onChange={(event) => setUnitId(event.target.value)}
               className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
             >
-              <option value="">Select a unit…</option>
+              <option value="">Select a property…</option>
               {unitOptions.map((unit) => (
                 <option key={unit.id} value={unit.id}>
                   {unit.identifier}

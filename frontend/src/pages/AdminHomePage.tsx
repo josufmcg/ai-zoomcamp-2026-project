@@ -1,29 +1,23 @@
 /**
- * Administrator home screen (backlog task 17).
+ * Administrator user management page (backlog task 17).
  *
- * The single route an administrator reaches from the sidebar. It stacks the two
- * administrator concerns — user management and a read-only view of the whole
- * property tree — as independent sections, each loading its own data through
- * the shared API client so one failing endpoint never blanks the other.
+ * The firm-wide property overview has its own route.
  */
 
-import { GlobalOverviewSection } from "./admin/GlobalOverviewSection";
 import { UsersSection } from "./admin/UsersSection";
+import { PageHeading } from "./components";
 
 export function AdminHomePage() {
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-          Users
-        </h1>
+        <PageHeading title="Users" icon="users" />
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-          Manage accounts and roles, and see every community in the firm.
+          Manage accounts, roles, and access to the platform.
         </p>
       </header>
 
       <UsersSection />
-      <GlobalOverviewSection />
     </div>
   );
 }

@@ -2,8 +2,8 @@
  * "Open initiatives" resident section (backlog task 15).
  *
  * Lists the initiatives that are open for voting and, for each one, the
- * caller's eligible units. Voting is **one ballot per eligible owned unit**, so
- * the form lets the resident pick an option for every unit they hold and
+ * caller's eligible properties. Voting is **one ballot per eligible owned property**, so
+ * the form lets the resident pick an option for every property they hold and
  * submits one request per unit. The selection and submit rules live in
  * {@link ./ballot} and are unit tested there.
  *
@@ -120,7 +120,7 @@ function InitiativeVoteCard({ initiative }: { initiative: Initiative }) {
 
       <AsyncSection
         state={eligible}
-        emptyMessage="None of your units are eligible to vote in this initiative."
+        emptyMessage="None of your properties are eligible to vote in this initiative."
         render={() => (
           <form className="mt-3 flex flex-col gap-3" onSubmit={handleSubmit}>
             <ul className="flex flex-col gap-2" data-testid={`eligible-${initiative.id}`}>
@@ -163,8 +163,10 @@ function InitiativeVoteCard({ initiative }: { initiative: Initiative }) {
                 </button>
                 <span className="text-sm text-slate-600 dark:text-slate-400" data-testid={`pending-${initiative.id}`}>
                   {openUnits.length === 0
-                    ? "All your eligible units have voted."
-                    : `${pending.length} of ${openUnits.length} unit(s) selected.`}
+                    ? "All your eligible properties have voted."
+                    : `${pending.length} of ${openUnits.length} ${
+                        openUnits.length === 1 ? "property" : "properties"
+                      } selected.`}
                 </span>
               </div>
             )}
@@ -175,7 +177,7 @@ function InitiativeVoteCard({ initiative }: { initiative: Initiative }) {
   );
 }
 
-/** One unit row: an option picker when it may vote, a summary when it has. */
+/** One property row: an option picker when it may vote, a summary when it has. */
 function EligibleUnitRow({
   unit,
   options,
@@ -215,7 +217,7 @@ function EligibleUnitRow({
         <div className="flex flex-wrap items-center gap-2">
           <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
             <span className="sr-only">
-              Option for {unit.unit_identifier}
+              Option for property {unit.unit_identifier}
             </span>
             <select
               aria-label={`Option for ${unit.unit_identifier}`}
@@ -255,7 +257,7 @@ export function OpenInitiativesSection() {
   return (
     <SectionCard
       title="Open initiatives"
-      description="Community votes you can take part in. You cast one ballot per eligible unit."
+      description="Community votes you can take part in. You cast one ballot per eligible property."
     >
       <AsyncSection
         state={initiatives}

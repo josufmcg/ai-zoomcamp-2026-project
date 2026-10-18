@@ -112,10 +112,10 @@ describe("PropertyTreeSection", () => {
 
     await waitFor(() => expect(screen.getByTestId("building-5")).toBeInTheDocument());
 
-    await user.click(screen.getByRole("button", { name: "Add unit" }));
-    await user.type(screen.getByLabelText("Unit identifier"), "G-01");
-    await user.selectOptions(screen.getByLabelText("Unit type"), "garage");
-    await user.click(screen.getByRole("button", { name: "Create unit" }));
+    await user.click(screen.getByRole("button", { name: "Add property" }));
+    await user.type(screen.getByLabelText("Property identifier"), "G-01");
+    await user.selectOptions(screen.getByLabelText("Property type"), "garage");
+    await user.click(screen.getByRole("button", { name: "Create property" }));
 
     await waitFor(() => expect(units).toHaveLength(1));
     expect(units[0]).toMatchObject({

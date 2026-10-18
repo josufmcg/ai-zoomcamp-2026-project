@@ -6,8 +6,8 @@
  * {@link ./initiativeScope}, so this component only owns the form state and
  * renders the eligibility filters it is handed.
  *
- * The scope is a filter over communities, buildings, unit types, and tags. Its
- * keys combine with AND and leaving them all empty means "every unit", which the
+ * The scope is a filter over communities, buildings, property types, and tags. Its
+ * keys combine with AND and leaving them all empty means "every property", which the
  * screen states explicitly so a manager cannot accidentally target the whole
  * portfolio when they meant one building.
  */
@@ -89,7 +89,7 @@ function ScopeSummary({ scope }: { scope: Initiative["scope"] }) {
   }
   return (
     <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-      Eligible: {parts.length === 0 ? "every unit" : parts.join(" · ")}
+      Eligible: {parts.length === 0 ? "every property" : parts.join(" · ")}
     </p>
   );
 }
@@ -255,12 +255,12 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
 
       <fieldset className="rounded-md border border-slate-200 p-3 dark:border-slate-700">
         <legend className="px-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Eligible units
+          Eligible properties
         </legend>
         <p className="mb-2 text-xs text-slate-500 dark:text-slate-400">
           {isEveryUnit(draft.scope)
-            ? "No filters — every unit is eligible to vote."
-            : "Only units matching all of the filters below may vote."}
+            ? "No filters — every property is eligible to vote."
+            : "Only properties matching all of the filters below may vote."}
         </p>
         <div className="flex flex-col gap-3">
           <div>
@@ -321,7 +321,7 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
 
           <div>
             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Unit types
+              Property types
             </span>
             <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
               {UNIT_TYPES.map((type: UnitType) => (
@@ -388,7 +388,7 @@ export function InitiativesSection() {
   return (
     <SectionCard
       title="Initiatives"
-      description="Community votes and their ballot counts. Create one with options and an eligible unit scope."
+      description="Community votes and their ballot counts. Create one with options and an eligible property scope."
     >
       <NewInitiativeForm onCreated={initiatives.reload} />
 

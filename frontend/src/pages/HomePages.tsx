@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { homePathForRole } from "../auth/navigation";
 import { Card, CenteredPanel } from "./components";
+import { PageHeading } from "./components";
 
 function OverviewSection() {
   const { user } = useAuth();
@@ -20,8 +21,8 @@ function OverviewSection() {
   }
 
   const tasksByRole = {
-    resident: "Task 15 adds units, bills, incidences, and open initiatives.",
-    manager: "Task 16 adds properties, assignments, bills, incidences, and initiatives.",
+    resident: "Manage your properties, bills, maintenance reports, and community votes.",
+    manager: "Manage properties, resident assignments, bills, maintenance reports, and community initiatives.",
     administrator: "Your screens manage user accounts and show the global property tree.",
   } as const;
 
@@ -46,9 +47,7 @@ function OverviewSection() {
 export function OverviewPage() {
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-        Overview
-      </h1>
+      <PageHeading title="Overview" icon="overview" />
       <OverviewSection />
     </div>
   );
@@ -69,7 +68,7 @@ export function ForbiddenPage() {
             : "You are not signed in."}
         </p>
         <Link
-          className="mt-4 inline-block rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
+          className="mt-4 inline-block rounded-md bg-rose-800 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 dark:bg-rose-700 dark:hover:bg-rose-600"
           to={user ? homePathForRole(user.role) : "/login"}
         >
           Back to my home screen

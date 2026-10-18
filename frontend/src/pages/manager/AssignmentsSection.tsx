@@ -117,7 +117,7 @@ export function AssignmentsSection() {
     const parsedUser = Number(userId);
     const parsedUnit = Number(unitId);
     if (!parsedUser || !parsedUnit) {
-      setError("Choose a resident and a unit.");
+      setError("Choose a resident and a property.");
       return;
     }
     setSaving(true);
@@ -134,7 +134,7 @@ export function AssignmentsSection() {
       assignments.reload();
     } catch (cause) {
       setError(
-        cause instanceof Error ? cause.message : "Unable to assign the unit.",
+        cause instanceof Error ? cause.message : "Unable to assign the property.",
       );
     } finally {
       setSaving(false);
@@ -144,7 +144,7 @@ export function AssignmentsSection() {
   return (
     <SectionCard
       title="Resident assignments"
-      description="Assign a resident to one of your units, or remove an existing assignment."
+      description="Link a resident to one of your properties, or remove an existing assignment."
     >
       <form
         className="mb-5 grid gap-3 rounded-md border border-slate-200 p-4 sm:grid-cols-3 dark:border-slate-700"
@@ -167,14 +167,14 @@ export function AssignmentsSection() {
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Unit
+          Property
           <select
-            aria-label="Unit"
+            aria-label="Property"
             value={unitId}
             onChange={(event) => setUnitId(event.target.value)}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           >
-            <option value="">Select a unit…</option>
+            <option value="">Select a property…</option>
             {unitOptions.map((unit) => (
               <option key={unit.id} value={unit.id}>
                 {unit.identifier} ({unitTypeLabel(unit.unit_type)})
@@ -217,7 +217,7 @@ export function AssignmentsSection() {
 
       <AsyncSection
         state={assignments}
-        emptyMessage="No residents are assigned to units yet."
+        emptyMessage="No residents are linked to properties yet."
         render={(rows) => (
           <ul className="flex flex-col gap-3" data-testid="assignment-list">
             {rows.map((assignment) => (

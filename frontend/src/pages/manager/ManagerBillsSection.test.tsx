@@ -101,10 +101,10 @@ describe("ManagerBillsSection", () => {
     );
 
     await waitFor(() =>
-      expect(screen.getByLabelText("Bill unit")).toHaveTextContent("A-101"),
+      expect(screen.getByLabelText("Bill property")).toHaveTextContent("A-101"),
     );
 
-    await user.selectOptions(screen.getByLabelText("Bill unit"), "10");
+    await user.selectOptions(screen.getByLabelText("Bill property"), "10");
     await user.type(screen.getByLabelText("Amount"), "99.90");
     await user.type(screen.getByLabelText("Bill description"), "Water");
     await user.type(screen.getByLabelText("Due date"), "2026-03-01");

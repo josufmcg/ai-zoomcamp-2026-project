@@ -86,7 +86,7 @@ describe("GlobalOverviewSection", () => {
       expect(screen.getByTestId("overview-building-6")).toBeInTheDocument(),
     );
 
-    expect(screen.getByTestId("overview-building-6")).toHaveTextContent("No units.");
+    expect(screen.getByTestId("overview-building-6")).toHaveTextContent("No properties.");
   });
 
   it("shows a note for a community with no buildings", async () => {

@@ -61,7 +61,7 @@ function BuildingItem({
         ))}
         {units.length === 0 && (
           <li className="py-1 text-sm text-slate-500 dark:text-slate-400">
-            No units.
+            No properties.
           </li>
         )}
       </ul>
@@ -100,7 +100,7 @@ export function GlobalOverviewSection() {
   return (
     <SectionCard
       title="Global property overview"
-      description="Every community, building, and unit in the firm. Read-only."
+      description="Every community, building, and property in the firm. Read-only."
     >
       <AsyncSection
         state={communities}

@@ -9,6 +9,17 @@
 
 import type { UserRole } from "../types/auth";
 
+/** Icon used to identify a section in the navigation. */
+export type NavIconName =
+  | "overview"
+  | "units"
+  | "properties"
+  | "users"
+  | "assignments"
+  | "bills"
+  | "incidences"
+  | "initiatives";
+
 /** Every role, used for links that all signed-in users can see. */
 export const ALL_ROLES: readonly UserRole[] = [
   "administrator",
@@ -22,6 +33,8 @@ export interface NavItem {
   label: string;
   /** Route the link points at, absolute. */
   to: string;
+  /** Icon used alongside the visible label. */
+  icon: NavIconName;
   /** Roles that see the link and may open the route. */
   roles: readonly UserRole[];
 }
@@ -34,10 +47,58 @@ export interface NavItem {
  * the entry points to those tasks' screens.
  */
 export const NAV_ITEMS: readonly NavItem[] = [
-  { label: "Overview", to: "/overview", roles: ALL_ROLES },
-  { label: "My units", to: "/resident", roles: ["resident"] },
-  { label: "My properties", to: "/manager", roles: ["manager"] },
-  { label: "Users", to: "/admin", roles: ["administrator"] },
+  { label: "Overview", to: "/overview", icon: "overview", roles: ALL_ROLES },
+  {
+    label: "My properties",
+    to: "/resident/units",
+    icon: "units",
+    roles: ["resident"],
+  },
+  { label: "My bills", to: "/resident/bills", icon: "bills", roles: ["resident"] },
+  {
+    label: "My incidences",
+    to: "/resident/incidences",
+    icon: "incidences",
+    roles: ["resident"],
+  },
+  {
+    label: "Open initiatives",
+    to: "/resident/initiatives",
+    icon: "initiatives",
+    roles: ["resident"],
+  },
+  {
+    label: "My properties",
+    to: "/manager/properties",
+    icon: "properties",
+    roles: ["manager"],
+  },
+  {
+    label: "Assignments",
+    to: "/manager/assignments",
+    icon: "assignments",
+    roles: ["manager"],
+  },
+  { label: "Bills", to: "/manager/bills", icon: "bills", roles: ["manager"] },
+  {
+    label: "Incidences",
+    to: "/manager/incidences",
+    icon: "incidences",
+    roles: ["manager"],
+  },
+  {
+    label: "Initiatives",
+    to: "/manager/initiatives",
+    icon: "initiatives",
+    roles: ["manager"],
+  },
+  { label: "Users", to: "/admin/users", icon: "users", roles: ["administrator"] },
+  {
+    label: "Global overview",
+    to: "/admin/properties",
+    icon: "properties",
+    roles: ["administrator"],
+  },
 ];
 
 /** Return the navigation entries visible to `role`. */
@@ -49,11 +110,11 @@ export function navItemsForRole(role: UserRole): NavItem[] {
 export function homePathForRole(role: UserRole): string {
   switch (role) {
     case "administrator":
-      return "/admin";
+      return "/admin/users";
     case "manager":
-      return "/manager";
+      return "/manager/properties";
     case "resident":
-      return "/resident";
+      return "/resident/units";
   }
 }
 

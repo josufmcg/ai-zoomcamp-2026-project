@@ -111,9 +111,20 @@ describe("login page", () => {
     vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
       await gate;
       const url = String(input);
-      return url.endsWith("/auth/token")
-        ? jsonResponse({ access_token: "jwt-from-login" })
-        : jsonResponse(PROFILE);
+      if (url.endsWith("/auth/token")) {
+        return jsonResponse({ access_token: "jwt-from-login" });
+      }
+      if (url.endsWith("/auth/me")) {
+        return jsonResponse(PROFILE);
+      }
+      if (
+        ["/communities", "/buildings", "/units", "/tags"].some((path) =>
+          url.endsWith(path),
+        )
+      ) {
+        return jsonResponse([]);
+      }
+      throw new Error(`Unexpected request to ${url}`);
     });
 
     renderApp(null, "/login");

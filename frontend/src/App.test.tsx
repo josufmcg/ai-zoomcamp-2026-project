@@ -40,7 +40,9 @@ describe("route guarding", () => {
   it("allows a resident onto the resident route", () => {
     renderAs("resident", "/resident");
 
-    expect(screen.getByRole("heading", { name: "My units" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "My properties", level: 1 }),
+    ).toBeInTheDocument();
   });
 
   it("allows a manager onto the manager route", () => {
@@ -53,6 +55,49 @@ describe("route guarding", () => {
     renderAs("administrator", "/admin");
 
     expect(screen.getByRole("heading", { name: "Users" })).toBeInTheDocument();
+  });
+
+  it("opens a manager subsection directly and marks it active in navigation", () => {
+    renderAs("manager", "/manager/bills");
+
+    expect(
+      screen.getByRole("heading", { name: "Bill management", level: 1 }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Bill management", level: 1 })
+        .querySelector("svg"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Bills" }),
+    ).toHaveAttribute("aria-current", "page");
+    expect(
+      screen.queryByRole("heading", { name: "Resident assignments" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("opens resident and administrator subsections directly", () => {
+    const resident = renderAs("resident", "/resident/bills");
+    expect(
+      screen.getByRole("heading", { name: "Bills", level: 1 }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "My bills" }),
+    ).toHaveAttribute("aria-current", "page");
+    resident.unmount();
+
+    renderAs("administrator", "/admin/properties");
+    expect(
+      screen.getByRole("heading", { name: "Global overview", level: 1 }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Global overview" }),
+    ).toHaveAttribute("aria-current", "page");
+  });
+
+  it("blocks other roles from a subsection route", () => {
+    renderAs("resident", "/manager/bills");
+
+    expect(screen.getByRole("heading", { name: "Not allowed" })).toBeInTheDocument();
   });
 
   it("sends an already signed-in user from /login to their home screen", () => {

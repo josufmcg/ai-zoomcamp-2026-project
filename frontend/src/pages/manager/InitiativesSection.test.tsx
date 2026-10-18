@@ -74,7 +74,7 @@ describe("InitiativesSection", () => {
     await waitFor(() => expect(submit).toBeEnabled());
   });
 
-  it("states that an empty scope means every unit", async () => {
+  it("states that an empty scope means every property", async () => {
     mockApi();
     renderWithProviders(
       <InitiativesSection />,
@@ -86,7 +86,7 @@ describe("InitiativesSection", () => {
     // assertion.
     await screen.findByLabelText("Riverside");
     expect(
-      screen.getByText(/No filters — every unit is eligible to vote/i),
+      screen.getByText(/No filters — every property is eligible to vote/i),
     ).toBeInTheDocument();
   });
 

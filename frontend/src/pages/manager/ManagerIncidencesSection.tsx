@@ -219,7 +219,7 @@ export function ManagerIncidencesSection() {
   return (
     <SectionCard
       title="Incidences"
-      description="Maintenance requests for your units. Advance the lifecycle and reply in the thread."
+      description="Maintenance requests for your properties. Advance the lifecycle and reply in the thread."
     >
       <div
         className="mb-4 flex flex-wrap gap-2"
@@ -250,7 +250,7 @@ export function ManagerIncidencesSection() {
         state={incidences}
         emptyMessage={
           filter === "all"
-            ? "No incidences have been reported for your units."
+            ? "No incidences have been reported for your properties."
             : `No incidences are ${filter}.`
         }
         render={(rows) => (

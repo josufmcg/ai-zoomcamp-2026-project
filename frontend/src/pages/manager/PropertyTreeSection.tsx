@@ -167,7 +167,7 @@ function NewUnitForm({
       setOpen(false);
       onCreated();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to add unit.");
+      setError(cause instanceof Error ? cause.message : "Unable to add property.");
     } finally {
       setSaving(false);
     }
@@ -180,7 +180,7 @@ function NewUnitForm({
         onClick={() => setOpen(true)}
         className="text-xs font-medium text-slate-600 underline hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
       >
-        Add unit
+        Add property
       </button>
     );
   }
@@ -195,7 +195,7 @@ function NewUnitForm({
           Identifier
           <input
             type="text"
-            aria-label="Unit identifier"
+            aria-label="Property identifier"
             value={identifier}
             maxLength={100}
             onChange={(event) => setIdentifier(event.target.value)}
@@ -205,7 +205,7 @@ function NewUnitForm({
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
           Type
           <select
-            aria-label="Unit type"
+            aria-label="Property type"
             value={unitType}
             onChange={(event) => setUnitType(event.target.value as UnitType)}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
@@ -230,7 +230,7 @@ function NewUnitForm({
           disabled={saving || !identifier.trim()}
           className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
         >
-          {saving ? "Adding…" : "Create unit"}
+          {saving ? "Adding…" : "Create property"}
         </button>
         <button
           type="button"
@@ -370,7 +370,7 @@ export function PropertyTreeSection() {
   return (
     <SectionCard
       title="Property tree"
-      description="Your communities, buildings, and units. Add to the tree and label rows with tags."
+      description="Your communities, buildings, and properties. Add to the tree and label rows with tags."
     >
       <div className="mb-5 border-b border-slate-200 pb-5 dark:border-slate-700">
         <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">

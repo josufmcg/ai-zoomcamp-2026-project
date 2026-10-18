@@ -27,6 +27,16 @@ import {
 import LoginPage from "./pages/LoginPage";
 import ManagerHomePage from "./pages/ManagerHomePage";
 import ResidentHomePage from "./pages/ResidentHomePage";
+import {
+  AdminPropertiesPage,
+  ManagerAssignmentsPage,
+  ManagerBillsPage,
+  ManagerIncidencesPage,
+  ManagerInitiativesPage,
+  ResidentBillsPage,
+  ResidentIncidencesPage,
+  ResidentInitiativesPage,
+} from "./pages/SectionPages";
 
 /** Send a signed-in visitor from `/` to their home screen, others to `/login`. */
 function RedirectToHomeOrLogin() {
@@ -74,7 +84,39 @@ export default function App() {
           path="/resident"
           element={
             <RequireAuth roles={["resident"]}>
+              <Navigate to="/resident/units" replace />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/resident/units"
+          element={
+            <RequireAuth roles={["resident"]}>
               <ResidentHomePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/resident/bills"
+          element={
+            <RequireAuth roles={["resident"]}>
+              <ResidentBillsPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/resident/incidences"
+          element={
+            <RequireAuth roles={["resident"]}>
+              <ResidentIncidencesPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/resident/initiatives"
+          element={
+            <RequireAuth roles={["resident"]}>
+              <ResidentInitiativesPage />
             </RequireAuth>
           }
         />
@@ -82,7 +124,47 @@ export default function App() {
           path="/manager"
           element={
             <RequireAuth roles={["manager"]}>
+              <Navigate to="/manager/properties" replace />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/manager/properties"
+          element={
+            <RequireAuth roles={["manager"]}>
               <ManagerHomePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/manager/assignments"
+          element={
+            <RequireAuth roles={["manager"]}>
+              <ManagerAssignmentsPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/manager/bills"
+          element={
+            <RequireAuth roles={["manager"]}>
+              <ManagerBillsPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/manager/incidences"
+          element={
+            <RequireAuth roles={["manager"]}>
+              <ManagerIncidencesPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/manager/initiatives"
+          element={
+            <RequireAuth roles={["manager"]}>
+              <ManagerInitiativesPage />
             </RequireAuth>
           }
         />
@@ -90,7 +172,23 @@ export default function App() {
           path="/admin"
           element={
             <RequireAuth roles={["administrator"]}>
+              <Navigate to="/admin/users" replace />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <RequireAuth roles={["administrator"]}>
               <AdminHomePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/properties"
+          element={
+            <RequireAuth roles={["administrator"]}>
+              <AdminPropertiesPage />
             </RequireAuth>
           }
         />

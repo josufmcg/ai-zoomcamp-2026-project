@@ -1,8 +1,8 @@
 /**
  * Manager home screen tests (backlog task 16).
  *
- * The screen stacks five independent sections; this asserts the ones the route
- * test names and that the manager-only screens are reachable through it.
+ * The property tree is kept on its own page; the other manager screens have
+ * dedicated routes.
  */
 
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -51,7 +51,7 @@ describe("ManagerHomePage", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders the manager section headings", async () => {
+  it("renders the property tree without stacking other manager sections", async () => {
     mockEmptyApi();
     renderWithProviders(
       <ManagerHomePage />,
@@ -68,14 +68,14 @@ describe("ManagerHomePage", () => {
       ).toBeInTheDocument(),
     );
     expect(
-      screen.getByRole("heading", { name: "Resident assignments" }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Bills" })).toBeInTheDocument();
+      screen.queryByRole("heading", { name: "Resident assignments" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Bills" })).not.toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Incidences" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("heading", { name: "Incidences" }),
+    ).not.toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Initiatives" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("heading", { name: "Initiatives" }),
+    ).not.toBeInTheDocument();
   });
 });

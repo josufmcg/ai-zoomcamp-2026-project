@@ -1,8 +1,8 @@
 /**
  * Administrator home screen tests (backlog task 17).
  *
- * The screen stacks two independent sections; this asserts the page heading the
- * route test names and that both administrator sections render.
+ * User management is kept on its own page; the global property overview has a
+ * dedicated route.
  */
 
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -36,7 +36,7 @@ describe("AdminHomePage", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders the administrator section headings", async () => {
+  it("renders user management without the global property overview", async () => {
     mockEmptyApi();
     renderWithProviders(
       <AdminHomePage />,
@@ -51,7 +51,7 @@ describe("AdminHomePage", () => {
       ).toBeInTheDocument(),
     );
     expect(
-      screen.getByRole("heading", { name: "Global property overview" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("heading", { name: "Global property overview" }),
+    ).not.toBeInTheDocument();
   });
 });

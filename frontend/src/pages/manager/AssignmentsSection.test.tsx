@@ -95,7 +95,7 @@ describe("AssignmentsSection", () => {
     );
 
     await user.selectOptions(screen.getByLabelText("Resident"), "3");
-    await user.selectOptions(screen.getByLabelText("Unit"), "10");
+    await user.selectOptions(screen.getByLabelText("Property"), "10");
     await user.selectOptions(screen.getByLabelText("Ownership"), "tenant");
     await user.click(screen.getByRole("button", { name: "Assign resident" }));
 

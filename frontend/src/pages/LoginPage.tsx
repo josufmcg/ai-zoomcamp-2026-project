@@ -11,6 +11,7 @@
 import { useState, type FormEvent } from "react";
 
 import { useAuth } from "../auth/AuthContext";
+import { BuildingMark } from "../components/Icons";
 import { ApiError } from "../services";
 import { Card, CenteredPanel } from "./components";
 
@@ -48,7 +49,8 @@ export default function LoginPage() {
   return (
     <CenteredPanel>
       <header className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+        <BuildingMark className="mx-auto h-14 w-14 text-rose-800" />
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
           EFINGES
         </h1>
         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
@@ -67,7 +69,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-rose-700 focus:ring-2 focus:ring-rose-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-rose-950"
             />
           </label>
 
@@ -80,7 +82,7 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+              className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-rose-700 focus:ring-2 focus:ring-rose-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-rose-950"
             />
           </label>
 
@@ -93,7 +95,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
+            className="rounded-md bg-rose-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-rose-700 dark:hover:bg-rose-600"
           >
             {submitting ? "Signing in…" : "Sign in"}
           </button>

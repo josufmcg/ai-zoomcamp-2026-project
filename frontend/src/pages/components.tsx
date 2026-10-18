@@ -9,7 +9,27 @@
 
 import type { ReactNode } from "react";
 
+import type { NavIconName } from "../auth/navigation";
+import { SectionIcon } from "../components/Icons";
 import type { AsyncState } from "../hooks/useAsync";
+
+/** Main content heading paired with the matching sidebar section icon. */
+export function PageHeading({
+  title,
+  icon,
+}: {
+  title: string;
+  icon: NavIconName;
+}) {
+  return (
+    <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-800 dark:bg-rose-950/50 dark:text-rose-300">
+        <SectionIcon name={icon} className="h-6 w-6" />
+      </span>
+      {title}
+    </h1>
+  );
+}
 
 /** Centered card used by the login, forbidden, and not-found screens. */
 export function Card({
@@ -39,7 +59,7 @@ export function Card({
 /** Full-height centered layout used by the screens shown without the shell. */
 export function CenteredPanel({ children }: { children: ReactNode }) {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-slate-50 p-8 dark:bg-slate-900">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-stone-50 p-8 dark:bg-slate-950">
       {children}
     </main>
   );

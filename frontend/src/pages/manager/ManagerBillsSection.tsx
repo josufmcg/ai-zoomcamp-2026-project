@@ -1,7 +1,7 @@
 /**
  * Manager bills (backlog task 16).
  *
- * Managers issue a manual bill for one of their units and mark a bill paid.
+ * Managers issue a manual bill for one of their properties and mark a bill paid.
  * Bills are listed through `GET /bills`, which the backend scopes to the
  * manager's communities and returns with the computed display status, so an
  * `overdue` bill is shown as such without the frontend touching the dates.
@@ -131,7 +131,7 @@ export function ManagerBillsSection() {
     }
     const parsedUnit = Number(unitId);
     if (!parsedUnit || !amount.trim() || !description.trim() || !dueDate) {
-      setError("Choose a unit, an amount, a description, and a due date.");
+      setError("Choose a property, an amount, a description, and a due date.");
       return;
     }
     setSaving(true);
@@ -158,21 +158,21 @@ export function ManagerBillsSection() {
   return (
     <SectionCard
       title="Bills"
-      description="Issue a manual bill for a unit you manage, and mark bills paid."
+      description="Issue a manual bill for a property you manage, and mark bills paid."
     >
       <form
         className="mb-5 grid gap-3 rounded-md border border-slate-200 p-4 sm:grid-cols-2 dark:border-slate-700"
         onSubmit={handleSubmit}
       >
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Unit
+          Property
           <select
-            aria-label="Bill unit"
+            aria-label="Bill property"
             value={unitId}
             onChange={(event) => setUnitId(event.target.value)}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           >
-            <option value="">Select a unit…</option>
+            <option value="">Select a property…</option>
             {unitOptions.map((unit) => (
               <option key={unit.id} value={unit.id}>
                 {unit.identifier} ({unitTypeLabel(unit.unit_type)})
@@ -241,7 +241,7 @@ export function ManagerBillsSection() {
 
       <AsyncSection
         state={bills}
-        emptyMessage="No bills have been issued for your units."
+        emptyMessage="No bills have been issued for your properties."
         render={(rows) => (
           <ul className="flex flex-col gap-3" data-testid="bill-list">
             {rows.map((bill) => (
