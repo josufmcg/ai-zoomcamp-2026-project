@@ -16,6 +16,7 @@
 import { useCallback, useMemo, useState, type FormEvent } from "react";
 
 import { useAsync } from "../../hooks/useAsync";
+import { useI18n } from "../../i18n/I18nContext";
 import { propertyApi } from "../../services";
 import {
   UNIT_TYPES,
@@ -46,6 +47,7 @@ function NewBuildingForm({
   tags: readonly { id: number; name: string }[];
   onCreated: () => void;
 }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [tagIds, setTagIds] = useState<number[]>([]);
@@ -83,7 +85,7 @@ function NewBuildingForm({
         onClick={() => setOpen(true)}
         className="text-sm font-medium text-slate-600 underline hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
       >
-        Add building
+        {t("Add building")}
       </button>
     );
   }
@@ -94,10 +96,10 @@ function NewBuildingForm({
       onSubmit={handleSubmit}
     >
       <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-        Building name
+        {t("Building name")}
         <input
           type="text"
-          aria-label="Building name"
+          aria-label={t("Building name")}
           value={name}
           maxLength={200}
           onChange={(event) => setName(event.target.value)}
@@ -116,14 +118,14 @@ function NewBuildingForm({
           disabled={saving || !name.trim()}
           className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
         >
-          {saving ? "Adding…" : "Create building"}
+          {saving ? t("Adding…") : t("Create building")}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
           className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
         >
-          Cancel
+          {t("Cancel")}
         </button>
       </div>
     </form>
@@ -140,6 +142,7 @@ function NewUnitForm({
   tags: readonly { id: number; name: string }[];
   onCreated: () => void;
 }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [identifier, setIdentifier] = useState("");
   const [unitType, setUnitType] = useState<UnitType>("apartment");
@@ -180,7 +183,7 @@ function NewUnitForm({
         onClick={() => setOpen(true)}
         className="text-xs font-medium text-slate-600 underline hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
       >
-        Add property
+        {t("Add property")}
       </button>
     );
   }
@@ -192,10 +195,10 @@ function NewUnitForm({
     >
       <div className="grid gap-2 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Identifier
+          {t("Identifier")}
           <input
             type="text"
-            aria-label="Property identifier"
+            aria-label={t("Property identifier")}
             value={identifier}
             maxLength={100}
             onChange={(event) => setIdentifier(event.target.value)}
@@ -203,16 +206,16 @@ function NewUnitForm({
           />
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Type
+          {t("Type")}
           <select
-            aria-label="Property type"
+            aria-label={t("Property type")}
             value={unitType}
             onChange={(event) => setUnitType(event.target.value as UnitType)}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           >
             {UNIT_TYPES.map((type) => (
               <option key={type} value={type}>
-                {unitTypeLabel(type)}
+                {t(unitTypeLabel(type))}
               </option>
             ))}
           </select>
@@ -230,14 +233,14 @@ function NewUnitForm({
           disabled={saving || !identifier.trim()}
           className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
         >
-          {saving ? "Adding…" : "Create property"}
+          {saving ? t("Adding…") : t("Create property")}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
           className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
         >
-          Cancel
+          {t("Cancel")}
         </button>
       </div>
     </form>
@@ -246,6 +249,7 @@ function NewUnitForm({
 
 /** Tag-management form used once at the top of the section. */
 function NewTagForm({ onCreated }: { onCreated: () => void }) {
+  const { t } = useI18n();
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -271,10 +275,10 @@ function NewTagForm({ onCreated }: { onCreated: () => void }) {
   return (
     <form className="flex flex-wrap items-end gap-2" onSubmit={handleSubmit}>
       <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-        New tag
+        {t("New tag")}
         <input
           type="text"
-          aria-label="New tag"
+          aria-label={t("New tag")}
           value={name}
           maxLength={100}
           onChange={(event) => setName(event.target.value)}
@@ -286,7 +290,7 @@ function NewTagForm({ onCreated }: { onCreated: () => void }) {
         disabled={saving || !name.trim()}
         className="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
       >
-        {saving ? "Creating…" : "Create tag"}
+        {saving ? t("Creating…") : t("Create tag")}
       </button>
       {error && <Notice tone="red">{error}</Notice>}
     </form>
@@ -329,6 +333,7 @@ function UnitRow({
 }
 
 export function PropertyTreeSection() {
+  const { t } = useI18n();
   const loadCommunities = useCallback(() => propertyApi.listCommunities(), []);
   const communities = useAsync<Community[]>(loadCommunities);
   const loadBuildings = useCallback(() => propertyApi.listBuildings(), []);
@@ -374,7 +379,7 @@ export function PropertyTreeSection() {
     >
       <div className="mb-5 border-b border-slate-200 pb-5 dark:border-slate-700">
         <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
-          Tags
+          {t("Tags")}
         </h3>
         <NewTagForm onCreated={tags.reload} />
         {tagsById.length > 0 && (

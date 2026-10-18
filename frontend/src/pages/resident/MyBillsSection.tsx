@@ -14,6 +14,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { useAsync } from "../../hooks/useAsync";
+import { useI18n } from "../../i18n/I18nContext";
 import { billingApi } from "../../services";
 import type { Bill, BillDisplayStatus } from "../../types/billing";
 import {
@@ -44,6 +45,7 @@ function statusLabel(status: BillDisplayStatus): string {
 }
 
 export function MyBillsSection() {
+  const { language, t } = useI18n();
   const [filter, setFilter] = useState<BillFilter>("all");
 
   const loadBills = useCallback(() => billingApi.listBills(), []);
@@ -61,7 +63,7 @@ export function MyBillsSection() {
       <div
         className="mb-4 flex flex-wrap gap-2"
         role="group"
-        aria-label="Bill status filter"
+        aria-label={t("Bill status filter")}
       >
         {BILL_FILTERS.map((option) => {
           const active = option === filter;
@@ -77,7 +79,7 @@ export function MyBillsSection() {
                   : "border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
               }`}
             >
-              {billFilterLabel(option)}{" "}
+              {t(billFilterLabel(option))}{" "}
               <span data-testid={`bill-count-${option}`}>
                 ({counts[option]})
               </span>
@@ -107,16 +109,16 @@ export function MyBillsSection() {
                     {bill.description}
                   </p>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {bill.unit_identifier} ({unitTypeLabel(bill.unit_type)})
+                    {bill.unit_identifier} ({t(unitTypeLabel(bill.unit_type))})
                     {" · "}
-                    issued {formatDate(bill.issue_date)}
+                        {t("issued")} {formatDate(bill.issue_date, language)}
                     {" · "}
-                    due {formatDate(bill.due_date)}
+                        {t("due")} {formatDate(bill.due_date, language)}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="font-semibold text-slate-900 dark:text-slate-100">
-                    {formatAmount(bill.amount)}
+                    {formatAmount(bill.amount, "USD", language)}
                   </span>
                   <span data-testid={`bill-status-${bill.id}`}>
                     <StatusBadge

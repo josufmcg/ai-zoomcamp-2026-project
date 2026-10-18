@@ -11,9 +11,11 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { navItemsForRole } from "../auth/navigation";
 import { BuildingMark, SectionIcon } from "../components/Icons";
+import { useI18n } from "../i18n/I18nContext";
 
 export default function AppShell() {
   const { user, signOut } = useAuth();
+  const { language, setLanguage, t } = useI18n();
   const navigate = useNavigate();
 
   // The shell is only reached through RequireAuth, so a missing user means the
@@ -39,12 +41,26 @@ export default function AppShell() {
               EFINGES
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Residential property management platform
+              {t("Residential property management platform")}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-end gap-4">
+          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+            <span>{t("Language")}</span>
+            <select
+              aria-label={t("Language")}
+              value={language}
+              onChange={(event) =>
+                setLanguage(event.target.value === "es" ? "es" : "en")
+              }
+              className="rounded-md border border-stone-300 bg-white px-2 py-1.5 dark:border-slate-700 dark:bg-slate-800"
+            >
+              <option value="en">{t("English")}</option>
+              <option value="es">{t("Español")}</option>
+            </select>
+          </label>
           <div className="text-right text-sm">
             <p className="font-medium text-slate-900 dark:text-slate-100">
               {user.email}
@@ -53,7 +69,7 @@ export default function AppShell() {
               className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400"
               data-testid="current-role"
             >
-              {user.role}
+              {t(user.role)}
             </p>
           </div>
           <button
@@ -61,14 +77,14 @@ export default function AppShell() {
             onClick={handleSignOut}
             className="rounded-md border border-stone-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-900 dark:border-slate-700 dark:text-slate-200 dark:hover:border-rose-900 dark:hover:bg-rose-950/40 dark:hover:text-rose-200"
           >
-            Sign out
+            {t("Sign out")}
           </button>
         </div>
       </header>
 
       <div className="flex flex-1 flex-col md:flex-row">
         <nav
-          aria-label="Main navigation"
+          aria-label={t("Main navigation")}
           className="border-b border-stone-200 bg-white px-4 py-4 md:w-56 md:border-b-0 md:border-r dark:border-slate-800 dark:bg-slate-900"
         >
           <ul className="flex flex-wrap gap-2 md:flex-col">
@@ -88,7 +104,7 @@ export default function AppShell() {
                     name={item.icon}
                     className="h-5 w-5 shrink-0"
                   />
-                  <span>{item.label}</span>
+                  <span>{t(item.label)}</span>
                 </NavLink>
               </li>
             ))}

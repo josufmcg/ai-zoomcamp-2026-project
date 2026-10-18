@@ -14,6 +14,7 @@
 import { useCallback, useState, type FormEvent } from "react";
 
 import { useAsync } from "../../hooks/useAsync";
+import { useI18n } from "../../i18n/I18nContext";
 import { governanceApi } from "../../services";
 import type {
   EligibleUnit,
@@ -37,6 +38,7 @@ import {
 
 /** Voting form for one open initiative. */
 function InitiativeVoteCard({ initiative }: { initiative: Initiative }) {
+  const { language, t } = useI18n();
   const loadEligible = useCallback(
     () => governanceApi.listEligibleUnits(initiative.id),
     [initiative.id],
@@ -88,7 +90,7 @@ function InitiativeVoteCard({ initiative }: { initiative: Initiative }) {
       setDone(true);
       eligible.reload();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to cast vote.");
+      setError(cause instanceof Error ? cause.message : t("Unable to cast vote."));
     } finally {
       setSubmitting(false);
     }
@@ -105,8 +107,8 @@ function InitiativeVoteCard({ initiative }: { initiative: Initiative }) {
             {initiative.title}
           </p>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Voting open {formatDate(initiative.opens_at)} –{" "}
-            {formatDate(initiative.closes_at)}
+            {t("Voting open")} {formatDate(initiative.opens_at, language)} –{" "}
+            {formatDate(initiative.closes_at, language)}
           </p>
         </div>
         <StatusBadge
@@ -120,7 +122,7 @@ function InitiativeVoteCard({ initiative }: { initiative: Initiative }) {
 
       <AsyncSection
         state={eligible}
-        emptyMessage="None of your properties are eligible to vote in this initiative."
+        emptyMessage={t("None of your properties are eligible to vote in this initiative.")}
         render={() => (
           <form className="mt-3 flex flex-col gap-3" onSubmit={handleSubmit}>
             <ul className="flex flex-col gap-2" data-testid={`eligible-${initiative.id}`}>
@@ -147,7 +149,7 @@ function InitiativeVoteCard({ initiative }: { initiative: Initiative }) {
 
             {error && <Notice tone="red">{error}</Notice>}
             {done && pending.length === 0 && (
-              <Notice>Your ballots were recorded.</Notice>
+              <Notice>{t("Your ballots were recorded.")}</Notice>
             )}
 
             {initiative.is_open && (
@@ -158,15 +160,23 @@ function InitiativeVoteCard({ initiative }: { initiative: Initiative }) {
                   className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
                 >
                   {submitting
-                    ? "Submitting…"
-                    : `Cast ${pending.length} ballot${pending.length === 1 ? "" : "s"}`}
+                    ? t("Submitting…")
+                    : pending.length === 1
+                      ? t("Cast {{count}} ballot", { count: pending.length })
+                      : t("Cast {{count}} ballots", { count: pending.length })}
                 </button>
                 <span className="text-sm text-slate-600 dark:text-slate-400" data-testid={`pending-${initiative.id}`}>
                   {openUnits.length === 0
-                    ? "All your eligible properties have voted."
-                    : `${pending.length} of ${openUnits.length} ${
-                        openUnits.length === 1 ? "property" : "properties"
-                      } selected.`}
+                    ? t("All your eligible properties have voted.")
+                    : openUnits.length === 1
+                      ? t("{{selected}} of {{eligible}} property selected.", {
+                          selected: pending.length,
+                          eligible: openUnits.length,
+                        })
+                      : t("{{selected}} of {{eligible}} properties selected.", {
+                          selected: pending.length,
+                          eligible: openUnits.length,
+                        })}
                 </span>
               </div>
             )}
@@ -193,9 +203,10 @@ function EligibleUnitRow({
   onSelect: (optionId: number) => void;
   onClear: () => void;
 }) {
+  const { t } = useI18n();
   const voted = unit.vote_id !== null;
   const chosenLabel =
-    options.find((option) => option.id === unit.option_id)?.label ?? "unknown";
+    options.find((option) => option.id === unit.option_id)?.label ?? t("unknown");
 
   return (
     <li
@@ -206,21 +217,21 @@ function EligibleUnitRow({
         <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
           {unit.unit_identifier}{" "}
           <span className="text-slate-500 dark:text-slate-400">
-            ({unitTypeLabel(unit.unit_type)})
+            ({t(unitTypeLabel(unit.unit_type))})
           </span>
         </p>
       </div>
 
       {voted ? (
-        <StatusBadge label={`Voted: ${chosenLabel}`} tone="green" />
+        <StatusBadge label={`${t("Voted")}: ${chosenLabel}`} tone="green" />
       ) : (
         <div className="flex flex-wrap items-center gap-2">
           <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
             <span className="sr-only">
-              Option for property {unit.unit_identifier}
+              {t("Option for property")} {unit.unit_identifier}
             </span>
             <select
-              aria-label={`Option for ${unit.unit_identifier}`}
+              aria-label={`${t("Option for")} ${unit.unit_identifier}`}
               value={selected ?? ""}
               disabled={disabled}
               onChange={(event) => {
@@ -233,7 +244,7 @@ function EligibleUnitRow({
               }}
               className="rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
             >
-              <option value="">No ballot</option>
+              <option value="">{t("No ballot")}</option>
               {options.map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.label}

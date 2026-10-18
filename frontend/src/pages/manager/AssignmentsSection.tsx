@@ -12,6 +12,7 @@
 import { useCallback, useMemo, useState, type FormEvent } from "react";
 
 import { useAsync } from "../../hooks/useAsync";
+import { useI18n } from "../../i18n/I18nContext";
 import { assignmentApi, propertyApi } from "../../services";
 import type { Assignment } from "../../types/assignment";
 import type { OwnershipType, Unit } from "../../types/property";
@@ -34,6 +35,7 @@ function AssignmentRow({
   assignment: Assignment;
   onRemoved: () => void;
 }) {
+  const { t } = useI18n();
   const [removing, setRemoving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,7 +64,7 @@ function AssignmentRow({
           {assignment.user.email}
         </p>
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          {assignment.unit.identifier} ({unitTypeLabel(assignment.unit.unit_type)})
+          {assignment.unit.identifier} ({t(unitTypeLabel(assignment.unit.unit_type))})
         </p>
         {error && (
           <div className="mt-1">
@@ -81,7 +83,7 @@ function AssignmentRow({
           disabled={removing}
           className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-900/30"
         >
-          {removing ? "Removing…" : "Remove"}
+          {removing ? t("Removing…") : t("Remove")}
         </button>
       </div>
     </li>
@@ -89,6 +91,7 @@ function AssignmentRow({
 }
 
 export function AssignmentsSection() {
+  const { t } = useI18n();
   const loadAssignments = useCallback(() => assignmentApi.listAssignments(), []);
   const assignments = useAsync<Assignment[]>(loadAssignments);
   const loadResidents = useCallback(
@@ -117,7 +120,7 @@ export function AssignmentsSection() {
     const parsedUser = Number(userId);
     const parsedUnit = Number(unitId);
     if (!parsedUser || !parsedUnit) {
-      setError("Choose a resident and a property.");
+      setError(t("Choose a resident and a property."));
       return;
     }
     setSaving(true);
@@ -143,22 +146,22 @@ export function AssignmentsSection() {
 
   return (
     <SectionCard
-      title="Resident assignments"
-      description="Link a resident to one of your properties, or remove an existing assignment."
+      title={t("Resident assignments")}
+      description={t("Link a resident to one of your properties, or remove an existing assignment.")}
     >
       <form
         className="mb-5 grid gap-3 rounded-md border border-slate-200 p-4 sm:grid-cols-3 dark:border-slate-700"
         onSubmit={handleSubmit}
       >
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Resident
+          {t("Resident")}
           <select
-            aria-label="Resident"
+            aria-label={t("Resident")}
             value={userId}
             onChange={(event) => setUserId(event.target.value)}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           >
-            <option value="">Select a resident…</option>
+            <option value="">{t("Select a resident…")}</option>
             {residentOptions.map((resident) => (
               <option key={resident.id} value={resident.id}>
                 {resident.email}
@@ -167,25 +170,25 @@ export function AssignmentsSection() {
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Property
+          {t("Property")}
           <select
-            aria-label="Property"
+            aria-label={t("Property")}
             value={unitId}
             onChange={(event) => setUnitId(event.target.value)}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           >
-            <option value="">Select a property…</option>
+            <option value="">{t("Select a property…")}</option>
             {unitOptions.map((unit) => (
               <option key={unit.id} value={unit.id}>
-                {unit.identifier} ({unitTypeLabel(unit.unit_type)})
+                {unit.identifier} ({t(unitTypeLabel(unit.unit_type))})
               </option>
             ))}
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Ownership
+          {t("Ownership")}
           <select
-            aria-label="Ownership"
+            aria-label={t("Ownership")}
             value={ownershipType}
             onChange={(event) =>
               setOwnershipType(event.target.value as OwnershipType)
@@ -194,7 +197,7 @@ export function AssignmentsSection() {
           >
             {OWNERSHIP_TYPES.map((type) => (
               <option key={type} value={type}>
-                {ownershipLabel(type)}
+                {t(ownershipLabel(type))}
               </option>
             ))}
           </select>
@@ -210,7 +213,7 @@ export function AssignmentsSection() {
             disabled={saving}
             className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
           >
-            {saving ? "Assigning…" : "Assign resident"}
+            {saving ? t("Assigning…") : t("Assign resident")}
           </button>
         </div>
       </form>

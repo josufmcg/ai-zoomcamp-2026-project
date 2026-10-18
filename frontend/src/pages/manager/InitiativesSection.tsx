@@ -15,6 +15,7 @@
 import { useCallback, useMemo, useState, type FormEvent } from "react";
 
 import { useAsync } from "../../hooks/useAsync";
+import { useI18n } from "../../i18n/I18nContext";
 import { governanceApi, propertyApi } from "../../services";
 import {
   UNIT_TYPES,
@@ -33,7 +34,7 @@ import {
   type InitiativeDraft,
   type ScopeSelection,
 } from "./initiativeScope";
-import { unitTypeLabel } from "../format";
+import { formatDate, unitTypeLabel } from "../format";
 import {
   AsyncSection,
   Notice,
@@ -74,28 +75,30 @@ function OptionTally({ options }: { options: InitiativeOption[] }) {
 
 /** Read-only summary of an initiative's eligible scope. */
 function ScopeSummary({ scope }: { scope: Initiative["scope"] }) {
+  const { t } = useI18n();
   const parts: string[] = [];
   if (scope.community_ids.length > 0) {
-    parts.push(`communities ${scope.community_ids.join(", ")}`);
+    parts.push(`${t("communities")} ${scope.community_ids.join(", ")}`);
   }
   if (scope.building_ids.length > 0) {
-    parts.push(`buildings ${scope.building_ids.join(", ")}`);
+    parts.push(`${t("buildings")} ${scope.building_ids.join(", ")}`);
   }
   if (scope.unit_types.length > 0) {
-    parts.push(scope.unit_types.map(unitTypeLabel).join(", "));
+    parts.push(scope.unit_types.map((type) => t(unitTypeLabel(type))).join(", "));
   }
   if (scope.tag_ids.length > 0) {
-    parts.push(`tags ${scope.tag_ids.join(", ")}`);
+    parts.push(`${t("tags")} ${scope.tag_ids.join(", ")}`);
   }
   return (
     <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-      Eligible: {parts.length === 0 ? "every property" : parts.join(" · ")}
+      {t("Eligible")}: {parts.length === 0 ? t("every property") : parts.join(" · ")}
     </p>
   );
 }
 
 /** The create-initiative form. */
 function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
+  const { t } = useI18n();
   const [draft, setDraft] = useState<InitiativeDraft>(() =>
     emptyDraft(todayIso()),
   );
@@ -170,13 +173,13 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
       onSubmit={handleSubmit}
     >
       <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-        New initiative
+        {t("New initiative")}
       </h3>
       <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-        Title
+        {t("Title")}
         <input
           type="text"
-          aria-label="Initiative title"
+          aria-label={t("Initiative title")}
           value={draft.title}
           maxLength={200}
           onChange={(event) => patch({ title: event.target.value })}
@@ -184,9 +187,9 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-        Description
+        {t("Description")}
         <textarea
-          aria-label="Initiative description"
+          aria-label={t("Initiative description")}
           rows={3}
           value={draft.description}
           maxLength={4000}
@@ -196,20 +199,20 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
       </label>
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Opens
+          {t("Opens")}
           <input
             type="date"
-            aria-label="Opens at"
+            aria-label={t("Opens at")}
             value={draft.opensAt}
             onChange={(event) => patch({ opensAt: event.target.value })}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Closes
+          {t("Closes")}
           <input
             type="date"
-            aria-label="Closes at"
+            aria-label={t("Closes at")}
             value={draft.closesAt}
             onChange={(event) => patch({ closesAt: event.target.value })}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
@@ -219,14 +222,14 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
 
       <fieldset>
         <legend className="text-sm font-medium text-slate-700 dark:text-slate-300">
-          Options
+          {t("Options")}
         </legend>
         <div className="mt-1 flex flex-col gap-2">
           {draft.optionLabels.map((label, index) => (
             <div key={index} className="flex items-center gap-2">
               <input
                 type="text"
-                aria-label={`Option ${index + 1}`}
+                aria-label={`${t("Option")} ${index + 1}`}
                 value={label}
                 maxLength={200}
                 onChange={(event) => setOption(index, event.target.value)}
@@ -238,7 +241,7 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
                   onClick={() => removeOption(index)}
                   className="text-xs font-medium text-red-700 underline dark:text-red-300"
                 >
-                  Remove
+                  {t("Remove")}
                 </button>
               )}
             </div>
@@ -249,23 +252,23 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
           onClick={addOption}
           className="mt-2 text-xs font-medium text-slate-600 underline hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
         >
-          Add option
+          {t("Add option")}
         </button>
       </fieldset>
 
       <fieldset className="rounded-md border border-slate-200 p-3 dark:border-slate-700">
         <legend className="px-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Eligible properties
+          {t("Eligible properties")}
         </legend>
         <p className="mb-2 text-xs text-slate-500 dark:text-slate-400">
           {isEveryUnit(draft.scope)
-            ? "No filters — every property is eligible to vote."
-            : "Only properties matching all of the filters below may vote."}
+            ? t("No filters — every property is eligible to vote.")
+            : t("Only properties matching all of the filters below may vote.")}
         </p>
         <div className="flex flex-col gap-3">
           <div>
             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Communities
+              {t("Communities")}
             </span>
             <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
               {(communities.data ?? []).map((community) => (
@@ -293,7 +296,7 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
 
           <div>
             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Buildings
+              {t("Buildings")}
             </span>
             <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
               {(buildings.data ?? []).map((building) => (
@@ -321,7 +324,7 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
 
           <div>
             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Property types
+              {t("Property types")}
             </span>
             <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
               {UNIT_TYPES.map((type: UnitType) => (
@@ -341,7 +344,7 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
                       })
                     }
                   />
-                  {unitTypeLabel(type)}
+                  {t(unitTypeLabel(type))}
                 </label>
               ))}
             </div>
@@ -361,7 +364,7 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
         <Notice tone="red">
           <ul className="list-disc pl-5">
             {problems.map((problem) => (
-              <li key={problem}>{problem}</li>
+              <li key={problem}>{t(problem)}</li>
             ))}
           </ul>
         </Notice>
@@ -374,7 +377,7 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
           disabled={saving || problems.length > 0}
           className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
         >
-          {saving ? "Creating…" : "Create initiative"}
+          {saving ? t("Creating…") : t("Create initiative")}
         </button>
       </div>
     </form>
@@ -382,6 +385,7 @@ function NewInitiativeForm({ onCreated }: { onCreated: () => void }) {
 }
 
 export function InitiativesSection() {
+  const { language } = useI18n();
   const loadInitiatives = useCallback(() => governanceApi.listInitiatives(), []);
   const initiatives = useAsync<Initiative[]>(loadInitiatives);
 
@@ -409,7 +413,8 @@ export function InitiativesSection() {
                       {initiative.title}
                     </p>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
-                      {initiative.opens_at} – {initiative.closes_at}
+                      {formatDate(initiative.opens_at, language)} –{" "}
+                      {formatDate(initiative.closes_at, language)}
                     </p>
                     <ScopeSummary scope={initiative.scope} />
                   </div>

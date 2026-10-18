@@ -13,6 +13,7 @@
 import { useCallback, useMemo, useState, type FormEvent } from "react";
 
 import { useAsync } from "../../hooks/useAsync";
+import { useI18n } from "../../i18n/I18nContext";
 import { billingApi, propertyApi } from "../../services";
 import type { Bill } from "../../types/billing";
 import type { Unit } from "../../types/property";
@@ -48,6 +49,7 @@ function todayIso(): string {
 
 /** One bill row with a pay action while it is unpaid. */
 function BillRow({ bill, onPaid }: { bill: Bill; onPaid: () => void }) {
+  const { language, t } = useI18n();
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -75,14 +77,14 @@ function BillRow({ bill, onPaid }: { bill: Bill; onPaid: () => void }) {
             {bill.description}
           </p>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            {bill.unit_identifier} ({unitTypeLabel(bill.unit_type)})
-            {" · due "}
-            {formatDate(bill.due_date)}
+            {bill.unit_identifier} ({t(unitTypeLabel(bill.unit_type))})
+            {" · "}
+            {t("due")} {formatDate(bill.due_date, language)}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <span className="font-semibold text-slate-900 dark:text-slate-100">
-            {formatAmount(bill.amount)}
+            {formatAmount(bill.amount, "USD", language)}
           </span>
           <span data-testid={`bill-status-${bill.id}`}>
             <StatusBadge label={statusLabel(bill.status)} tone={statusTone(bill.status)} />
@@ -94,7 +96,7 @@ function BillRow({ bill, onPaid }: { bill: Bill; onPaid: () => void }) {
               disabled={paying}
               className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
             >
-              {paying ? "Saving…" : "Mark paid"}
+              {paying ? t("Saving…") : t("Mark paid")}
             </button>
           )}
         </div>
@@ -109,6 +111,7 @@ function BillRow({ bill, onPaid }: { bill: Bill; onPaid: () => void }) {
 }
 
 export function ManagerBillsSection() {
+  const { t } = useI18n();
   const loadBills = useCallback(() => billingApi.listBills(), []);
   const bills = useAsync<Bill[]>(loadBills);
   const loadUnits = useCallback(() => propertyApi.listUnits(), []);
@@ -131,7 +134,7 @@ export function ManagerBillsSection() {
     }
     const parsedUnit = Number(unitId);
     if (!parsedUnit || !amount.trim() || !description.trim() || !dueDate) {
-      setError("Choose a property, an amount, a description, and a due date.");
+      setError(t("Choose a property, an amount, a description, and a due date."));
       return;
     }
     setSaving(true);
@@ -157,35 +160,35 @@ export function ManagerBillsSection() {
 
   return (
     <SectionCard
-      title="Bills"
-      description="Issue a manual bill for a property you manage, and mark bills paid."
+      title={t("Bills")}
+      description={t("Issue a manual bill for a property you manage, and mark bills paid.")}
     >
       <form
         className="mb-5 grid gap-3 rounded-md border border-slate-200 p-4 sm:grid-cols-2 dark:border-slate-700"
         onSubmit={handleSubmit}
       >
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Property
+          {t("Property")}
           <select
-            aria-label="Bill property"
+            aria-label={t("Bill property")}
             value={unitId}
             onChange={(event) => setUnitId(event.target.value)}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           >
-            <option value="">Select a property…</option>
+            <option value="">{t("Select a property…")}</option>
             {unitOptions.map((unit) => (
               <option key={unit.id} value={unit.id}>
-                {unit.identifier} ({unitTypeLabel(unit.unit_type)})
+                {unit.identifier} ({t(unitTypeLabel(unit.unit_type))})
               </option>
             ))}
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Amount
+          {t("Amount")}
           <input
             type="text"
             inputMode="decimal"
-            aria-label="Amount"
+            aria-label={t("Amount")}
             placeholder="125.50"
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
@@ -193,10 +196,10 @@ export function ManagerBillsSection() {
           />
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300 sm:col-span-2">
-          Description
+          {t("Description")}
           <input
             type="text"
-            aria-label="Bill description"
+            aria-label={t("Bill description")}
             value={description}
             maxLength={500}
             onChange={(event) => setDescription(event.target.value)}
@@ -204,20 +207,20 @@ export function ManagerBillsSection() {
           />
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Issue date
+          {t("Issue date")}
           <input
             type="date"
-            aria-label="Issue date"
+            aria-label={t("Issue date")}
             value={issueDate}
             onChange={(event) => setIssueDate(event.target.value)}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Due date
+          {t("Due date")}
           <input
             type="date"
-            aria-label="Due date"
+            aria-label={t("Due date")}
             value={dueDate}
             onChange={(event) => setDueDate(event.target.value)}
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
@@ -234,7 +237,7 @@ export function ManagerBillsSection() {
             disabled={saving}
             className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
           >
-            {saving ? "Issuing…" : "Issue bill"}
+            {saving ? t("Issuing…") : t("Issue bill")}
           </button>
         </div>
       </form>

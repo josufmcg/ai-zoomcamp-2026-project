@@ -57,6 +57,14 @@ what the UI shows.
 The sidebar links come from `src/auth/navigation.ts`, which is a plain data
 model filtered by role, so the shell and the tests agree on what each role sees.
 
+## Languages
+
+The frontend supports English (default) and Spanish. Signed-in users can choose
+the language from the selector in the top bar; the choice is saved in browser
+local storage and restored on later visits. Keep the English and Spanish message
+catalogues in `src/i18n/en.json` and `src/i18n/es.json` in sync when adding
+user-facing text.
+
 ## Resident screens (backlog task 15)
 
 The resident's four areas are separate sidebar destinations and routes. Each

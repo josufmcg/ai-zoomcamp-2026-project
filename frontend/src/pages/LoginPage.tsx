@@ -12,11 +12,13 @@ import { useState, type FormEvent } from "react";
 
 import { useAuth } from "../auth/AuthContext";
 import { BuildingMark } from "../components/Icons";
+import { useI18n } from "../i18n/I18nContext";
 import { ApiError } from "../services";
 import { Card, CenteredPanel } from "./components";
 
 export default function LoginPage() {
   const { signIn } = useAuth();
+  const { t } = useI18n();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,10 +39,10 @@ export default function LoginPage() {
     } catch (cause) {
       const message =
         cause instanceof ApiError && cause.status === 401
-          ? "Incorrect email or password."
+          ? t("Incorrect email or password.")
           : cause instanceof Error
             ? cause.message
-            : "Unable to sign in.";
+            : t("Unable to sign in.");
       setError(message);
       setSubmitting(false);
     }
@@ -54,14 +56,14 @@ export default function LoginPage() {
           EFINGES
         </h1>
         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-          Residential property management platform
+          {t("Residential property management platform")}
         </p>
       </header>
 
-      <Card title="Sign in" subtitle="Use the email and password of your account.">
+      <Card title={t("Sign in")} subtitle={t("Use the email and password of your account.")}>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
           <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-            Email
+            {t("Email")}
             <input
               type="email"
               name="email"
@@ -74,7 +76,7 @@ export default function LoginPage() {
           </label>
 
           <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-            Password
+            {t("Password")}
             <input
               type="password"
               name="password"
@@ -97,7 +99,7 @@ export default function LoginPage() {
             disabled={submitting}
             className="rounded-md bg-rose-800 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-rose-700 dark:hover:bg-rose-600"
           >
-            {submitting ? "Signing in…" : "Sign in"}
+            {submitting ? t("Signing in…") : t("Sign in")}
           </button>
         </form>
       </Card>

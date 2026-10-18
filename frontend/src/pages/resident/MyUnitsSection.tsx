@@ -10,11 +10,13 @@
 import { useCallback } from "react";
 
 import { useAsync } from "../../hooks/useAsync";
+import { useI18n } from "../../i18n/I18nContext";
 import { propertyApi } from "../../services";
 import { ownershipLabel, unitTypeLabel } from "../format";
 import { AsyncSection, SectionCard, StatusBadge, TagList } from "../components";
 
 export function MyUnitsSection() {
+  const { t } = useI18n();
   const loadUnits = useCallback(() => propertyApi.listMyUnits(), []);
   const units = useAsync(loadUnits);
 
@@ -38,9 +40,9 @@ export function MyUnitsSection() {
                     {unit.identifier}
                   </p>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    {unitTypeLabel(unit.unit_type)}
+                    {t(unitTypeLabel(unit.unit_type))}
                     {" · "}
-                    {ownershipLabel(unit.ownership_type)}
+                    {t(ownershipLabel(unit.ownership_type))}
                   </p>
                   <TagList tags={unit.tags} />
                 </div>

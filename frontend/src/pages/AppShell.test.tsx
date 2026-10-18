@@ -69,6 +69,25 @@ describe("navigation shell", () => {
     expect(screen.getByTestId("current-role")).toHaveTextContent("manager");
     expect(document.querySelector("header svg")).toBeInTheDocument();
   });
+
+  it("switches the interface to Spanish and remembers the preference", async () => {
+    const user = userEvent.setup();
+    const view = renderApp(makeSession("manager"), "/overview");
+
+    await user.selectOptions(screen.getByRole("combobox", { name: "Language" }), "es");
+
+    expect(screen.getByRole("navigation", { name: "Navegación principal" })).toHaveTextContent("Resumen");
+    expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Resumen" })).toBeInTheDocument();
+    expect(window.localStorage.getItem("efinges.language")).toBe("es");
+    expect(document.documentElement.lang).toBe("es");
+
+    view.unmount();
+    renderApp(makeSession("manager"), "/overview");
+    expect(screen.getByRole("navigation", { name: "Navegación principal" })).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByRole("combobox", { name: "Idioma" }), "en");
+  });
 });
 
 describe("logout", () => {

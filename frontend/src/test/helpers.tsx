@@ -6,6 +6,7 @@ import { MemoryRouter } from "react-router-dom";
 
 import App from "../App";
 import { AuthProvider } from "../auth/AuthProvider";
+import { I18nProvider } from "../i18n/I18nProvider";
 import type { AuthSession, User, UserRole } from "../types/auth";
 
 /** Build a `Response`-like object for a mocked `fetch`. */
@@ -47,7 +48,9 @@ export function renderWithProviders(
 ) {
   return render(
     <MemoryRouter initialEntries={[route]}>
-      <AuthProvider initialSession={session}>{ui}</AuthProvider>
+      <I18nProvider>
+        <AuthProvider initialSession={session}>{ui}</AuthProvider>
+      </I18nProvider>
     </MemoryRouter>,
   );
 }

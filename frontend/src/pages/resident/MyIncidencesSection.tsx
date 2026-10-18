@@ -14,6 +14,7 @@
 import { useCallback, useMemo, useState, type FormEvent } from "react";
 
 import { useAsync } from "../../hooks/useAsync";
+import { useI18n } from "../../i18n/I18nContext";
 import { maintenanceApi, propertyApi } from "../../services";
 import type { Incidence, IncidenceStatus } from "../../types/maintenance";
 import { formatDateTime } from "../format";
@@ -46,6 +47,7 @@ function IncidenceCard({
   incidence: Incidence;
   onCommented: () => void;
 }) {
+  const { language, t } = useI18n();
   const [comment, setComment] = useState("");
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,13 +83,14 @@ function IncidenceCard({
           </p>
           <p className="text-sm text-slate-600 dark:text-slate-400">
             {incidence.unit_identifier}
-            {" · submitted "}
-            {formatDateTime(incidence.created_at)}
+            {" · "}
+            {t("submitted")}{" "}
+            {formatDateTime(incidence.created_at, language)}
           </p>
         </div>
         <span data-testid={`incidence-status-${incidence.id}`}>
           <StatusBadge
-            label={incidence.status}
+            label={t(incidence.status)}
             tone={statusTone(incidence.status)}
           />
         </span>
@@ -99,11 +102,11 @@ function IncidenceCard({
 
       <div className="mt-4 border-t border-slate-200 pt-3 dark:border-slate-700">
         <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Discussion ({incidence.comments.length})
+          {t("Discussion")} ({incidence.comments.length})
         </h4>
         {incidence.comments.length === 0 ? (
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            No comments yet.
+            {t("No comments yet.")}
           </p>
         ) : (
           <ul className="mt-2 flex flex-col gap-2" data-testid={`comments-${incidence.id}`}>
@@ -113,7 +116,7 @@ function IncidenceCard({
                 className="rounded bg-slate-50 px-3 py-2 text-sm dark:bg-slate-900/40"
               >
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {entry.author_email} · {formatDateTime(entry.created_at)}
+                  {entry.author_email} · {formatDateTime(entry.created_at, language)}
                 </p>
                 <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300">
                   {entry.body}
@@ -126,8 +129,8 @@ function IncidenceCard({
         <form className="mt-3 flex gap-2" onSubmit={handleComment}>
           <input
             type="text"
-            aria-label={`Comment on ${incidence.title}`}
-            placeholder="Write a comment…"
+            aria-label={`${t("Comment on")} ${incidence.title}`}
+            placeholder={t("Write a comment…")}
             value={comment}
             onChange={(event) => setComment(event.target.value)}
             className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
@@ -137,7 +140,7 @@ function IncidenceCard({
             disabled={posting || comment.trim().length === 0}
             className="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
           >
-            {posting ? "Posting…" : "Comment"}
+            {posting ? t("Posting…") : t("Comment")}
           </button>
         </form>
         {error && (
@@ -151,6 +154,7 @@ function IncidenceCard({
 }
 
 export function MyIncidencesSection() {
+  const { t } = useI18n();
   const loadIncidences = useCallback(() => maintenanceApi.listIncidences(), []);
   const incidences = useAsync<Incidence[]>(loadIncidences);
   const loadUnits = useCallback(() => propertyApi.listMyUnits(), []);
@@ -171,7 +175,7 @@ export function MyIncidencesSection() {
     }
     const parsedUnitId = Number(unitId);
     if (!parsedUnitId || !title.trim() || !description.trim()) {
-      setError("Choose a property and fill in both fields.");
+      setError(t("Choose a property and fill in both fields."));
       return;
     }
     setSubmitting(true);
@@ -196,8 +200,8 @@ export function MyIncidencesSection() {
 
   return (
     <SectionCard
-      title="My incidences"
-      description="Report an issue and track the conversation with your manager."
+      title={t("My incidences")}
+      description={t("Report an issue and track the conversation with your manager.")}
     >
       <form
         className="mb-5 grid gap-3 rounded-md border border-slate-200 p-4 dark:border-slate-700"
@@ -205,14 +209,14 @@ export function MyIncidencesSection() {
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-            Property
+            {t("Property")}
             <select
-              aria-label="Property"
+              aria-label={t("Property")}
               value={unitId}
               onChange={(event) => setUnitId(event.target.value)}
               className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
             >
-              <option value="">Select a property…</option>
+              <option value="">{t("Select a property…")}</option>
               {unitOptions.map((unit) => (
                 <option key={unit.id} value={unit.id}>
                   {unit.identifier}
@@ -221,10 +225,10 @@ export function MyIncidencesSection() {
             </select>
           </label>
           <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-            Title
+            {t("Title")}
             <input
               type="text"
-              aria-label="Title"
+              aria-label={t("Title")}
               value={title}
               maxLength={200}
               onChange={(event) => setTitle(event.target.value)}
@@ -233,9 +237,9 @@ export function MyIncidencesSection() {
           </label>
         </div>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Description
+          {t("Description")}
           <textarea
-            aria-label="Description"
+            aria-label={t("Description")}
             rows={3}
             value={description}
             maxLength={4000}
@@ -250,7 +254,7 @@ export function MyIncidencesSection() {
             disabled={submitting}
             className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
           >
-            {submitting ? "Submitting…" : "Submit incidence"}
+            {submitting ? t("Submitting…") : t("Submit incidence")}
           </button>
         </div>
       </form>

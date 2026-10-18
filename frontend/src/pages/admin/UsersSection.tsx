@@ -16,6 +16,7 @@ import { useCallback, useMemo, useState, type FormEvent } from "react";
 
 import { useAuth } from "../../auth/AuthContext";
 import { useAsync } from "../../hooks/useAsync";
+import { useI18n } from "../../i18n/I18nContext";
 import { userApi } from "../../services";
 import { USER_ROLES, type User, type UserRole } from "../../types/auth";
 import { roleLabel } from "../format";
@@ -35,8 +36,23 @@ import {
   type UserDraft,
 } from "./userForm";
 
+function translateUserProblem(
+  problem: string,
+  t: ReturnType<typeof useI18n>["t"],
+): string {
+  const passwordMinimum = /^The password must be at least (\d+) characters\.$/.exec(
+    problem,
+  );
+  return passwordMinimum
+    ? t("The password must be at least {{count}} characters.", {
+        count: passwordMinimum[1],
+      })
+    : t(problem);
+}
+
 /** Collapsed form that creates one account. */
 function NewUserForm({ onCreated }: { onCreated: () => void }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<UserDraft>(emptyUserDraft);
   const [errors, setErrors] = useState<string[]>([]);
@@ -75,7 +91,7 @@ function NewUserForm({ onCreated }: { onCreated: () => void }) {
         onClick={() => setOpen(true)}
         className="mb-5 text-sm font-medium text-slate-600 underline hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
       >
-        Add user
+        {t("Add user")}
       </button>
     );
   }
@@ -86,10 +102,10 @@ function NewUserForm({ onCreated }: { onCreated: () => void }) {
       onSubmit={handleSubmit}
     >
       <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-        Email
+        {t("Email")}
         <input
           type="email"
-          aria-label="Email"
+          aria-label={t("Email")}
           value={draft.email}
           maxLength={320}
           onChange={(event) =>
@@ -99,10 +115,10 @@ function NewUserForm({ onCreated }: { onCreated: () => void }) {
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-        Password
+        {t("Password")}
         <input
           type="password"
-          aria-label="Password"
+          aria-label={t("Password")}
           value={draft.password}
           maxLength={128}
           onChange={(event) =>
@@ -112,9 +128,9 @@ function NewUserForm({ onCreated }: { onCreated: () => void }) {
         />
       </label>
       <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-        Role
+        {t("Role")}
         <select
-          aria-label="New user role"
+          aria-label={t("New user role")}
           value={draft.role}
           onChange={(event) =>
             setDraft((current) => ({
@@ -126,7 +142,7 @@ function NewUserForm({ onCreated }: { onCreated: () => void }) {
         >
           {USER_ROLES.map((role) => (
             <option key={role} value={role}>
-              {roleLabel(role)}
+              {t(roleLabel(role))}
             </option>
           ))}
         </select>
@@ -136,7 +152,7 @@ function NewUserForm({ onCreated }: { onCreated: () => void }) {
           <Notice tone="red">
             <ul className="list-disc pl-4">
               {errors.map((problem) => (
-                <li key={problem}>{problem}</li>
+                <li key={problem}>{translateUserProblem(problem, t)}</li>
               ))}
             </ul>
           </Notice>
@@ -148,7 +164,7 @@ function NewUserForm({ onCreated }: { onCreated: () => void }) {
           disabled={saving}
           className="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
         >
-          {saving ? "Creating…" : "Create user"}
+          {saving ? t("Creating…") : t("Create user")}
         </button>
         <button
           type="button"
@@ -159,7 +175,7 @@ function NewUserForm({ onCreated }: { onCreated: () => void }) {
           }}
           className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
         >
-          Cancel
+          {t("Cancel")}
         </button>
       </div>
     </form>
@@ -176,6 +192,7 @@ function UserRow({
   actorId: number;
   onChanged: () => void;
 }) {
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -236,7 +253,7 @@ function UserRow({
           />
           {ownRow && (
             <span className="text-xs text-slate-500 dark:text-slate-400">
-              (you)
+              {t("(you)")}
             </span>
           )}
         </div>
@@ -248,9 +265,9 @@ function UserRow({
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-          <span className="sr-only">Role</span>
+          <span className="sr-only">{t("Role")}</span>
           <select
-            aria-label={`Role for ${user.email}`}
+            aria-label={`${t("Role for")} ${user.email}`}
             value={user.role}
             disabled={busy}
             onChange={(event) => changeRole(event.target.value as UserRole)}
@@ -258,7 +275,7 @@ function UserRow({
           >
             {USER_ROLES.map((role) => (
               <option key={role} value={role}>
-                {roleLabel(role)}
+                {t(roleLabel(role))}
               </option>
             ))}
           </select>
@@ -269,7 +286,7 @@ function UserRow({
           disabled={busy}
           className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
         >
-          {user.is_active ? "Deactivate" : "Reactivate"}
+          {user.is_active ? t("Deactivate") : t("Reactivate")}
         </button>
       </div>
     </li>
@@ -277,6 +294,7 @@ function UserRow({
 }
 
 export function UsersSection() {
+  const { t } = useI18n();
   const { user: actor } = useAuth();
   const [roleFilter, setRoleFilter] = useState<UserRole | "">("");
   const [activeFilter, setActiveFilter] = useState<"" | "active" | "inactive">(
@@ -308,16 +326,16 @@ export function UsersSection() {
 
       <div className="mb-4 flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Filter by role
+          {t("Filter by role")}
           <select
-            aria-label="Filter by role"
+            aria-label={t("Filter by role")}
             value={roleFilter}
             onChange={(event) =>
               setRoleFilter(event.target.value as UserRole | "")
             }
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           >
-            <option value="">All roles</option>
+            <option value="">{t("All roles")}</option>
             {USER_ROLES.map((role) => (
               <option key={role} value={role}>
                 {roleLabel(role)}
@@ -326,18 +344,18 @@ export function UsersSection() {
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
-          Filter by status
+          {t("Filter by status")}
           <select
-            aria-label="Filter by status"
+            aria-label={t("Filter by status")}
             value={activeFilter}
             onChange={(event) =>
               setActiveFilter(event.target.value as "" | "active" | "inactive")
             }
             className="rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
           >
-            <option value="">All accounts</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="">{t("All accounts")}</option>
+            <option value="active">{t("Active")}</option>
+            <option value="inactive">{t("Inactive")}</option>
           </select>
         </label>
       </div>

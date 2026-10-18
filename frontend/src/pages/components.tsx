@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 import type { NavIconName } from "../auth/navigation";
 import { SectionIcon } from "../components/Icons";
 import type { AsyncState } from "../hooks/useAsync";
+import { useI18n } from "../i18n/I18nContext";
 
 /** Main content heading paired with the matching sidebar section icon. */
 export function PageHeading({
@@ -21,12 +22,13 @@ export function PageHeading({
   title: string;
   icon: NavIconName;
 }) {
+  const { t } = useI18n();
   return (
     <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-800 dark:bg-rose-950/50 dark:text-rose-300">
         <SectionIcon name={icon} className="h-6 w-6" />
       </span>
-      {title}
+      {t(title)}
     </h1>
   );
 }
@@ -41,14 +43,15 @@ export function Card({
   subtitle?: string;
   children: ReactNode;
 }) {
+  const { t } = useI18n();
   return (
     <section className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
       <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-        {title}
+        {t(title)}
       </h1>
       {subtitle && (
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-          {subtitle}
+          {t(subtitle)}
         </p>
       )}
       <div className="mt-5">{children}</div>
@@ -77,16 +80,17 @@ export function SectionCard({
   actions?: ReactNode;
   children: ReactNode;
 }) {
+  const { t } = useI18n();
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            {title}
+            {t(title)}
           </h2>
           {description && (
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-              {description}
+              {t(description)}
             </p>
           )}
         </div>
@@ -105,6 +109,7 @@ export function StatusBadge({
   label: string;
   tone?: "slate" | "amber" | "green" | "red" | "blue";
 }) {
+  const { t } = useI18n();
   const tones = {
     slate:
       "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
@@ -121,7 +126,7 @@ export function StatusBadge({
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${tones[tone]}`}
       data-testid="status-badge"
     >
-      {label}
+      {t(label)}
     </span>
   );
 }
@@ -134,6 +139,7 @@ export function Notice({
   children: ReactNode;
   tone?: "slate" | "red";
 }) {
+  const { t } = useI18n();
   const tones = {
     slate:
       "border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-300",
@@ -145,7 +151,7 @@ export function Notice({
       className={`rounded-md border px-3 py-2 text-sm ${tones[tone]}`}
       role={tone === "red" ? "alert" : undefined}
     >
-      {children}
+      {typeof children === "string" ? t(children) : children}
     </div>
   );
 }
@@ -168,18 +174,19 @@ export function AsyncSection<T>({
   /** Override the emptiness test for value types where `[]` is not the only case. */
   isEmpty?: (data: T) => boolean;
 }) {
+  const { t } = useI18n();
   if (state.loading) {
-    return <Notice>Loading…</Notice>;
+    return <Notice>{t("Loading…")}</Notice>;
   }
   if (state.error) {
     return <Notice tone="red">{state.error.message}</Notice>;
   }
   if (state.data === null) {
-    return <Notice>No data.</Notice>;
+    return <Notice>{t("No data.")}</Notice>;
   }
   const empty = isEmpty ? isEmpty(state.data) : isEmptyArray(state.data);
   if (empty && emptyMessage) {
-    return <Notice>{emptyMessage}</Notice>;
+    return <Notice>{t(emptyMessage)}</Notice>;
   }
   return <>{render(state.data)}</>;
 }

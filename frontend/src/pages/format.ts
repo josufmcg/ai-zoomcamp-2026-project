@@ -7,6 +7,11 @@
 
 import type { UserRole } from "../types/auth";
 import type { OwnershipType, UnitType } from "../types/property";
+import type { Language } from "../i18n/I18nContext";
+
+function localeFor(language: Language): string {
+  return language === "es" ? "es-ES" : "en-US";
+}
 
 /** Human-readable label for a user role (`"administrator"` → `"Administrator"`). */
 export function roleLabel(role: UserRole): string {
@@ -38,12 +43,12 @@ export function ownershipLabel(ownership: OwnershipType): string {
 }
 
 /** Format an ISO date (`YYYY-MM-DD`) as a short, locale-aware date. */
-export function formatDate(isoDate: string): string {
+export function formatDate(isoDate: string, language: Language = "en"): string {
   const date = new Date(`${isoDate}T00:00:00`);
   if (Number.isNaN(date.getTime())) {
     return isoDate;
   }
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(localeFor(language), {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -51,12 +56,15 @@ export function formatDate(isoDate: string): string {
 }
 
 /** Format an ISO date-time as a short, locale-aware date and time. */
-export function formatDateTime(isoDateTime: string): string {
+export function formatDateTime(
+  isoDateTime: string,
+  language: Language = "en",
+): string {
   const date = new Date(isoDateTime);
   if (Number.isNaN(date.getTime())) {
     return isoDateTime;
   }
-  return date.toLocaleString(undefined, {
+  return date.toLocaleString(localeFor(language), {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -71,12 +79,16 @@ export function formatDateTime(isoDateTime: string): string {
  * The amount travels as a decimal string and is **not** parsed into a float, so
  * an unparseable value is shown verbatim rather than as `NaN`.
  */
-export function formatAmount(amount: string, currency = "USD"): string {
+export function formatAmount(
+  amount: string,
+  currency = "USD",
+  language: Language = "en",
+): string {
   const value = Number(amount);
   if (!Number.isFinite(value)) {
     return amount;
   }
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat(localeFor(language), {
     style: "currency",
     currency,
   }).format(value);

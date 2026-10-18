@@ -9,6 +9,7 @@
 
 import { useState } from "react";
 
+import { useI18n } from "../../i18n/I18nContext";
 import type { Tag } from "../../types/property";
 import { Notice } from "../components";
 import { toggleId } from "./tagSelection";
@@ -25,14 +26,15 @@ export function TagChecklist({
   onToggle: (tagId: number) => void;
   legend?: string;
 }) {
+  const { t } = useI18n();
   if (tags.length === 0) {
     return (
       <fieldset>
         <legend className="text-sm font-medium text-slate-700 dark:text-slate-300">
-          {legend}
+          {t(legend)}
         </legend>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          No tags yet.
+          {t("No tags yet.")}
         </p>
       </fieldset>
     );
@@ -41,7 +43,7 @@ export function TagChecklist({
   return (
     <fieldset>
       <legend className="text-sm font-medium text-slate-700 dark:text-slate-300">
-        {legend}
+        {t(legend)}
       </legend>
       <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
         {tags.map((tag) => (
@@ -80,6 +82,7 @@ export function TagEditor({
   onSave: (tagIds: number[]) => Promise<void>;
   label: string;
 }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<number[]>([...selectedTagIds]);
   const [saving, setSaving] = useState(false);
@@ -111,7 +114,7 @@ export function TagEditor({
         onClick={openEditor}
         className="text-xs font-medium text-slate-600 underline hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
       >
-        Edit tags
+        {t("Edit tags")}
       </button>
     );
   }
@@ -122,7 +125,7 @@ export function TagEditor({
         tags={tags}
         selected={draft}
         onToggle={(tagId) => setDraft((current) => toggleId(current, tagId))}
-        legend={`${label} tags`}
+        legend={`${label} ${t("tags")}`}
       />
       {error && (
         <div className="mt-2">
@@ -136,14 +139,14 @@ export function TagEditor({
           disabled={saving}
           className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
         >
-          {saving ? "Saving…" : "Save tags"}
+          {saving ? t("Saving…") : t("Save tags")}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
           className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
         >
-          Cancel
+          {t("Cancel")}
         </button>
       </div>
     </div>

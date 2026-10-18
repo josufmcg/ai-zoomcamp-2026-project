@@ -10,6 +10,7 @@ import { MyIncidencesSection } from "./resident/MyIncidencesSection";
 import { OpenInitiativesSection } from "./resident/OpenInitiativesSection";
 import { PageHeading } from "./components";
 import type { NavIconName } from "../auth/navigation";
+import { useI18n } from "../i18n/I18nContext";
 
 function SectionPage({
   title,
@@ -22,12 +23,13 @@ function SectionPage({
   description: string;
   children: ReactNode;
 }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-6">
       <header>
         <PageHeading title={title} icon={icon} />
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-          {description}
+          {t(description)}
         </p>
       </header>
       {children}

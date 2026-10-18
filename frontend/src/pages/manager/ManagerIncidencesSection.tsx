@@ -14,6 +14,7 @@
 import { useCallback, useMemo, useState, type FormEvent } from "react";
 
 import { useAsync } from "../../hooks/useAsync";
+import { useI18n } from "../../i18n/I18nContext";
 import { maintenanceApi } from "../../services";
 import {
   INCIDENCE_STATUSES,
@@ -55,6 +56,7 @@ function ManagerIncidenceCard({
   incidence: Incidence;
   onChanged: () => void;
 }) {
+  const { language, t } = useI18n();
   const [comment, setComment] = useState("");
   const [posting, setPosting] = useState(false);
   const [advancing, setAdvancing] = useState(false);
@@ -112,16 +114,17 @@ function ManagerIncidenceCard({
           </p>
           <p className="text-sm text-slate-600 dark:text-slate-400">
             {incidence.unit_identifier}
-            {" · by "}
+            {" · "}
+            {t("by")}{" "}
             {incidence.created_by_email}
             {" · "}
-            {formatDateTime(incidence.created_at)}
+            {formatDateTime(incidence.created_at, language)}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span data-testid={`incidence-status-${incidence.id}`}>
             <StatusBadge
-              label={incidence.status}
+              label={t(incidence.status)}
               tone={statusTone(incidence.status)}
             />
           </span>
@@ -133,7 +136,7 @@ function ManagerIncidenceCard({
               data-testid={`advance-${incidence.id}`}
               className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
             >
-              {advancing ? "Saving…" : transitionLabel(next[0])}
+              {advancing ? t("Saving…") : t(transitionLabel(next[0]))}
             </button>
           )}
         </div>
@@ -145,11 +148,11 @@ function ManagerIncidenceCard({
 
       <div className="mt-4 border-t border-slate-200 pt-3 dark:border-slate-700">
         <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          Discussion ({incidence.comments.length})
+          {t("Discussion")} ({incidence.comments.length})
         </h4>
         {incidence.comments.length === 0 ? (
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            No comments yet.
+            {t("No comments yet.")}
           </p>
         ) : (
           <ul
@@ -162,7 +165,7 @@ function ManagerIncidenceCard({
                 className="rounded bg-slate-50 px-3 py-2 text-sm dark:bg-slate-900/40"
               >
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {entry.author_email} · {formatDateTime(entry.created_at)}
+                  {entry.author_email} · {formatDateTime(entry.created_at, language)}
                 </p>
                 <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300">
                   {entry.body}
@@ -175,8 +178,8 @@ function ManagerIncidenceCard({
         <form className="mt-3 flex gap-2" onSubmit={handleComment}>
           <input
             type="text"
-            aria-label={`Comment on ${incidence.title}`}
-            placeholder="Reply to the resident…"
+            aria-label={`${t("Comment on")} ${incidence.title}`}
+            placeholder={t("Reply to the resident…")}
             value={comment}
             onChange={(event) => setComment(event.target.value)}
             className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
@@ -186,7 +189,7 @@ function ManagerIncidenceCard({
             disabled={posting || comment.trim().length === 0}
             className="rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-300"
           >
-            {posting ? "Posting…" : "Reply"}
+            {posting ? t("Posting…") : t("Reply")}
           </button>
         </form>
         {error && (
@@ -200,6 +203,7 @@ function ManagerIncidenceCard({
 }
 
 export function ManagerIncidencesSection() {
+  const { t } = useI18n();
   const [filter, setFilter] = useState<IncidenceStatus | "all">("all");
 
   const loadIncidences = useCallback(
@@ -224,7 +228,7 @@ export function ManagerIncidencesSection() {
       <div
         className="mb-4 flex flex-wrap gap-2"
         role="group"
-        aria-label="Incidence status filter"
+        aria-label={t("Incidence status filter")}
       >
         {filters.map((option) => {
           const active = option === filter;
@@ -240,7 +244,7 @@ export function ManagerIncidencesSection() {
                   : "border-slate-300 text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
               }`}
             >
-              {option === "all" ? "All" : option}
+              {t(option === "all" ? "All" : option)}
             </button>
           );
         })}
@@ -251,7 +255,7 @@ export function ManagerIncidencesSection() {
         emptyMessage={
           filter === "all"
             ? "No incidences have been reported for your properties."
-            : `No incidences are ${filter}.`
+            : t("No incidences are {{status}}.", { status: t(filter) })
         }
         render={(rows) => (
           <ul className="flex flex-col gap-4" data-testid="incidence-list">
