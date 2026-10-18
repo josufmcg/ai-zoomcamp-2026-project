@@ -302,3 +302,17 @@ Because the context files and the reusable prompts are versioned with the code,
 a reviewer can replay the same delegation and check whether the model now
 produces the corrected result directly — which is the strongest available proof
 that the correction was real and durable.
+
+## 7. Browser tab icon
+
+**Prompt.** "Can you use the main icon as the browser tab icon, or create a very
+simple version of it?"
+
+**Context.** `frontend/src/components/Icons.tsx` defines the existing
+`BuildingMark`, and `frontend/index.html` is the Vite HTML entry point.
+
+**Result and review.** Added `frontend/public/favicon.svg` using the same
+building mark and EFINGES brand color, and linked it from the HTML head. The
+SVG was checked against the inline mark. The production build could not be
+verified in this environment: the installed Node.js is 14.19, below the
+frontend's declared minimum of 20.19.
