@@ -57,7 +57,8 @@ make up      # build the images, start every service, wait for health, print URL
 make seed    # create the demo administrator, manager, residents, and domain data
 ```
 
-Then open <http://127.0.0.1:3000> and sign in as `admin@efinges.demo`,
+Then open <http://127.0.0.1:3000> on the server and sign in as
+`admin@efinges.demo`,
 `manager@efinges.demo`, or `alice@efinges.demo` (password `efinges-demo-123`).
 The API docs are at <http://127.0.0.1:8000/docs> and Grafana at
 <http://127.0.0.1:3001>. See [Run the full stack with Docker
@@ -125,18 +126,41 @@ make down    # stop and remove the containers
 ```
 
 `make up` waits for every service health check before returning, so the stack
-is ready to use as soon as the command finishes.
+is ready to use as soon as the command finishes. The frontend and backend ports
+are published on all network interfaces, so other machines can connect using
+the server's hostname or IP address. PostgreSQL and observability ports remain
+bound to loopback.
 
 | Service | URL |
 | --- | --- |
-| Frontend | <http://127.0.0.1:3000> |
-| Backend | <http://127.0.0.1:8000> |
-| API docs (Swagger UI) | <http://127.0.0.1:8000/docs> |
+| Frontend (server) | <http://127.0.0.1:3000> |
+| Frontend (other machines) | `http://<server-hostname-or-IP>:3000` |
+| Backend (server) | <http://127.0.0.1:8000> |
+| Backend (other machines) | `http://<server-hostname-or-IP>:8000` |
+| API docs (Swagger UI) | <http://127.0.0.1:8000/docs> (on the server) |
 | Grafana | <http://127.0.0.1:3001> (`admin` / `admin`) |
 | Prometheus | <http://127.0.0.1:9090> |
 | Loki | <http://127.0.0.1:3100> |
 | Tempo | <http://127.0.0.1:3200> |
 | PostgreSQL | `postgresql://efinges:efinges@127.0.0.1:5432/efinges` |
+
+### Remote access
+
+For local-only use, the default `localhost` URLs work. From another computer,
+`localhost` refers to that computer, not the server. To access the stack
+remotely, copy `.env.example` to `.env` and set `SERVER_ADDRESS` below to the
+hostname or IP address clients use to reach the server:
+
+```dotenv
+VITE_API_URL=http://SERVER_ADDRESS:8000
+CORS_ALLOW_ORIGINS=http://SERVER_ADDRESS:3000
+```
+
+Replace `SERVER_ADDRESS` with the actual hostname or IP; it is a placeholder,
+not a literal value. Rebuild the frontend and restart the stack with `make up`
+after changing these values. Ensure the address resolves from client machines.
+Host firewall rules are not changed by these instructions; allow the frontend
+and backend ports there if access is blocked.
 
 ### Configuration
 
@@ -159,8 +183,8 @@ make up POSTGRES_PORT=5434   # use a different host port for PostgreSQL
 | `TEMPO_PORT` | `3200` | Host port for Tempo |
 | `GRAFANA_ADMIN_USER` | `admin` | Grafana admin username |
 | `GRAFANA_ADMIN_PASSWORD` | `admin` | Grafana admin password |
-| `VITE_API_URL` | `http://localhost:8000` | Backend URL baked into the frontend bundle at build time |
-| `CORS_ALLOW_ORIGINS` | `http://localhost:3000,http://127.0.0.1:3000` | Browser origins allowed to call the API |
+| `VITE_API_URL` | `http://localhost:8000` | Backend URL baked into the frontend bundle at build time; set to the server address for remote access |
+| `CORS_ALLOW_ORIGINS` | `http://localhost:3000,http://127.0.0.1:3000` | Browser origins allowed to call the API; add the remote frontend origin for remote access |
 | `SECRET_KEY` | `dev-only-secret-key-change-me-in-production` | Secret used to sign JWTs |
 | `EFINGES_SUBNET` | `10.215.25.0/24` | Docker Compose network subnet |
 | `EFINGES_TAG` | `local` | Image tag for the backend and frontend images |
@@ -171,7 +195,7 @@ requires rebuilding the frontend image:
 
 ```bash
 make down
-make up VITE_API_URL=http://localhost:9000
+make up VITE_API_URL=http://SERVER_ADDRESS:9000
 ```
 
 ### How the services fit together
@@ -185,8 +209,9 @@ make up VITE_API_URL=http://localhost:9000
   backend answers cross-origin requests from the origins listed in
   `CORS_ALLOW_ORIGINS`. Add a deployed frontend origin to that list or the
   browser will discard every API response.
-- All services publish their ports on `127.0.0.1` only and share the
-  `10.215.25.0/24` subnet.
+- The frontend and backend ports are published on all host interfaces;
+  PostgreSQL and observability ports remain bound to `127.0.0.1`. The services
+  share the `10.215.25.0/24` subnet.
 
 ### Observability
 

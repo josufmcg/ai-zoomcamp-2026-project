@@ -18,7 +18,7 @@ services:
       context: .
       dockerfile: Dockerfile.backend
     ports:
-      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     environment:
       # Point the backend at the postgres service on the compose network.
       DATABASE_URL: postgresql+psycopg://efinges:efinges@postgres:5432/efinges
@@ -50,7 +50,7 @@ services:
         # Browser-facing backend URL, baked into the bundle at build time.
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
     ports:
-      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
       backend:
         condition: service_healthy
